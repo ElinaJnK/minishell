@@ -1,5 +1,14 @@
 # MINISHELL
 
+## Etapes a realiser
+	1. 
+
+
+
+
+echo "Today is $(date)" || &&
+
+
 A forgotten love story
 
 ## Rules (by Doja playing in the background)

@@ -2,7 +2,18 @@ CC			= cc
 
 NAME		= minishell
 
-SOURCES =	main.c			\
+SOURCES_BUILTINS	=	helo.c		\
+
+SOURCES_ENV 		=	j.c			\
+
+SOURCES_EXEC		=				\
+
+SOURCES_PARSING 	=	abr.c		\
+						tokenize.c	\
+
+SOURCES_SHELL 		=	main.c		\
+
+SOURCES_UTILS 		=				\
 
 LIBFT		= libft
 
@@ -16,9 +27,14 @@ OBJ_DIR		= obj
 
 RM			= rm -f
 
-SRC	=	$(addprefix $(SRC_DIR)/,$(SOURCES))
-OBJS =	$(addprefix $(OBJ_DIR)/,$(SOURCES:.c=.o))
-
+OBJS_BUILTINS 	= $(addprefix $(OBJ_DIR)/builtins/,$(SOURCES_BUILTINS:.c=.o))
+OBJS_ENV 		= $(addprefix $(OBJ_DIR)/env/,$(SOURCES_ENV:.c=.o))
+OBJS_EXEC 		= $(addprefix $(OBJ_DIR)/exec/,$(SOURCES_EXEC:.c=.o))
+OBJS_PARSING 	= $(addprefix $(OBJ_DIR)/parsing/,$(SOURCES_PARSING:.c=.o))
+OBJS_SHELL 		= $(addprefix $(OBJ_DIR)/shell/,$(SOURCES_SHELL:.c=.o))
+OBJS_UTILS 		= $(addprefix $(OBJ_DIR)/utils/,$(SOURCES_UTILS:.c=.o))
+OBJS = $(OBJS_BUILTINS) $(OBJS_ENV) $(OBJS_EXEC) $(OBJS_PARSING) $(OBJS_SHELL) $(OBJS_UTILS)
+$(info $$SRC is [${OBJS}])
 all: lib obj $(NAME)
 
 lib:
@@ -30,7 +46,7 @@ obj:
 $(NAME): $(OBJS)
 	$(CC) $(OBJS) -L $(LIBFT) -lreadline -lft -o $(NAME)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INCLUDE)/minishell.h Makefile
+$(OBJ_DIR)/*/%.o: $(SRC_DIR)/*/%.c $(INCLUDE)/minishell.h Makefile
 	$(CC) $(CFLAGS) -I $(INCLUDE) -c $< -o $@
 
 bonus: $(NAME)
