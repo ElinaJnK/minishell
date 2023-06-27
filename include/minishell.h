@@ -6,33 +6,41 @@
 # include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 #include "../libft/libft.h"
-
-/*----types token----*/
-/*
-	- 0 : &&
-	- 1 : ||
-	- 2 : >
-	- 3 : *
-*/
+#include <signal.h>
 
 typedef struct s_token
 {
-	char			*token;
+	char			*content;
 	int				type;
-	struct t_token	*next;
+	struct s_token	*next;
 }		t_token;
 
 typedef struct s_abr
 {
 	char			*str;
-	struct t_abr	*g;
-	struct t_abr	*d;
+	struct s_abr	*g;
+	struct s_abr	*d;
 }		t_abr;
+
+typedef struct	s_sig
+{
+	int				ctrlc;
+	int				ctrld;
+	int				exit_status;
+	pid_t			pid;
+}		t_sig;
+
 
 /*----abr----*/
 t_abr	*create_abr(char *expr, int start, int end);
 
 /*----parsing functions----*/
 void	read_stdin(char *limiter);
+
+/*----utils----*/
+void	generate_pipes(int *pipe_fds, int num_pipes);
+void	close_pipes(int *pipe_fds, int num_pipes);
 #endif

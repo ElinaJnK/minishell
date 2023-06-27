@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_substr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: karimasadykova <karimasadykova@student.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/19 18:44:53 by ksadykov          #+#    #+#             */
-/*   Updated: 2022/11/19 18:44:57 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/06/25 17:13:43 by karimasadyk      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
