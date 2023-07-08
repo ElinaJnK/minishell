@@ -328,6 +328,18 @@ int main() {
 - strerror/perror : send the string associated to an error message. perror will transform error codes into readable error messages
 - isatty
 
+## 3.1.1 Shell Operation
+
+The following is a brief description of the shell’s operation when it reads and executes a command. Basically, the shell does the following:
+
+1. Reads its input from a file (see Shell Scripts), from a string supplied as an argument to the -c invocation option (see Invoking Bash), or from the user’s terminal.
+2. Breaks the input into words and operators, obeying the quoting rules described in Quoting. These tokens are separated by metacharacters. Alias expansion is performed by this step (see Aliases).
+3. Parses the tokens into simple and compound commands (see Shell Commands).
+4. Performs the various shell expansions (see Shell Expansions), breaking the expanded tokens into lists of filenames (see Filename Expansion) and commands and arguments.
+5. Performs any necessary redirections (see Redirections) and removes the redirection operators and their operands from the argument list.
+6. Executes the command (see Executing Commands).
+7. Optionally waits for the command to complete and collects its exit status (see Exit Status).
+
 ## Notes
 ($?) Expands to the exit status of the most recently executed foreground pipeline.
 
@@ -410,7 +422,9 @@ Redirection of output in this fashion causes the file whose name results from th
 
 The general format for appending output is:
 
+```sh
 [n]>>word
+```
 
 ### 3.6.6 Here Documents
 
@@ -418,10 +432,11 @@ This type of redirection instructs the shell to read input from the current sour
 
 The format of here-documents is:
 
+```sh
 [n]<<[-]word
         here-document
 delimiter
-
+```
 
 ```sh
 No parameter and variable expansion, command substitution, arithmetic expansion, or filename expansion is performed on word. If any part of word is quoted, the delimiter is the result of quote removal on word, and the lines in the here-document are not expanded. If word is unquoted, all lines of the here-document are subjected to parameter expansion, command substitution, and arithmetic expansion, the character sequence \newline is ignored, and ‘\’ must be used to quote the characters ‘\’, ‘$’, and ‘`’.

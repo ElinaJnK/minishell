@@ -1,31 +1,47 @@
-#include "../../minishell.h"
+#include "minishell.h"
 
-int	is_op(char *line, int i)
+int	get_type(char *tok)
 {
-	if (ft_strncmp(line + i, "&&", 2) == 0)
-		return (1);
-	else if (ft_strncmp(line + i, "||", 2) == 0)
-		return (2);
-	else if (ft_strncmp(line + i, "|", 1) == 0)
-		return (3);
-	else if (ft_strncmp(line + i, ">", 1) == 0)
-		return (4);
-	else if (ft_strncmp(line + i, "<", 1) == 0)
-		return (5);
-	else if (ft_strncmp(line + i, ">>", 2) == 0)
-		return (6);
-	else if (ft_strncmp(line + i, "<<", 2) == 0)
-		return (7);
-	else
+	int	op;
+	int	meta;
+
+	if (!tok)
 		return (0);
+	op = is_op(tok);
+	meta = is_fb(tok);
+	if (op)
+		return (op);
+	if (meta)
+		return (meta);
+	return (0);
 }
 
-int	is_sep(char *line, int i)
+int	is_op(char *line)
 {
-	if (ft_strncmp(line + i, " ", 1) != 0 && ft_strncmp(line + i, "\n", 1) != 0
-		&& ft_strncmp(line + i, "\t", 1) != 0)
-		return (0);
-	return (1);
+	if (ft_strncmp(line, "&&", 2) == 0)
+		return (1);
+	else if (ft_strncmp(line, "||", 2) == 0)
+		return (2);
+	return (0);
+}
+
+int	is_fb(char *line)
+{
+	if (ft_strncmp(line, "|", 1) == 0)
+		return (3);
+	else if (ft_strncmp(line, ">", 1) == 0)
+		return (4);
+	else if (ft_strncmp(line, "<", 1) == 0)
+		return (5);
+	else if (ft_strncmp(line, ">>", 2) == 0)
+		return (6);
+	else if (ft_strncmp(line, "<<", 2) == 0)
+		return (7);
+	else if (ft_strncmp(line, "(", 1) == 0)
+		return (8);
+	else if (ft_strncmp(line, ")", 1) == 0)
+		return (9);
+	return (0);
 }
 
 void	add_back_tok(t_token **lst_tok, t_token *new)
@@ -33,8 +49,8 @@ void	add_back_tok(t_token **lst_tok, t_token *new)
 	t_token	*tmp;
 
 	if (!lst_tok)
-		add_back_tok("lst_tok is NULL");
-	if (!*lst_tok)
+		failure("lst_tok is NULL");
+	if (*lst_tok == NULL)
 	{
 		*lst_tok = new;
 		return ;
@@ -56,4 +72,19 @@ t_token	*new_token(char *content, int type)
 	tok->type = type;
 	tok->next = NULL;
 	return (tok);
+}
+
+void	free_lst_tok(t_token **lst_tok)
+{
+	t_token	*tmp;
+
+	if (!lst_tok)
+		return ;
+	while (*lst_tok)
+	{
+		tmp = (*lst_tok)->next;
+		free((*lst_tok)->content);
+		free(*lst_tok);
+		*lst_tok = tmp;
+	}
 }

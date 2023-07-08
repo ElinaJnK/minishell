@@ -11,6 +11,16 @@
 #include "../libft/libft.h"
 #include <signal.h>
 
+/*
+- 0 : (
+- 1 : )
+- 2 : &&
+- 3 : ||
+- 4 : cmd
+- 5 : arg (ou p-e mettre cmd + arg ensemble)
+- 6 : <
+- 7 : >
+*/
 typedef struct s_token
 {
 	char			*content;
@@ -34,8 +44,7 @@ typedef struct	s_sig
 }		t_sig;
 
 
-/*----abr----*/
-t_abr	*create_abr(char *expr, int start, int end);
+void	failure(const char *message);
 
 /*----parsing functions----*/
 void	read_stdin(char *limiter);
@@ -43,4 +52,13 @@ void	read_stdin(char *limiter);
 /*----utils----*/
 void	generate_pipes(int *pipe_fds, int num_pipes);
 void	close_pipes(int *pipe_fds, int num_pipes);
+void	add_back_tok(t_token **lst_tok, t_token *new);
+int		is_op(char *line);
+int		is_fb(char *line);
+int		get_type(char *tok);
+t_token	*new_token(char *content, int type);
+void	free_lst_tok(t_token **lst_tok);
+
+/*----signal----*/
+void	catch_the_signal(int *pipe_fds);
 #endif

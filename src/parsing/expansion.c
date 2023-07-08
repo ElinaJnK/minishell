@@ -1,4 +1,4 @@
-#include "../../minishell.h"
+#include "minishell.h"
 
 char	*insert_into_line(char *line, char *var, int start, int end)
 {
