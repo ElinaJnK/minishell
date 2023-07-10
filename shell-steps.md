@@ -137,21 +137,40 @@ On a donc:
 # if we take this structure:
 typedef struct s_cmd
 {
-	char			*content;
+	t_token			*lst_tok;
+	t_cmd			*lst_com;
 	int				type;
-	struct s_token	*next;
+	struct s_cmd	*next;
+}		t_cmd;
+typedef struct s_cmd
+{
+	t_token			*content;
+	int				type;
+	struct s_cmd	*left;
+	struct s_cmd	*right;
 }		t_cmd;
 > [echo nana, cmd] -> [&&, meta] -> [(cd dossier || echo yum), cmpound_cmd]
 ```
 
 ```sh
 > (1 && 2) || ((3 || 4 || 5) && (6 && 7)) && 8
-> [1, &&, 2] -> [||] -> [ [3, ||, 4, ||, 5] -> [&&] -> [6, &&, 7] ]
+> [1, &&, 2] -> [||] -> [ [3, ||, 4, ||, 5] -> [&&] -> [6, &&, 7] ] -> [&&] -> [8]
 ```
+			 ||
+		/			\
+	1 && 2				&&
+					/		\
+				&&			8
+			/		\
+	3 || 4 || 5		6 && 7
+
 On peut eventuellement envisager ça pour les types:
 - 0 : simple command
 - 1 : compound command
 - 2 : metacaracter
+
+control operator
+A token that performs a control function. It is a newline or one of the following: ‘||’, ‘&&’, ‘&’, ‘;’, ‘;;’, ‘;&’, ‘;;&’, ‘|’, ‘|&’, ‘(’, or ‘)’.
 
 Et le tralala que Karimo a déjà fait
 Attention, quand on lancera l'appel pour le subshell dans l'étape du dessus, il faudra faire ça aussi ! (i think)

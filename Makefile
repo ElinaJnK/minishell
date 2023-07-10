@@ -9,10 +9,12 @@ NAME		= minishell
 # SOURCES_EXEC		=				\
 
 SOURCES_PARSING 	=	tokenize.c	\
+						grouping.c	\
 
 SOURCES_SHELL 		=	main.c		\
 
 SOURCES_UTILS 		=	token.c		\
+						group.c		\
 
 LIBFT		= libft
 

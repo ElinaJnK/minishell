@@ -28,12 +28,13 @@ typedef struct s_token
 	struct s_token	*next;
 }		t_token;
 
-typedef struct s_abr
+typedef struct s_ast
 {
-	char			*str;
-	struct s_abr	*g;
-	struct s_abr	*d;
-}		t_abr;
+	t_token			*tok;
+	int				type;
+	struct s_ast	*left;
+	struct s_ast	*right;
+}		t_ast;
 
 typedef struct	s_sig
 {
@@ -48,6 +49,13 @@ void	failure(const char *message);
 
 /*----parsing functions----*/
 void	read_stdin(char *limiter);
+t_token	*tokenize(char *line);
+
+
+/*----ast tree----*/
+void	free_ast(t_ast *a);
+t_ast	*new_node(t_token *tok);
+void	failure_group(const char *message, t_ast *ast);
 
 /*----utils----*/
 void	generate_pipes(int *pipe_fds, int num_pipes);

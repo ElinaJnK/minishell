@@ -114,28 +114,30 @@ t_token	*tokenize(char *line)
 }
 
 /*--------------------------------TEST-------------------------------------*/
-void	print_list_tok(t_token *lst_tok)
-{
-	t_token	*temp;
+// void	print_list_tok(t_token *lst_tok)
+// {
+// 	t_token	*temp;
 
-	temp = lst_tok;
-	while (temp)
-	{
-		printf("[%s, %d]->", temp->content, temp->type);
-		temp = temp->next;
-	}
-	printf("\n");
-}
+// 	temp = lst_tok;
+// 	while (temp)
+// 	{
+// 		// printf("[%s, %d]->", temp->content, temp->type);
+// 		printf("[%s]->", temp->content);
+// 		temp = temp->next;
+// 	}
+// 	printf("\n");
+// }
 
-int	main(void)
-{
-	t_token	*lst_tok;
+// int	main(void)
+// {
+// 	t_token	*lst_tok;
 
-	// lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
-	//lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
-	lst_tok = tokenize("((wsh)) && cd dossier||echo he'l'lo");
-	printf("Testing 1 2 1 2, the mic is on\n");
-	print_list_tok(lst_tok);
-	return (0);
-}
+// 	// lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
+// 	//lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
+// 	lst_tok = tokenize("(((echo bye)) && cd dossier||echo he'l'lo ) | cat -e");	
+// 	// ( smpl_cmd && smpl_cmd || smpl_cmd ) | smpl_cmd
+// 	printf("Testing 1 2 1 2, the mic is on\n");
+// 	print_list_tok(lst_tok);
+// 	return (0);
+// }
 /*--------------------------------------------------------------------------*/
