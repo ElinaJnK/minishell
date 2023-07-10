@@ -110,7 +110,8 @@ t_token	*tokenize(char *line)
 		if (line[i] != '\0' && !is_op(line + i) && !is_fb(line + i))
 			i++;
 	}
-	return (add_rest(&lst_tok, tok, q_flag), lst_tok);
+	add_rest(&lst_tok, tok, q_flag);
+	return (check_tok(lst_tok), lst_tok);
 }
 
 /*--------------------------------TEST-------------------------------------*/

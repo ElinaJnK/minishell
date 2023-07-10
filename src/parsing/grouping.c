@@ -1,5 +1,19 @@
 #include "minishell.h"
 
+void	print_list_tok(t_token *lst_tok)
+{
+	t_token	*temp;
+
+	temp = lst_tok;
+	while (temp)
+	{
+		//printf("[%s, %d]->", temp->content, temp->type);
+		printf("[%s]->", temp->content);
+		temp = temp->next;
+	}
+	printf("\n");
+}
+
 t_token	*cut(t_token *lst_tok, int s, int e)
 {
 	t_token	*cut;
@@ -16,6 +30,8 @@ t_token	*cut(t_token *lst_tok, int s, int e)
 		add_back_tok(&cut, new_token(tmp->content, tmp->type));
 		tmp = tmp->next;
 	}
+	printf("WTF HAPPENING HERE in cut :\n");
+	print_list_tok(cut);
 	return (cut);
 }
 
@@ -51,29 +67,31 @@ t_ast	*create_ast(t_token *lst_tok)
 
 	while (d && i <= e)
 	{
-		if (d->type == 8) // Opening parenthesis
+		printf("here f\n");
+		if (d->type == 8)
 		{
 			if (p == 0)
-				s = i + 1; // Start of the subexpression
+				s = i + 1;
 			p++;
 		}
-		else if (d->type == 9) // Closing parenthesis
+		else if (d->type == 9)
 		{
 			p--;
 			if (p == 0)
 			{
-				// Create a new AST node for the subexpression
-				r = new_node(d);
-				
-				r->left = create_ast(cut(lst_tok, s, i - 1));
-				r->right = create_ast(cut(lst_tok, i + 1, e));
+				printf("fff\n");
+				r = new_node(cut(d, s, s + 1));
+				printf("i : %d s : % d e : %d \n", i, s, e);
+				r->left = create_ast(cut(lst_tok, s, i));
+				printf("i : %d e : %d \n", i, e);
+				r->right = create_ast(cut(lst_tok, i + 2, e));
 				break;
 			}
 		}
 		else if (p == 0 && (d->type == 1 || d->type == 2)) // Operator
 		{
-			r = new_node(d);
-			r->left = create_ast(cut(lst_tok, s, i - 1));
+			r = new_node(cut(d, s, s + 1));
+			r->left = create_ast(cut(lst_tok, s, i));
 			r->right = create_ast(cut(lst_tok, i + 1, e));
 			break;
 		}
@@ -84,26 +102,13 @@ t_ast	*create_ast(t_token *lst_tok)
 
 	if (r == NULL)
 	{
+		printf("here\n");
 		r = new_node(lst_tok);
 		r->left = NULL;
 		r->right = NULL;
 	}
 
 	return r;
-}
-
-void	print_list_tok(t_token *lst_tok)
-{
-	t_token	*temp;
-
-	temp = lst_tok;
-	while (temp)
-	{
-		//printf("[%s, %d]->", temp->content, temp->type);
-		printf("[%s]->", temp->content);
-		temp = temp->next;
-	}
-	printf("\n");
 }
 
 void	print_ast(t_ast *root)
@@ -116,6 +121,30 @@ void	print_ast(t_ast *root)
 	print_ast(root->right);
 }
 
+void print_ast_tree(t_ast* root, int level) {
+    if (root == NULL) {
+        return;
+    }
+
+    // Print right subtree
+    print_ast_tree(root->right, level + 1);
+
+    // Print indentation based on the level
+    for (int i = 0; i < level; i++) {
+        printf("   ");
+    }
+
+    // Print node value
+    printf("|__");
+    print_list_tok(root->tok);
+    printf("\n");
+
+    // Print left subtree
+    print_ast_tree(root->left, level + 1);
+}
+
+
+
 int	main(void)
 {
 	t_ast	*a;
@@ -123,9 +152,12 @@ int	main(void)
 
 	// lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
 	//lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
-	lst_tok = tokenize("((echo bye) && cd dossier||echo he'l'lo ) || cat -e");
+	//lst_tok = tokenize("((echo bye) && cd dossier||echo he'l'lo )| cat -e");
+	lst_tok = tokenize("<   ");
+	printf("lst_tok type : %d\n", lst_tok->type);
 	print_list_tok(lst_tok);
 	a = create_ast(lst_tok);
+	print_ast_tree(a, 5);
 	print_ast(a);
 	free_lst_tok(&lst_tok);
 	free_ast(a);

@@ -44,13 +44,12 @@ typedef struct	s_sig
 	pid_t			pid;
 }		t_sig;
 
-
-void	failure(const char *message);
-
 /*----parsing functions----*/
 void	read_stdin(char *limiter);
 t_token	*tokenize(char *line);
-
+void	check_tok(t_token *lst_tok);
+void	failure(const char *message);
+void	failure_parse(const char *message, t_token *lst_tok);
 
 /*----ast tree----*/
 void	free_ast(t_ast *a);

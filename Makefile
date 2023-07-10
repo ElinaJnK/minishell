@@ -10,6 +10,7 @@ NAME		= minishell
 
 SOURCES_PARSING 	=	tokenize.c	\
 						grouping.c	\
+						tcheck.c	\
 
 SOURCES_SHELL 		=	main.c		\
 
@@ -37,19 +38,25 @@ OBJS_UTILS 		= $(addprefix $(OBJ_DIR)/utils/,$(SOURCES_UTILS:.c=.o))
 # OBJS = $(OBJS_BUILTINS) $(OBJS_ENV) $(OBJS_EXEC) $(OBJS_PARSING) $(OBJS_SHELL) $(OBJS_UTILS)
 OBJS = $(OBJS_PARSING) $(OBJS_SHELL) $(OBJS_UTILS)
 $(info $$SRC is [${OBJS}])
-all: lib obj $(NAME)
+all: lib $(NAME)
 
 lib:
 	@make -C $(LIBFT)
-
-obj:
-	mkdir -p $(OBJ_DIR)
 
 $(NAME): $(OBJS)
 	$(CC) $(OBJS) -L $(LIBFT) -lreadline -lft -o $(NAME)
 
 $(OBJ_DIR)/*/%.o: $(SRC_DIR)/*/%.c $(INCLUDE)/minishell.h Makefile
 	$(CC) $(CFLAGS) -I $(INCLUDE) -c $< -o $@
+
+$(OBJ_DIR)/parsing:
+	mkdir -p $(OBJ_DIR)/parsing
+
+$(OBJ_DIR)/shell:
+	mkdir -p $(OBJ_DIR)/shell
+
+$(OBJ_DIR)/utils:
+	mkdir -p $(OBJ_DIR)/utils
 
 bonus: $(NAME)
 
