@@ -14,7 +14,7 @@ void	print_list_tok(t_token *lst_tok)
 	printf("\n");
 }
 
-t_token	*cut(t_token *lst_tok, int s, int e)
+t_token	*lst_cut(t_token *lst_tok, int s, int e)
 {
 	t_token	*cut;
 	t_token	*tmp;
@@ -65,7 +65,7 @@ t_ast	*create_ast(t_token *lst_tok)
 	int e = lstsize(lst_tok);
 	int i = s;
 
-	while (d && i <= e)
+	while (d && i < e)
 	{
 		printf("here f\n");
 		if (d->type == 8)
@@ -80,19 +80,19 @@ t_ast	*create_ast(t_token *lst_tok)
 			if (p == 0)
 			{
 				printf("fff\n");
-				r = new_node(cut(d, s, s + 1));
+				r = new_node(lst_cut(d, s, s + 1));
 				printf("i : %d s : % d e : %d \n", i, s, e);
-				r->left = create_ast(cut(lst_tok, s, i));
+				r->left = create_ast(lst_cut(lst_tok, s, i));
 				printf("i : %d e : %d \n", i, e);
-				r->right = create_ast(cut(lst_tok, i + 2, e));
+				r->right = create_ast(lst_cut(lst_tok, i + 2, e));
 				break;
 			}
 		}
 		else if (p == 0 && (d->type == 1 || d->type == 2)) // Operator
 		{
-			r = new_node(cut(d, s, s + 1));
-			r->left = create_ast(cut(lst_tok, s, i));
-			r->right = create_ast(cut(lst_tok, i + 1, e));
+			r = new_node(lst_cut(d, s, s + 1));
+			r->left = create_ast(lst_cut(lst_tok, s, i));
+			r->right = create_ast(lst_cut(lst_tok, i + 1, e));
 			break;
 		}
 
@@ -108,58 +108,62 @@ t_ast	*create_ast(t_token *lst_tok)
 		r->right = NULL;
 	}
 
-	return r;
+	return (r);
 }
 
-void	print_ast(t_ast *root)
+void	print_ast(t_ast *root, char c)
 {
 	if (root == NULL)
 		return ;
 
-	print_ast(root->left);
+	print_ast(root->left, c + 1);
+	printf("%c", c);
 	print_list_tok(root->tok);
-	print_ast(root->right);
+	print_ast(root->right, c + 1);
 }
 
-void print_ast_tree(t_ast* root, int level) {
-    if (root == NULL) {
-        return;
-    }
-
-    // Print right subtree
-    print_ast_tree(root->right, level + 1);
-
-    // Print indentation based on the level
-    for (int i = 0; i < level; i++) {
-        printf("   ");
-    }
-
-    // Print node value
-    printf("|__");
-    print_list_tok(root->tok);
-    printf("\n");
-
-    // Print left subtree
-    print_ast_tree(root->left, level + 1);
-}
-
-
-
-int	main(void)
+void	print_ast_tree(t_ast* root, int level)
 {
-	t_ast	*a;
-	t_token	*lst_tok;
+	if (root == NULL)
+	{
+		return ;
+	}
 
-	// lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
-	//lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
-	//lst_tok = tokenize("((echo bye) && cd dossier||echo he'l'lo )| cat -e");
-	lst_tok = tokenize("<   ");
-	printf("lst_tok type : %d\n", lst_tok->type);
-	print_list_tok(lst_tok);
-	a = create_ast(lst_tok);
-	print_ast_tree(a, 5);
-	print_ast(a);
-	free_lst_tok(&lst_tok);
-	free_ast(a);
-	return (0);
+	// Print right subtree
+	print_ast_tree(root->right, level + 1);
+
+	// Print indentation based on the level
+	for (int i = 0; i < level; i++) {
+		printf("   ");
+	}
+
+	// Print node value
+	printf("|__");
+	print_list_tok(root->tok);
+	printf("\n");
+
+	// Print left subtree
+	print_ast_tree(root->left, level + 1);
 }
+
+
+
+// int	main(void)
+// {
+// 	t_ast	*a;
+// 	t_token	*lst_tok;
+
+// 	// lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
+// 	//lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
+// 	//lst_tok = tokenize("((echo bye) && cd dossier||echo he'l'lo )| cat -e");
+// 	//lst_tok = tokenize("echo hello && echo world || echo hello 2world");
+// 	lst_tok = tokenize("a&&b||c");
+// 	printf("lst_tok type : %d\n", lst_tok->type);
+// 	print_list_tok(lst_tok);
+// 	a = create_ast(lst_tok);
+// 	print_ast_tree(a, 5);
+// 	print_ast(a, 'A');
+// 	free_lst_tok(&lst_tok);
+// 	free_ast(a);
+// 	return (0);
+// }

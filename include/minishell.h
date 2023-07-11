@@ -44,6 +44,8 @@ typedef struct	s_sig
 	pid_t			pid;
 }		t_sig;
 
+void	print_list_tok(t_token *lst_tok);
+
 /*----parsing functions----*/
 void	read_stdin(char *limiter);
 t_token	*tokenize(char *line);
