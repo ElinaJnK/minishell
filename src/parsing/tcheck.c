@@ -11,17 +11,17 @@ void	check_tok(t_token *lst_tok)
 		failure_parse("tcheque error", lst_tok);
 	while (tmp && tmp->next)
 	{
-		if (tmp->type == 8)
+		if (tmp->type == OPEN_PAR)
 			p++;
-		if (tmp->type == 9)
+		if (tmp->type == CLOSE_PAR)
 			p--;
-		if ((tmp->next->type == 8 && tmp->type == 0)
-			|| (tmp->type == 9 && tmp->next->type == 0))
-			failure_parse("tcheque error", lst_tok);
-		if (((tmp->type == 1 || tmp->type == 2) && tmp->next->type != 0
-				&& tmp->next->type != 8 && tmp->next->type != 9)
-			|| (tmp->type != 0 && tmp->type != 8 && tmp->type != 9
-				&& (tmp->next->type == 1 || tmp->next->type == 2)))
+		if ((tmp->next->type == OPEN_PAR && tmp->type == CMD)
+			|| (tmp->type == CLOSE_PAR && tmp->next->type == CMD)
+			|| ((tmp->type == AND || tmp->type == OR) && tmp->next->type != CMD
+				&& tmp->next->type != OPEN_PAR && tmp->next->type != CLOSE_PAR)
+			|| ((tmp->type != CMD && tmp->type != EXPAND)
+				&& tmp->type != OPEN_PAR && tmp->type != CLOSE_PAR
+				&& (tmp->next->type == AND || tmp->next->type == OR)))
 			failure_parse("tcheque error", lst_tok);
 		tmp = tmp->next;
 	}

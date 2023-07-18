@@ -9,8 +9,9 @@ NAME		= minishell
 # SOURCES_EXEC		=				\
 
 SOURCES_PARSING 	=	tokenize.c	\
-						grouping.c	\
+						ast.c		\
 						tcheck.c	\
+						in_utils.c	\
 
 SOURCES_SHELL 		=	main.c		\
 
