@@ -178,33 +178,36 @@ void printAST(t_ast* root) {
     printASTHelper(root, 0, 0);
 }
 
-int main() {
-	//char command[] = "cmd1 || ( cmd2 && ( cmd3 || cmd4 ) )";
-	// char command[] = "( 1 && 2 ) || ( ( 3 || 4 || 5 ) && ( 6 || 7 ) ) && 8";
-	//char command[] = "( cmd3 || cmd4 ) && cmd5";
-	//char command[] = "cmd1 || ( cmd3 || cmd4 ) && cmd5";
-	//char command[] = "( cmd3 || cmd4 ) | cmd5";
-	//char command[] = "cmd1 > e && cmd2 && cmd3 > d > f3";
-	char command[] = "echo a > fichier1 && echo c && echo rawr > fichier2 > fichier3";
-	int count;
-	t_token *t = tokenize(command);
-	t_cmd *tokens = transform_into_tab(t, &count);
-	int i = 0;
-	while(tokens && i < count)
-	{
-		printf("%s\n", tokens[i].content);
-		i++;
-	}
-	printf("count: %d\n", count);
-	t_ast* root = build_ast(tokens, 0, count - 1);
-	printAST(root);
-	printf("\n");
+// int main(int argc, char **argv, char **env) {
+// 	//char command[] = "cmd1 || ( cmd2 && ( cmd3 || cmd4 ) )";
+// 	// char command[] = "( 1 && 2 ) || ( ( 3 || 4 || 5 ) && ( 6 || 7 ) ) && 8";
+// 	//char command[] = "( cmd3 || cmd4 ) && cmd5";
+// 	//char command[] = "cmd1 || ( cmd3 || cmd4 ) && cmd5";
+// 	//char command[] = "( cmd3 || cmd4 ) | cmd5";
+// 	//char command[] = "cmd1 > e && cmd2 && cmd3 > d > f3";
+// 	(void)argc;
+// 	(void)argv;
+// 	printf("%s\n", env[0]);
+// 	char command[] = "echo a > fichier1 && echo c && echo rawr > fichier2 > fichier3";
+// 	int count;
+// 	t_token *t = tokenize(command);
+// 	t_cmd *tokens = transform_into_tab(t, &count);
+// 	int i = 0;
+// 	while(tokens && i < count)
+// 	{
+// 		printf("%s\n", tokens[i].content);
+// 		i++;
+// 	}
+// 	printf("count: %d\n", count);
+// 	t_ast* root = build_ast(tokens, 0, count - 1);
+// 	printAST(root);
+// 	printf("\n");
 
-	// Cleanup: Free the memory of the AST and tokens
-	free_ast(root);
-	i = 0;
-	while (i < count)
-		free(tokens[i++].content);
-	free(tokens);
-	return 0;
-}
+// 	// Cleanup: Free the memory of the AST and tokens
+// 	free_ast(root);
+// 	i = 0;
+// 	while (i < count)
+// 		free(tokens[i++].content);
+// 	free(tokens);
+// 	return 0;
+// }

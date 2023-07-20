@@ -12,10 +12,12 @@ SOURCES_PARSING 	=	tokenize.c	\
 						ast.c		\
 						tcheck.c	\
 						in_utils.c	\
+						spy_env.c	\
 
 SOURCES_SHELL 		=	main.c		\
 
 SOURCES_UTILS 		=	token.c		\
+						env.c		\
 						group.c		\
 
 LIBFT		= libft

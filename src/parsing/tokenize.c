@@ -157,21 +157,23 @@ void print_list_tok(t_token *lst_tok)
 		printf("[%s, %d]->", temp->content, temp->type);
 		// printf("[%s]->", temp->content);
 		temp = temp->next;
+		printf("\n");
 	}
 	printf("\n");
 }
 
-// int	main(void)
-// {
-// 	t_token	*lst_tok;
+int	main(void)
+{
+	t_token	*lst_tok;
 
-// 	// lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
-// 	//lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
-// 	//lst_tok = tokenize("(((echo '$bye')) && cd dossier||echo $user ) | cat -e");	
-// 	// ( smpl_cmd && smpl_cmd || smpl_cmd ) | smpl_cmd
-// 	lst_tok = tokenize("(echo '$bye' && echo $nym || echo $user ) | cat -e");
-// 	// lst_tok = tokenize("echo hello is $USER");
-// 	printf("Testing 1 2 1 2, the mic is on\n");
-// 	print_list_tok(lst_tok);
-// 	return (0);
-// }
+	// lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
+	//lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
+	//lst_tok = tokenize("(((echo '$bye')) && cd dossier||echo $user ) | cat -e");	
+	// ( smpl_cmd && smpl_cmd || smpl_cmd ) | smpl_cmd
+	//lst_tok = tokenize("(echo '$bye' && echo $nym || echo $user ) | cat -e");
+	lst_tok = tokenize("echo '$user'$USER");
+	// lst_tok = tokenize("echo hello is $USER");
+	printf("Testing 1 2 1 2, the mic is on\n");
+	print_list_tok(lst_tok);
+	return (0);
+}

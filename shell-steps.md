@@ -188,6 +188,9 @@ Ici on fait nos petits dup2 j'imagine, on prend les piti fichier et on remplace 
 - Executes the command (see Executing Commands).
 Optionally waits for the command to complete and collects its exit status (see Exit Status).
 
+- dans export, verifier que chaque variable qu'on rajoute respecte la specification posix:
+environment variable names must consist solely of uppercase letters, digits, and underscores (_), and they must not start with a digit.
+
 EXECVE OH OUI ENFIN AH OUI OUI OUI OUI OUI
 
 puis on gère les signaux <3

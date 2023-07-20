@@ -49,6 +49,13 @@ typedef struct s_ast
 	struct s_ast	*right;
 } t_ast;
 
+typedef struct s_env
+{
+	char			*name;
+	char			*value;
+	struct s_env	*next;
+} t_env;
+
 typedef struct s_sig
 {
 	int ctrlc;
@@ -81,6 +88,11 @@ int is_fb(char *line);
 int get_type(char *tok);
 t_token *new_token(char *content, int type);
 void free_lst_tok(t_token **lst_tok);
+
+/*----env----*/
+void	add_back_env(t_env **lst_env, t_env *new);
+t_env	*new_env(char *name, char *value);
+void	free_lst_env(t_env **lst_env);
 
 /*----signal----*/
 void catch_the_signal(int *pipe_fds);
