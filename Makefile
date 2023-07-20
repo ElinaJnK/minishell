@@ -12,6 +12,7 @@ SOURCES_PARSING 	=	tokenize.c	\
 						ast.c		\
 						tcheck.c	\
 						in_utils.c	\
+						expansion.c	\
 						spy_env.c	\
 
 SOURCES_SHELL 		=	main.c		\

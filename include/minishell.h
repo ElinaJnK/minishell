@@ -69,7 +69,7 @@ t_cmd	*transform_into_tab(t_token *t, int *count);
 
 /*----parsing functions----*/
 void read_stdin(char *limiter);
-t_token *tokenize(char *line);
+t_token	*tokenize(char *line, t_env *lst_env);
 void check_tok(t_token *lst_tok);
 void failure(const char *message);
 void failure_parse(const char *message, t_token *lst_tok);
@@ -78,6 +78,9 @@ void failure_parse(const char *message, t_token *lst_tok);
 void free_ast(t_ast *a);
 t_ast *new_node(t_token *tok);
 void failure_group(const char *message, t_ast *ast);
+
+/*---expansion---*/
+char	*expansion(char *line, int *i, t_env *env);
 
 /*----utils----*/
 void generate_pipes(int *pipe_fds, int num_pipes);
@@ -91,6 +94,7 @@ void free_lst_tok(t_token **lst_tok);
 
 /*----env----*/
 void	add_back_env(t_env **lst_env, t_env *new);
+t_env	*spy_env(char **env);
 t_env	*new_env(char *name, char *value);
 void	free_lst_env(t_env **lst_env);
 

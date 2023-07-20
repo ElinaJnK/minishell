@@ -195,3 +195,5 @@ EXECVE OH OUI ENFIN AH OUI OUI OUI OUI OUI
 
 puis on gère les signaux <3
 
+env erreur quand 2eme =  
+

@@ -26,7 +26,10 @@ t_env	*spy_env(char **env)
 	{
 		elem = ft_split(env[i], '=');
 		if (elem[2])
+		{
+			printf("elem[2] : %s\n", elem[2]);
 			return (failure_env("env variable has > 1 \' = \' character ", elem), NULL);
+		}
 		add_back_env(&lst_env, new_env(elem[0], elem[1]));
 		i++;
 	}

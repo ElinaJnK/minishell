@@ -26,7 +26,7 @@ char	*ft_addchr(char *s1, char c, t_token *lst_tok)
 	return (join);
 }
 
-int	expansion(char *line)
+int	is_expansion(char *line)
 {
 	int	i;
 
@@ -42,7 +42,7 @@ int	expansion(char *line)
 
 void	update_tok(char *line, t_token **tok, int *q_flag, t_token *lst_tok)
 {
-	if (*q_flag != 1 && expansion((*tok)->content))
+	if (*q_flag != 1 && is_expansion((*tok)->content))
 		(*tok)->type = 10;
 	if (*line == '"' && *q_flag == 0)
 		*q_flag = 2;
@@ -117,7 +117,7 @@ t_token	*init_param(t_token **lst_tok, int *q_flag, int *i)
 	return (init_tok(*lst_tok));
 }
 
-t_token	*tokenize(char *line)
+t_token	*tokenize(char *line, t_env *lst_env)
 {
 	t_token	*lst_tok;
 	t_token	*tok;
@@ -127,8 +127,13 @@ t_token	*tokenize(char *line)
 	tok = init_param(&lst_tok, &q_flag, &i);
 	while ((size_t)i < ft_strlen(line))
 	{
-		if (is_op(line + i) || is_fb(line + i) || line[i] == ' ')
+		if (is_op(line + i) || is_fb(line + i) || line[i] == ' '
+			|| (*(line + i) == '$' && q_flag != 1))
 		{
+			if (*(line + i) == '$' && q_flag != 1)
+			{
+				line = expansion(line + i, &i, lst_env);
+			}
 			if (q_flag == 0 && tok != NULL && tok->content[0] != '\0')
 			{
 				add_back_tok(&lst_tok, tok);
@@ -162,16 +167,20 @@ void print_list_tok(t_token *lst_tok)
 	printf("\n");
 }
 
-int	main(void)
+int	main(int ac, char **av, char **env)
 {
 	t_token	*lst_tok;
+	t_env	*lst_env;
 
+	(void)av;
+	(void)ac;
 	// lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
 	//lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
 	//lst_tok = tokenize("(((echo '$bye')) && cd dossier||echo $user ) | cat -e");	
 	// ( smpl_cmd && smpl_cmd || smpl_cmd ) | smpl_cmd
 	//lst_tok = tokenize("(echo '$bye' && echo $nym || echo $user ) | cat -e");
-	lst_tok = tokenize("echo '$user'$USER");
+	lst_env = spy_env(env);
+	lst_tok = tokenize("echo '$user'$USER", lst_env);
 	// lst_tok = tokenize("echo hello is $USER");
 	printf("Testing 1 2 1 2, the mic is on\n");
 	print_list_tok(lst_tok);
