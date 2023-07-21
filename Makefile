@@ -6,20 +6,21 @@ NAME		= minishell
 
 # SOURCES_ENV 		=				\
 
-# SOURCES_EXEC		=				\
+#SOURCES_EXEC		=				\
 
-SOURCES_PARSING 	=	tokenize.c	\
-						ast.c		\
-						tcheck.c	\
-						in_utils.c	\
+SOURCES_PARSING 	=	ast.c		\
 						expansion.c	\
+						in_utils.c	\
 						spy_env.c	\
+						tcheck.c	\
+						tok_tik.c	\
+						tokenize.c	\
 
 SOURCES_SHELL 		=	main.c		\
 
-SOURCES_UTILS 		=	token.c		\
-						env.c		\
-						group.c		\
+SOURCES_UTILS 		=	env.c		\
+						token.c		\
+						tree.c		\
 
 LIBFT		= libft
 

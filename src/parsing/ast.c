@@ -1,103 +1,113 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "minishell.h"
 
-t_ast *create_node(t_cmd *cmd)
+void	ast_in_par(t_cmd *tokens, t_ast **root, t_ast **cur, t_border *b)
 {
-	t_ast*	node;
+	int		j;
+	int		n;
+	int		p_count;
+	t_ast	*subtree;
 
-	node = (t_ast *) malloc(sizeof(t_ast));
-	node->cmd = cmd;
-	node->left = NULL;
-	node->right = NULL;
-	return (node);
+	if (*root || *cur)
+		;
+	p_count = 1;
+	j = *b->start;
+	while (j++ <= b->end)
+	{
+		if (tokens[j].type == OPEN_PAR)
+			p_count++;
+		else if (tokens[j].type == CLOSE_PAR)
+			p_count--;
+		if (p_count == 0)
+			break ;
+	}
+	n = *b->start + 1;
+	subtree = build_ast(tokens, &(t_border){&n, j - 1});
+	if (*cur == NULL)
+		*root = subtree;
+	else
+		(*cur)->right = subtree;
+	*b->start = j;
 }
 
-t_ast* build_ast(t_cmd *tokens, int start, int end) {
+void	ast_redir(t_cmd *tokens, t_ast **root, t_ast **current, int start)
+{
+	t_ast	*node;
+	t_ast	*tmp;
+
+	if (*root || *current)
+		;
+	tmp = NULL;
+	node = create_node(&tokens[start]);
+	if (*current == NULL)
+	{
+		node->left = *root;
+		*current = node;
+		*root = node;
+	}
+	else
+	{
+		tmp = *current;
+		while (tmp && tmp->right)
+			tmp = tmp->right;
+		(*current)->right = node;
+		node->left = tmp;
+		*current = node;
+	}
+}
+
+void	ast_cmd(t_cmd *tokens, t_ast **root, t_ast **current, int start)
+{
+	t_ast	*node;
+
+	if (*root || *current)
+		;
+	node = create_node(&tokens[start]);
+	if (*current == NULL)
+		*root = node;
+	else
+		(*current)->right = node;
+}
+
+void	ast_op(t_cmd *tokens, t_ast **root, t_ast **current, int start)
+{
+	t_ast	*node;
+
+	node = create_node(&tokens[start]);
+	node->left = *root;
+	*current = node;
+	*root = NULL;
+}
+
+t_ast	*build_ast(t_cmd *tokens, t_border *b)
+{
 	t_ast	*root;
 	t_ast	*current;
-	int		p_open;
-	int		p_close;
 	int		i;
-	int		j;
-	t_ast* subtree;
-	t_ast* node;
-	t_ast* tmp;
 
-	if (start > end)
+	if (*b->start > b->end)
 		return (NULL);
 	root = NULL;
 	current = NULL;
-	i = start;
-	while (i <= end)
+	i = *b->start;
+	while (i <= b->end)
 	{
 		if (!root)
 			root = current;
 		if (tokens[i].type == OPEN_PAR)
-		{
-			p_open = 1;
-			p_close = 0;
-			j = i + 1;
-			while (j <= end)
-			{
-				if (tokens[j].type == OPEN_PAR)
-					p_open++;
-				else if (tokens[j].type == CLOSE_PAR)
-					p_close++;
-				if (p_open == p_close)
-					break ;
-				j++;
-			}
-			subtree = build_ast(tokens, i + 1, j - 1);
-			if (current == NULL)
-				root = subtree;
-			else
-				current->right = subtree;
-			i = j;
-		}
-		else if (tokens[i].type == OR || tokens[i].type == AND
-			|| tokens[i].type == PIPE)
-		{
-			node = create_node(&tokens[i]);
-			node->left = root;
-			current = node;
-			root = NULL;
-		}
-		else if (tokens[i].type == REDIR || tokens[i].type == REDIR2
-			|| tokens[i].type == DREDIR || tokens[i].type == DREDIR2)
-		{
-			node = create_node(&tokens[i]);
-			if (current == NULL)
-			{
-				node->left = root;
-				current = node;
-				root = node;
-			}
-			else
-			{
-				tmp = current;
-				while (tmp && tmp->right)
-					tmp = tmp->right;
-				current->right = node;
-				node->left = tmp;
-				current = node;
-			}
-		}
+			ast_in_par(tokens, &root, &current, &(t_border){&i, b->end});
+		else if (tokens[i].type >= AND && tokens[i].type <= PIPE)
+			ast_op(tokens, &root, &current, i);
+		else if (tokens[i].type >= REDIR
+			&& tokens[i].type <= DREDIR2)
+			ast_redir(tokens, &root, &current, i);
 		else
-		{
-			node = create_node(&tokens[i]);
-			if (current == NULL)
-				root = node;
-			else
-				current->right = node;
-		}
+			ast_cmd(tokens, &root, &current, i);
 		i++;
 	}
-	if (root == NULL)
-		root = current;
 	return (root);
 }
+
+/*------------------------------------FUNCTIONS TO DELETE-----------------------------------------------------*/
 
 // Function to tokenize the command string
 char** tokenizeCommand(char* command, int* count) {
@@ -116,15 +126,6 @@ char** tokenizeCommand(char* command, int* count) {
 
 	*count = i;
 	return tokens;
-}
-
-// Function to recursively free the memory of the AST
-void free_ast(t_ast* node) {
-	if (node == NULL)
-		return;
-	free_ast(node->left);
-	free_ast(node->right);
-	free(node);
 }
 
 // Function to print the AST in postfix order (for demonstration purposes)
@@ -166,7 +167,7 @@ void printASTHelper(t_ast* node, int depth, int isRight) {
 	int i = 0;
 	while (node->cmd->args && i < node->cmd->nb_args)
 	{
-		printf("%s", node->cmd->args[i]);
+		printf("%s ", node->cmd->args[i]);
 		i++;
 	}
 	printf("\n");
@@ -178,36 +179,47 @@ void printAST(t_ast* root) {
     printASTHelper(root, 0, 0);
 }
 
-// int main(int argc, char **argv, char **env) {
-// 	//char command[] = "cmd1 || ( cmd2 && ( cmd3 || cmd4 ) )";
-// 	// char command[] = "( 1 && 2 ) || ( ( 3 || 4 || 5 ) && ( 6 || 7 ) ) && 8";
-// 	//char command[] = "( cmd3 || cmd4 ) && cmd5";
-// 	//char command[] = "cmd1 || ( cmd3 || cmd4 ) && cmd5";
-// 	//char command[] = "( cmd3 || cmd4 ) | cmd5";
-// 	//char command[] = "cmd1 > e && cmd2 && cmd3 > d > f3";
-// 	(void)argc;
-// 	(void)argv;
-// 	printf("%s\n", env[0]);
-// 	char command[] = "echo a > fichier1 && echo c && echo rawr > fichier2 > fichier3";
-// 	int count;
-// 	t_token *t = tokenize(command);
-// 	t_cmd *tokens = transform_into_tab(t, &count);
-// 	int i = 0;
-// 	while(tokens && i < count)
-// 	{
-// 		printf("%s\n", tokens[i].content);
-// 		i++;
-// 	}
-// 	printf("count: %d\n", count);
-// 	t_ast* root = build_ast(tokens, 0, count - 1);
-// 	printAST(root);
-// 	printf("\n");
+int main(int argc, char **argv, char **env) {
+	//char command[] = "cmd1 || ( cmd2 && ( cmd3 || cmd4 ) )";
+	// char command[] = "( 1 && 2 ) || ( ( 3 || 4 || 5 ) && ( 6 || 7 ) ) && 8";
+	//char command[] = "( cmd3 || cmd4 ) && cmd5";
+	//char command[] = "cmd1 || ( cmd3 || cmd4 ) && cmd5";
+	//char command[] = "( cmd3 || cmd4 ) | cmd5";
+	//char command[] = "cmd1 > e && cmd2 && cmd3 > d > f3";
+	//char command[] = "(echo h && echo k) > fichier";
+	(void)argc;
+	(void)argv;
+	printf("%s\n", env[0]);
+	//char command[] = "echo a > fichier1 && echo c || cat fichier && echo rawr > fichier2 > fichier3";
+	// char command[] = "echo New line < output.txt";
+	char command[] = "echo a > f > g > e";
+	int count;
+	t_env *lst_env = spy_env(env);
+	t_token *t = tokenize(command, lst_env);
+	print_list_tok(t);
+	t_cmd *tokens = transform_into_tab(t, &count);
+	int i = 0;
+	printf("----------------------------------------\n");
+	while(tokens && i < count)
+	{
+		printf("%s\t", tokens[i].content);
+		i++;
+	}
+	printf("\n-----------count : %d--------------------\n", count);
+	t_border *b = malloc(sizeof(t_border));
+	int n = 0;
+	b->start = &n;
+	b->end = count - 1;
+	t_ast* root = build_ast(tokens, b);
+	printAST(root);
+	printf("\n");
 
-// 	// Cleanup: Free the memory of the AST and tokens
-// 	free_ast(root);
-// 	i = 0;
-// 	while (i < count)
-// 		free(tokens[i++].content);
-// 	free(tokens);
-// 	return 0;
-// }
+	free_ast(root);
+	i = 0;
+	while (i < count)
+		free(tokens[i++].content);
+	free(tokens);
+	return 0;
+}
+
+/*------------------------------------FUNCTIONS TO DELETE-----------------------------------------------------*/

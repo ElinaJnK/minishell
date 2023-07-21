@@ -195,5 +195,81 @@ EXECVE OH OUI ENFIN AH OUI OUI OUI OUI OUI
 
 puis on gère les signaux <3
 
-env erreur quand 2eme =  
+
+# Redirections
+
+tree->left = reponse()
+operation
+tree->right = reponse()
+
+if (node == '&&')
+{
+	if (reponse_gauche == 0): //succes
+		regarder reponse_droite
+	else if (reponse_gauche == 1): //failure
+		return ;
+}
+
+if (node == '||')
+{
+	if (reponse_gauche == 0) //success
+		c bon
+	sinon
+		regarder reponse_droite
+}
+
+- >
+if (node == '>')
+{
+	reponse_gauche -> stdout -> enlever tt du fichier et rajouter la sortie de gauche
+}
+- <
+if (node == '<')
+{
+	PROBLEMATIQUE AYAYAYAYA
+}
+- >>
+if (node == '>>')
+{
+	reponse_gauche -> stdout -> append to fichier a droite, si pas de fichier on en cree un nv
+}
+- <<
+
+operation
+tree->left = reponse()
+tree->right = reponse()
+
+int	exec_rec(root, args??, type_op):
+	if (!root->left && !root->right):
+		if (type_op == >, <):
+			
+		return (execution(root->content))
+	if (root->content == &&):
+		rep_left = exec_rec(root->left, NULL)
+		if (rep_left == FAILURE):
+			return exit status FAILURE // on finit l'execution
+		rep_right = exec_rec(root>right, NULL)
+	if (root->content == ||):
+		rep_left = exec_rec(root->left, NULL)
+		if (rep_left == SUCCES):
+			return exit status SUCCES // on finit l'execution
+		rep_right = exec_rec(root>right, NULL)
+	if (root->content == |):
+		rep_left = exec_rec(root->left, NULL) // recuperer la valeur renvoyee par le fils gauche et la donner au fils droite
+		rep_right = exec_rec(root->right, rep_left)
+	if (root->content == > || root->content == <):
+		if (root->right->content == is file)
+			char *fichier = root->right->content
+			OPEN(fichier)
+		rep_right_fichier = exec_rec(root->right, )
+		rep_left = exec_rec(root->left, rep_right_fichier, root->content)
+	if (root->content == <<): //here_doc
+		char *LIMITER = root->right->content
+		rep_left = exec_rec(root->left, fichier)
+	
+
+
+
+
+
 

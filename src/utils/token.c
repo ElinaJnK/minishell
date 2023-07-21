@@ -29,14 +29,14 @@ int	is_fb(char *line)
 {
 	if (ft_strncmp(line, "|", 1) == 0)
 		return (PIPE);
-	else if (ft_strncmp(line, ">", 1) == 0)
-		return (REDIR);
-	else if (ft_strncmp(line, "<", 1) == 0)
-		return (REDIR2);
 	else if (ft_strncmp(line, ">>", 2) == 0)
 		return (DREDIR);
 	else if (ft_strncmp(line, "<<", 2) == 0)
 		return (DREDIR2);
+	else if (ft_strncmp(line, ">", 1) == 0)
+		return (REDIR);
+	else if (ft_strncmp(line, "<", 1) == 0)
+		return (REDIR2);
 	else if (ft_strncmp(line, "(", 1) == 0)
 		return (OPEN_PAR);
 	else if (ft_strncmp(line, ")", 1) == 0)

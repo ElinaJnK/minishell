@@ -7,9 +7,34 @@ void	failure_env(const char *message, char **elem)
 	i = 0;
 	while (elem && elem[i])
 		free(elem[i]);
-	free(elem);
+	if (elem)
+		free(elem);
 	perror(message);
 	exit(EXIT_FAILURE);
+}
+
+char	**get_env(char *data)
+{
+	char	**elem;
+	int		i;
+
+	i = 0;
+	elem = malloc(sizeof(char *) * 3);
+	if (!elem || !data)
+	{
+		failure_env("malloc of elem, data is NULL", NULL);
+	}
+	elem[2] = NULL;
+	while (data[i] && data[i] != '=')
+		i++;
+	elem[0] = malloc(sizeof(char) * (i + 1));
+	if (!elem[0])
+	{
+		failure_env("malloc of elem[0] is NULL", elem);
+	}
+	ft_strlcpy(elem[0], data, i + 1);
+	elem[1] = ft_strdup(data + i + 1);
+	return (elem);
 }
 
 t_env	*spy_env(char **env)
@@ -24,12 +49,7 @@ t_env	*spy_env(char **env)
 		return (NULL);
 	while (env && env[i])
 	{
-		elem = ft_split(env[i], '=');
-		if (elem[2])
-		{
-			printf("elem[2] : %s\n", elem[2]);
-			return (failure_env("env variable has > 1 \' = \' character ", elem), NULL);
-		}
+		elem = get_env(env[i]);
 		add_back_env(&lst_env, new_env(elem[0], elem[1]));
 		i++;
 	}
@@ -44,7 +64,7 @@ void print_list_env(t_env *lst_env)
 	temp = lst_env;
 	while (temp)
 	{
-		printf("%s=%s", temp->name, temp->value);
+		printf("%s  =   %s", temp->name, temp->value);
 		// printf("[%s]->", temp->content);
 		temp = temp->next;
 		printf("\n");
