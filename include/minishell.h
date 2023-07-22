@@ -78,6 +78,9 @@ void	failure(const char *message);
 void	failure_parse(const char *message, t_token *lst_tok);
 void	failure_group(const char *message, t_ast *ast);
 
+/*---execution----*/
+char	*get_command_path(char *command, t_env *env);
+
 /*----parsing functions----*/
 void	read_stdin(char *limiter);
 t_token	*tokenize(char *line, t_env *lst_env);

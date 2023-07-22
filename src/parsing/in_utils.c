@@ -30,19 +30,16 @@ void	fill_cmd(t_cmd *cmd, t_token **t)
 		(cmd->nb_args)++;
 		tmp = tmp->next;
 	}
-	//if (!cmd->nb_args)
-	//	return ;
-	cmd->args = (char **)malloc(sizeof(char *) * (cmd->nb_args + 1));
+	cmd->args = (char **)malloc(sizeof(char *) * (cmd->nb_args + 2));
 	if (!cmd->args)
 		return (failure_parse("malloc in abr creation", *t));
-	printf("nb args : %d\n", cmd->nb_args);
 	while (*t && (*t)->type == CMD && i < cmd->nb_args + 1)
 	{
 		cmd->args[i] = (*t)->content;
-		printf("string : %s\n", cmd->args[i]);
 		*t = (*t)->next;
 		i++;
 	}
+	cmd->args[i] = NULL;
 }
 
 void	init_op(t_cmd *cmd, t_token *t)
@@ -79,6 +76,5 @@ t_cmd	*transform_into_tab(t_token *t, int *count)
 	*count = i;
 	cmd[i].content = NULL;
 	cmd[i].type = -1;
-	i = 0;
 	return (cmd);
 }

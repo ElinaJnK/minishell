@@ -57,19 +57,19 @@ t_env	*spy_env(char **env)
 }
 
 /*-------------------------------------TESTS-----------------------*/
-void print_list_env(t_env *lst_env)
-{
-	t_env *temp;
+// void print_list_env(t_env *lst_env)
+// {
+// 	t_env *temp;
 
-	temp = lst_env;
-	while (temp)
-	{
-		printf("%s  =   %s", temp->name, temp->value);
-		// printf("[%s]->", temp->content);
-		temp = temp->next;
-		printf("\n");
-	}
-}
+// 	temp = lst_env;
+// 	while (temp)
+// 	{
+// 		printf("%s  =   %s", temp->name, temp->value);
+// 		// printf("[%s]->", temp->content);
+// 		temp = temp->next;
+// 		printf("\n");
+// 	}
+// }
 
 // int main(int ac, char **av, char **env)
 // {

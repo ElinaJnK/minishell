@@ -6,7 +6,8 @@ NAME		= minishell
 
 # SOURCES_ENV 		=				\
 
-SOURCES_EXEC		=		\
+SOURCES_EXEC		=	execute.c	\
+						path.c		\
 
 SOURCES_PARSING 	=	ast.c		\
 						expansion.c	\

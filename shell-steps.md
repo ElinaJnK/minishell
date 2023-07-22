@@ -284,9 +284,13 @@ int	exec_rec(root, args??):
 (echo a && echo b) && (echo bruh  > 3 && echo rawr) >> f > c d | cat  -> ON NE PEUT PAS AVOIR C D OMGE
 
 
-	
+// dans execute, pour execve faut passer char **env en argument
 
+//aussi qd on cree des arguments pour la commande:
+	si on a echo hello world, jsp si on doit mettre dans args = [echo, hello, world, NULL]
+															ou [echo, hello world, NULL]
 
+// j delete ft_strjoin dans gnl_utils.c psq y a la redefinition
 
 
 
