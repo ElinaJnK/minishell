@@ -195,7 +195,7 @@ void printASTHelper(t_ast* node, int depth, int isRight) {
 	}
 	printf("%s ", node->cmd->content);
 	int i = 0;
-	while (node->cmd->args && i < node->cmd->nb_args)
+	while (node->cmd->args && i < node->cmd->nb_args + 1)
 	{
 		printf("%s ", node->cmd->args[i]);
 		i++;
