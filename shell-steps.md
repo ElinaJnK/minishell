@@ -195,6 +195,8 @@ EXECVE OH OUI ENFIN AH OUI OUI OUI OUI OUI
 
 puis on gère les signaux <3
 
+!!! gerer les fichiers vides qq part p-e ?
+ls > "" > e
 
 # Redirections
 
@@ -239,33 +241,49 @@ operation
 tree->left = reponse()
 tree->right = reponse()
 
-int	exec_rec(root, args??, type_op):
+int	exec_rec(root, args??):
 	if (!root->left && !root->right):
-		if (type_op == >, <):
-			
 		return (execution(root->content))
 	if (root->content == &&):
-		rep_left = exec_rec(root->left, NULL)
+		rep_left = exec_rec(root->left)
 		if (rep_left == FAILURE):
 			return exit status FAILURE // on finit l'execution
-		rep_right = exec_rec(root>right, NULL)
+		rep_right = exec_rec(root>right)
+
 	if (root->content == ||):
-		rep_left = exec_rec(root->left, NULL)
+		rep_left = exec_rec(root->left)
 		if (rep_left == SUCCES):
 			return exit status SUCCES // on finit l'execution
-		rep_right = exec_rec(root>right, NULL)
+		rep_right = exec_rec(root>right)
+
 	if (root->content == |):
-		rep_left = exec_rec(root->left, NULL) // recuperer la valeur renvoyee par le fils gauche et la donner au fils droite
+		rep_left = exec_rec(root->left) // recuperer la valeur renvoyee par le fils gauche et la donner au fils droite
 		rep_right = exec_rec(root->right, rep_left)
-	if (root->content == > || root->content == <):
-		if (root->right->content == is file)
-			char *fichier = root->right->content
-			OPEN(fichier)
-		rep_right_fichier = exec_rec(root->right, )
-		rep_left = exec_rec(root->left, rep_right_fichier, root->content)
-	if (root->content == <<): //here_doc
-		char *LIMITER = root->right->content
+
+	if (root->content == > || root->content == < || root->content == >>):
+		t_ast *tmp = root
+
+		while (tmp->right):
+			if (tmp->left): // y a un fichier a creer
+				char *f = tmp->content
+				OPEN etc et selon <,> ou >> on fait append ou pas
+			tmp = tmp->right
+		char *fichier = tmp
 		rep_left = exec_rec(root->left, fichier)
+		return rep_left
+
+	// MODIFIER AST ARBRE POUR QUE DELIMITEUR SOIT A DROITE
+	if (root->content == <<): //here_doc
+		char *delim = root->right
+		if (!delim):
+			erreur
+		char *fichier = faire gnl ou comme on a fait dans pipex
+		rep_left = exec_rec(root->left, fichier)
+		return rep_left
+
+(echo a && echo b) && (echo bruh  > 3 && echo rawr) >> f > c d | cat  -> ON NE PEUT PAS AVOIR C D OMGE
+
+
 	
 
 

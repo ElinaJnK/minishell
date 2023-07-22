@@ -6,7 +6,7 @@ NAME		= minishell
 
 # SOURCES_ENV 		=				\
 
-#SOURCES_EXEC		=				\
+SOURCES_EXEC		=		\
 
 SOURCES_PARSING 	=	ast.c		\
 						expansion.c	\
@@ -37,7 +37,8 @@ RM			= rm -f
 OBJS_PARSING = $(addprefix $(OBJ_DIR)/parsing/,$(SOURCES_PARSING:.c=.o))
 OBJS_SHELL = $(addprefix $(OBJ_DIR)/shell/,$(SOURCES_SHELL:.c=.o))
 OBJS_UTILS = $(addprefix $(OBJ_DIR)/utils/,$(SOURCES_UTILS:.c=.o))
-OBJS = $(OBJS_PARSING) $(OBJS_SHELL) $(OBJS_UTILS)
+OBJS_EXEC = $(addprefix $(OBJ_DIR)/exec/,$(SOURCES_EXEC:.c=.o))
+OBJS = $(OBJS_PARSING) $(OBJS_SHELL) $(OBJS_UTILS) $(OBJS_EXEC)
 
 all: lib obj $(NAME)
 
@@ -48,7 +49,7 @@ $(NAME): $(OBJS)
 	$(CC) $(OBJS) -L $(LIBFT) -lreadline -lft -o $(NAME)
 
 obj:
-	mkdir -p $(OBJ_DIR) $(OBJ_DIR)/parsing $(OBJ_DIR)/shell $(OBJ_DIR)/utils
+	mkdir -p $(OBJ_DIR) $(OBJ_DIR)/parsing $(OBJ_DIR)/shell $(OBJ_DIR)/utils $(OBJ_DIR)/exec
 
 $(OBJ_DIR)/parsing/%.o: $(SRC_DIR)/parsing/%.c $(INCLUDE)/minishell.h Makefile
 	$(CC) $(CFLAGS) -I $(INCLUDE) -c $< -o $@
@@ -57,6 +58,9 @@ $(OBJ_DIR)/shell/%.o: $(SRC_DIR)/shell/%.c $(INCLUDE)/minishell.h Makefile
 	$(CC) $(CFLAGS) -I $(INCLUDE) -c $< -o $@
 
 $(OBJ_DIR)/utils/%.o: $(SRC_DIR)/utils/%.c $(INCLUDE)/minishell.h Makefile
+	$(CC) $(CFLAGS) -I $(INCLUDE) -c $< -o $@
+
+$(OBJ_DIR)/exec/%.o: $(SRC_DIR)/exec/%.c $(INCLUDE)/minishell.h Makefile
 	$(CC) $(CFLAGS) -I $(INCLUDE) -c $< -o $@
 
 bonus: $(NAME)

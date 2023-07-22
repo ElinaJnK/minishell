@@ -44,10 +44,19 @@ void	ast_redir(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 		*current = node;
 		*root = node;
 	}
+	else if ((*current)->cmd->type == DREDIR2)
+	{
+		tmp = (*root)->right;
+		node = create_node(&tokens[start]);
+		(*root)->right = node;
+		node->left = tmp;
+		*current = node;
+	}
 	else
 	{
-		tmp = *current;
-		while (tmp && tmp->right)
+		tmp = (*current)->right;
+		while (tmp && tmp->right
+			&& !(tmp->cmd->type >= 1 && tmp->cmd->type <= 3))
 			tmp = tmp->right;
 		(*current)->right = node;
 		node->left = tmp;
@@ -78,6 +87,26 @@ void	ast_op(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 	*root = NULL;
 }
 
+void	ast_pipe(t_cmd *tokens, t_ast **root, t_ast **current, int start)
+{
+	t_ast 	*tmp;
+	t_ast	*node;
+
+	tmp = NULL;
+	node = NULL;
+	if ((*root)->cmd->type == AND || (*root)->cmd->type == OR)
+	{
+		tmp = (*root)->right;
+		node = create_node(&tokens[start]);
+		(*root)->right = node;
+		node->left = tmp;
+		*current = node;
+	}
+		//ast_redir(tokens, root, current, start);
+	else
+		ast_op(tokens, root, current, start);
+}
+
 t_ast	*build_ast(t_cmd *tokens, t_border *b)
 {
 	t_ast	*root;
@@ -95,11 +124,12 @@ t_ast	*build_ast(t_cmd *tokens, t_border *b)
 			root = current;
 		if (tokens[i].type == OPEN_PAR)
 			ast_in_par(tokens, &root, &current, &(t_border){&i, b->end});
-		else if (tokens[i].type >= AND && tokens[i].type <= PIPE)
+		else if (tokens[i].type == AND || tokens[i].type == OR)
 			ast_op(tokens, &root, &current, i);
-		else if (tokens[i].type >= REDIR
-			&& tokens[i].type <= DREDIR2)
+		else if ((tokens[i].type >= REDIR && tokens[i].type <= DREDIR2))
 			ast_redir(tokens, &root, &current, i);
+		else if (tokens[i].type == PIPE)
+			ast_pipe(tokens, &root, &current, i);
 		else
 			ast_cmd(tokens, &root, &current, i);
 		i++;
@@ -192,7 +222,15 @@ int main(int argc, char **argv, char **env) {
 	printf("%s\n", env[0]);
 	//char command[] = "echo a > fichier1 && echo c || cat fichier && echo rawr > fichier2 > fichier3";
 	// char command[] = "echo New line < output.txt";
-	char command[] = "echo a > f > g > e";
+	// char command[] = "echo a > f > g > e";
+	//char command[] = "echo a > f1 && echo b || cat f1 && echo c > f2 > f3";
+	//char command[] = "echo c && (echo a && cat << EOF) > f1";
+	//char command[] = "(echo a && echo b) && (echo d && ((echo bruh  > 3 && echo rawr) && echo r)) >> f > c | cat";
+	//char command[] = "(echo a && echo b) && (echo bruh && echo rawr) | cat";
+	//char command[] = "(echo a && echo b) && (echo bruh  > 3 && echo rawr) >> f > c | cat";
+	//char command[] = "echo a | echo c >> f | echo m > f2 | cat ll";
+	//char command[] = "echo a > '' > f2 | echo c";
+	char command[] = "cmd arg << LIMITER | cmd1 >> file | echo pipe";
 	int count;
 	t_env *lst_env = spy_env(env);
 	t_token *t = tokenize(command, lst_env);
