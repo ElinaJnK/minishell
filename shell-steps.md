@@ -296,4 +296,5 @@ int	exec_rec(root, args??):
 
 
 
-
+!!!! EXPANSION FAUT CHERCHER LE DERNIER ARG DU PATH avec /
+echo /mnt/nfs/homes/ksadykov$user

@@ -63,8 +63,8 @@ void	lims_rec(t_ast *root, t_token **lst_lim)
 		return ;
 	if (root->left == NULL | root->right == NULL)
 		add_back_tok(lst_lim, new_token(root->cmd->content, 0));
-	else if (root->cmd->type != DREDIR2)
-		return ;
+	// else if (root->cmd->type != DREDIR2)
+	// 	return ;
 	else
 	{
 		lims_rec(root->left, lst_lim);
@@ -74,24 +74,33 @@ void	lims_rec(t_ast *root, t_token **lst_lim)
 
 void	exec_here(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 {
-	int		pipe_fds[2];
+	int		pipe_fds1[2];
+	int		pipe_fds2[2];
 	t_token	*lst_lim;
 	t_token	*tmp;
 
 	(void)input_fd;
 	lst_lim = NULL;
-	lims_rec(root->right, &lst_lim);
+	if (root->right->cmd->type != DREDIR2)
+		lims_rec(root->right->left, &lst_lim);
+	else
+		lims_rec(root->right, &lst_lim);
 	tmp = lst_lim;
+	print_list_tok(lst_lim);
 	if (!lst_lim)
 		failure("pas de limiteur");
 	while (tmp)
 	{
-		open_here_doc(pipe_fds, tmp->content);
+		open_here_doc(pipe_fds1, tmp->content);
 		tmp = tmp->next;
 	}
 	//if (lst_lim)
 	//	free_lst_tok(&lst_lim);
-	exec_ast(root->left, pipe_fds[0], output_fd, lst_env);
+	//exec_ast(root->left, pipe_fds[0], output_fd, lst_env);
+	if (pipe(pipe_fds2) < 0)
+		failure("pipe");
+	exec_ast(root->left, pipe_fds1[0], pipe_fds2[1], lst_env);
+	exec_ast(root->right, pipe_fds2[0], output_fd, lst_env);
 }
 
 void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
@@ -157,11 +166,15 @@ int main(int argc, char **argv, char **env) {
 	(void)argv;
 	//char command[] = "echo a && echo b | echo c";
 	//char command[] = "echo a | echo c >> f | echo m > f2 | cat ll";
-	char command[] = "cat << EOF << hello << bye";
+	//char command[] = "cat << EOF << hello << bye > f << EOF > g";
+	//char command[] = "(echo a && echo b) && (echo d && ((echo bruh  > 3 && echo rawr) && echo r)) >> f > c | cat";
 	//char command[] = "(echo a v && echo \"hello world\") && (echo bruh && echo rawr) | cat";
+	//char command[] = "cat << EOF << hello << bye > f > g";
+	//char command[] = "cat << EOF << hello << bye > f << EOF";
+	char command[] = "(echo $USER'$user' && echo b)";
 	int count;
 	t_env *lst_env = spy_env(env);
-	t_token *t = tokenize(command, lst_env);
+	t_token *t = tokenize(ft_strdup(command), lst_env);
 	print_list_tok(t);
 	t_cmd *tokens = transform_into_tab(t, &count);
 	int i = 0;
