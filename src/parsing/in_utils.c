@@ -56,6 +56,7 @@ t_cmd	*transform_into_tab(t_token *t, int *count)
 	t_token	*tmp;
 	int		i;
 
+	(void)tmp;
 	cmd = malloc(sizeof(t_cmd) * (lst_size_tok(t) + 1));
 	if (!cmd)
 		return (failure_parse("cmd is NULL in-utils", t), NULL);
@@ -72,7 +73,7 @@ t_cmd	*transform_into_tab(t_token *t, int *count)
 		}
 		i++;
 	}
-	free_lst_tok(&t);
+	//free_lst_tok(&tmp);
 	*count = i;
 	cmd[i].content = NULL;
 	cmd[i].type = -1;

@@ -39,22 +39,36 @@ void	exec_pipe(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 void	exec_redir(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 {
 	t_ast	*tmp;
+	t_ast	*before;
 	int		fd;
 
 	fd = 1;
 	tmp = root->right;
+	before = root;
 	(void)output_fd;
 	while (tmp->right)
 	{
-		if (tmp->left)
+		// here maybe check if tmp->left is a << ?
+		if (tmp->left && tmp->left->cmd->type == CMD)
 			open(tmp->left->cmd->content, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		printf("cmd (in boucle): %s\n", tmp->cmd->content);
+		before = tmp;
 		tmp = tmp->right;
 	}
-	if (tmp->cmd->type == DREDIR)
+	printf("cmd : %s\n", tmp->cmd->content);
+	if (before->cmd->type == DREDIR)
+	{
+		// we never get here, we don't append correctly since we are looking one step too far
+		//maybe solved ?
+		printf("here\n");
 		fd = open(tmp->cmd->content, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	}
 	else
 		fd = open(tmp->cmd->content, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	exec_ast(root->left, input_fd, fd, lst_env);
+	printf("root left content : %s\n", root->left->cmd->content);
+	// cette ligne la ne marche pas mais en gros j'aimerais retourner au cat quoi, juste avec le nouveau fd
+	if (root->left->cmd->type != DREDIR2)
+		exec_ast(root->left, input_fd, fd, lst_env);
 }
 
 void	lims_rec(t_ast *root, t_token **lst_lim)
@@ -75,12 +89,13 @@ void	lims_rec(t_ast *root, t_token **lst_lim)
 void	exec_here(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 {
 	int		pipe_fds1[2];
-	int		pipe_fds2[2];
+	//int		pipe_fds2[2];
 	t_token	*lst_lim;
 	t_token	*tmp;
 
 	(void)input_fd;
 	lst_lim = NULL;
+	//ici faire une boucle eventuellement mais ca ressemble + a un patch qu'autre chose
 	if (root->right->cmd->type != DREDIR2)
 		lims_rec(root->right->left, &lst_lim);
 	else
@@ -94,13 +109,15 @@ void	exec_here(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 		open_here_doc(pipe_fds1, tmp->content);
 		tmp = tmp->next;
 	}
+	// we cannot do this since free_lst_tok also frees the char which we are using everywhere, we either need
+	//to keep track of all the lst_tok we have or just malloc *content again (i think this might be easier )??
 	//if (lst_lim)
 	//	free_lst_tok(&lst_lim);
 	//exec_ast(root->left, pipe_fds[0], output_fd, lst_env);
-	if (pipe(pipe_fds2) < 0)
-		failure("pipe");
-	exec_ast(root->left, pipe_fds1[0], pipe_fds2[1], lst_env);
-	exec_ast(root->right, pipe_fds2[0], output_fd, lst_env);
+	printf("root content : %s\n", root->cmd->content);
+	printf("root right content : %s\n", root->right->cmd->content);
+	exec_ast(root->right, pipe_fds1[0], output_fd, lst_env);
+	exec_ast(root->left, pipe_fds1[0], output_fd, lst_env);
 }
 
 void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
@@ -170,8 +187,9 @@ int main(int argc, char **argv, char **env) {
 	//char command[] = "(echo a && echo b) && (echo d && ((echo bruh  > 3 && echo rawr) && echo r)) >> f > c | cat";
 	//char command[] = "(echo a v && echo \"hello world\") && (echo bruh && echo rawr) | cat";
 	//char command[] = "cat << EOF << hello << bye > f > g";
-	//char command[] = "cat << EOF << hello << bye > f << EOF";
-	char command[] = "(echo $USER'$user' && echo b)";
+	char command[] = "cat << EOF << hello << bye > f";
+	//char command[] = "echo a > f > g >> a";
+	//char command[] = "(echo $USER'$user' && echo b)";
 	int count;
 	t_env *lst_env = spy_env(env);
 	t_token *t = tokenize(ft_strdup(command), lst_env);
