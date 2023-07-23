@@ -76,13 +76,10 @@ void	print_list_tok(t_token *lst_tok);
 /*----failure-----*/
 void	failure(const char *message);
 void	failure_parse(const char *message, t_token *lst_tok);
-void	failure_group(const char *message, t_ast *ast);
-
-/*---execution----*/
-char	*get_command_path(char *command, t_env *env);
+void	failure_exec(const char *message);
 
 /*----parsing functions----*/
-void	read_stdin(char *limiter);
+//void	read_stdin(char *limiter);
 t_token	*tokenize(char *line, t_env *lst_env);
 void	check_tok(t_token *lst_tok);
 
@@ -107,6 +104,7 @@ t_cmd	*transform_into_tab(t_token *t, int *count);
 void	add_back_env(t_env **lst_env, t_env *new);
 t_env	*spy_env(char **env);
 t_env	*new_env(char *name, char *value);
+char	**env_to_tab(t_env *lst_env);
 void	free_lst_env(t_env **lst_env);
 
 /*----utils----*/
@@ -118,6 +116,14 @@ int		is_fb(char *line);
 int		get_type(char *tok);
 t_token	*new_token(char *content, int type);
 void	free_lst_tok(t_token **lst_tok);
+
+/*----execution----*/
+char	*get_command_path(char *command, t_env *env);
+void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env);
+void	exec_com(t_ast *node, int input_fd, int output_fd, t_env *lst_env);
+
+/*---here doc----*/
+int		open_here_doc(int *pipe_fds, char *limiter);
 
 /*----signal----*/
 void catch_the_signal(int *pipe_fds);

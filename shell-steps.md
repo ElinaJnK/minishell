@@ -292,6 +292,8 @@ int	exec_rec(root, args??):
 
 // j delete ft_strjoin dans gnl_utils.c psq y a la redefinition
 
+!!!!!!! REVIEW ALL FAILURES
+
 
 
 

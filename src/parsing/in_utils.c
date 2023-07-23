@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-int	lst_size(t_token *lst)
+int	lst_size_tok(t_token *lst)
 {
 	int		i;
 	t_token	*tmp;
@@ -56,10 +56,11 @@ t_cmd	*transform_into_tab(t_token *t, int *count)
 	t_token	*tmp;
 	int		i;
 
-	cmd = malloc(sizeof(t_cmd) * (lst_size(t) + 1));
+	cmd = malloc(sizeof(t_cmd) * (lst_size_tok(t) + 1));
 	if (!cmd)
 		return (failure_parse("cmd is NULL in-utils", t), NULL);
 	i = 0;
+	tmp = t;
 	while (t)
 	{
 		if (t->type == CMD)
@@ -69,10 +70,9 @@ t_cmd	*transform_into_tab(t_token *t, int *count)
 			init_op(&cmd[i], t);
 			t = t->next;
 		}
-		tmp = t;
-		free(tmp);
 		i++;
 	}
+	free_lst_tok(&t);
 	*count = i;
 	cmd[i].content = NULL;
 	cmd[i].type = -1;

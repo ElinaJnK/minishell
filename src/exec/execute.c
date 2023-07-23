@@ -1,130 +1,119 @@
 #include <minishell.h>
 
-/*
-int	exec_rec(root, args??, impu):
-	if (!root->left && !root->right):
-		return (execution(root->content))
-	if (root->content == &&):
-		rep_left = exec_rec(root->left)
-		if (rep_left == FAILURE):
-			return exit status FAILURE // on finit l'execution
-		rep_right = exec_rec(root>right)
-
-	if (root->content == ||):
-		rep_left = exec_rec(root->left)
-		if (rep_left == SUCCES):
-			return exit status SUCCES // on finit l'execution
-		rep_right = exec_rec(root>right)
-
-	if (root->content == |):
-		rep_left = exec_rec(root->left) // recuperer la valeur renvoyee par le fils gauche et la donner au fils droite
-		rep_right = exec_rec(root->right, rep_left)
-
-	if (root->content == > || root->content == < || root->content == >>):
-		t_ast *tmp = root->right
-
-		while (tmp->right):
-			if (tmp->left): // y a un fichier a creer
-				char *f = tmp->content
-				OPEN etc et selon <,> ou >> on fait append ou pas
-			tmp = tmp->right
-		char *fichier = tmp->cmd->content
-		int out_fd = OPEN(fichier)
-		rep_left = exec_rec(root->left, input_fd, out_fd)
-		return rep_left
-
-	if (root->content == <<): //here_doc
-		char *delim = root->right
-		if (!delim):
-			erreur
-		char *fichier = faire gnl ou comme on a fait dans pipex
-		rep_left = exec_rec(root->left, fichier)
-		return rep_left
-*/
-
-void	execution(int pid, t_cmd *cmd, t_env *lst_env, char **env)
-{
-	char	*path;
-
-	path = get_command_path(cmd->content, lst_env);
-	if (!path)
-		failure("path");
-	if (execve(path, cmd->args, env) < 0)
-		failure("execve");
-	else if (pid < 0)
-		failure("pid");
-}
-
-void exec_com(t_ast *node, int input_fd, int output_fd, t_env *lst_env, char **env)
-{
-	pid_t	pid;
-	int		status;
-
-	pid = fork();
-	if (pid < 0)
-	{
-		perror("fork error");
-		exit(1);
-	}
-	else if (pid == 0)
-	{
-		if (input_fd != STDIN_FILENO)
-		{
-			dup2(input_fd, STDIN_FILENO);
-			close(input_fd);
-		}
-		if (output_fd != STDOUT_FILENO)
-		{
-			dup2(output_fd, STDOUT_FILENO);
-			close(output_fd);
-		}
-		execution(pid, node->cmd, lst_env, env);
-		perror("exec error");
-		exit(1);
-	}
-	else
-		waitpid(pid, &status, 0);
-}
-
-void exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env, char **env)
+void	exec_and(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 {
 	int	status;
 
 	status = 0;
+	exec_ast(root->left, input_fd, output_fd, lst_env);
+	wait(&status);
+	if (WEXITSTATUS(status) == 0)
+		exec_ast(root->right, input_fd, output_fd, lst_env);
+}
+
+void	exec_or(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
+{
+	int	status;
+
+	status = 0;
+	exec_ast(root->left, input_fd, output_fd, lst_env);
+	wait(&status);
+	if (WEXITSTATUS(status) != 0)
+		exec_ast(root->right, input_fd, output_fd, lst_env);
+}
+
+void	exec_pipe(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
+{
+	int	pipe_fds[2];
+	int	status;
+
+	status = 0;
+	if (pipe(pipe_fds) < 0)
+		failure_exec("fork error");
+	exec_ast(root->left, input_fd, pipe_fds[1], lst_env);
+	close(pipe_fds[1]);
+	wait(&status);
+	exec_ast(root->right, pipe_fds[0], output_fd, lst_env);
+}
+
+void	exec_redir(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
+{
+	t_ast	*tmp;
+	int		fd;
+
+	fd = 1;
+	tmp = root->right;
+	(void)output_fd;
+	while (tmp->right)
+	{
+		if (tmp->left)
+			open(tmp->left->cmd->content, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		tmp = tmp->right;
+	}
+	if (tmp->cmd->type == DREDIR)
+		fd = open(tmp->cmd->content, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	else
+		fd = open(tmp->cmd->content, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	exec_ast(root->left, input_fd, fd, lst_env);
+}
+
+void	lims_rec(t_ast *root, t_token **lst_lim)
+{
+	if (!root)
+		return ;
+	if (root->left == NULL | root->right == NULL)
+		add_back_tok(lst_lim, new_token(root->cmd->content, 0));
+	else if (root->cmd->type != DREDIR2)
+		return ;
+	else
+	{
+		lims_rec(root->left, lst_lim);
+		lims_rec(root->right, lst_lim);
+	}
+}
+
+void	exec_here(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
+{
+	int		pipe_fds[2];
+	t_token	*lst_lim;
+	t_token	*tmp;
+
+	(void)input_fd;
+	lst_lim = NULL;
+	lims_rec(root->right, &lst_lim);
+	tmp = lst_lim;
+	if (!lst_lim)
+		failure("pas de limiteur");
+	while (tmp)
+	{
+		open_here_doc(pipe_fds, tmp->content);
+		tmp = tmp->next;
+	}
+	//if (lst_lim)
+	//	free_lst_tok(&lst_lim);
+	exec_ast(root->left, pipe_fds[0], output_fd, lst_env);
+}
+
+void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
+{
 	if (root == NULL)
 		return ;
 	if (root->left == NULL && root->right == NULL)
 	{
-		exec_com(root, input_fd, output_fd, lst_env, env);
+		exec_com(root, input_fd, output_fd, lst_env);
 		return ;
 	}
 	if (root->cmd->type == AND)
-	{
-		exec_ast(root->left, input_fd, output_fd, lst_env, env);
-		wait(&status);
-		if (WEXITSTATUS(status) == 0)
-			exec_ast(root->right, input_fd, output_fd, lst_env, env);
-	}
+		exec_and(root, input_fd, output_fd, lst_env);
 	else if (root->cmd->type == OR)
-	{
-		exec_ast(root->left, input_fd, output_fd, lst_env, env);
-		wait(&status);
-		if (WEXITSTATUS(status) != 0)
-			exec_ast(root->right, input_fd, output_fd, lst_env, env);
-	}
+		exec_or(root, input_fd, output_fd, lst_env);
 	else if (root->cmd->type == PIPE)
-	{
-		int	pipe_fds[2];
-		if (pipe(pipe_fds) < 0)
-		{
-			perror("pipe error");
-			exit(1);
-		}
-		exec_ast(root->left, input_fd, pipe_fds[1], lst_env, env);
-		close(pipe_fds[1]);
-		wait(&status);
-		exec_ast(root->right, pipe_fds[0], output_fd, lst_env, env);
-	}
+		exec_pipe(root, input_fd, output_fd, lst_env);
+	else if (root->cmd->type == REDIR || root->cmd->type == REDIR2
+		|| root->cmd->type == DREDIR)
+		exec_redir(root, input_fd, output_fd, lst_env);
+	else if (root->cmd->type == DREDIR2)
+		exec_here(root, input_fd, output_fd, lst_env);
 }
 
 void printSpaces(int count) {
@@ -149,7 +138,7 @@ void printASTHelper(t_ast* node, int depth, int isRight) {
 	}
 	printf("%s ", node->cmd->content);
 	int i = 0;
-	while (node->cmd->args && i < node->cmd->nb_args)
+	while (node->cmd->args && i < node->cmd->nb_args + 1)
 	{
 		printf("%s ", node->cmd->args[i]);
 		i++;
@@ -167,7 +156,9 @@ int main(int argc, char **argv, char **env) {
 	(void)argc;
 	(void)argv;
 	//char command[] = "echo a && echo b | echo c";
-	char command[] = "(echo a && echo b) && (echo bruh && echo rawr) | cat";
+	//char command[] = "echo a | echo c >> f | echo m > f2 | cat ll";
+	char command[] = "cat << EOF << hello << bye";
+	//char command[] = "(echo a v && echo \"hello world\") && (echo bruh && echo rawr) | cat";
 	int count;
 	t_env *lst_env = spy_env(env);
 	t_token *t = tokenize(command, lst_env);
@@ -188,7 +179,7 @@ int main(int argc, char **argv, char **env) {
 	t_ast* root = build_ast(tokens, b);
 	printAST(root);
 	printf("\n");
-	exec_ast(root, STDIN_FILENO, STDOUT_FILENO, lst_env, env);
+	exec_ast(root, STDIN_FILENO, STDOUT_FILENO, lst_env);
 	free_ast(root);
 	i = 0;
 	while (i < count)

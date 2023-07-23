@@ -89,7 +89,7 @@ void	ast_op(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 
 void	ast_pipe(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 {
-	t_ast 	*tmp;
+	t_ast	*tmp;
 	t_ast	*node;
 
 	tmp = NULL;
@@ -102,7 +102,6 @@ void	ast_pipe(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 		node->left = tmp;
 		*current = node;
 	}
-		//ast_redir(tokens, root, current, start);
 	else
 		ast_op(tokens, root, current, start);
 }

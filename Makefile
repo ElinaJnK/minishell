@@ -7,6 +7,7 @@ NAME		= minishell
 # SOURCES_ENV 		=				\
 
 SOURCES_EXEC		=	execute.c	\
+						here_doc.c	\
 						path.c		\
 
 SOURCES_PARSING 	=	ast.c		\
@@ -20,6 +21,7 @@ SOURCES_PARSING 	=	ast.c		\
 SOURCES_SHELL 		=	main.c		\
 
 SOURCES_UTILS 		=	env.c		\
+						exec.c		\
 						token.c		\
 						tree.c		\
 
