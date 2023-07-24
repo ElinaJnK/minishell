@@ -298,3 +298,17 @@ int	exec_rec(root, args??):
 
 !!!! EXPANSION FAUT CHERCHER LE DERNIER ARG DU PATH avec /
 echo /mnt/nfs/homes/ksadykov$user
+
+
+
+
+!!!! TESTS a gerer !!!
+test -> bizarre
+cat /dev/urandom 
+cat << $USER > f
+-> attention, $USER doit etre interprete EXACTEMENT comme user, PAS D'EXPANSION DASN HERE_DOC
+-> MAIS
+
+ls > f2 > f1 > f0
+bash: f1: Permission denied
+f0 N'EST PAS CREE
