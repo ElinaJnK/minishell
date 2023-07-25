@@ -131,6 +131,8 @@ t_ast	*build_ast(t_cmd *tokens, t_border *b)
 			ast_pipe(tokens, &root, &current, i);
 		else
 			ast_cmd(tokens, &root, &current, i);
+		if (current)
+			printf("curr : %s\n", current->cmd->content);
 		i++;
 	}
 	return (root);
@@ -138,106 +140,107 @@ t_ast	*build_ast(t_cmd *tokens, t_border *b)
 
 /*------------------------------------FUNCTIONS TO DELETE-----------------------------------------------------*/
 
-// // Function to print the AST in postfix order (for demonstration purposes)
-// void printASTb(t_ast* node) {
-// 	if (node == NULL)
-// 		return;
-// 	printASTb(node->left);
-// 	printf("%s ", node->cmd->content);
-// 	int i = 0;
-// 	while (node->cmd->args && i < node->cmd->nb_args)
-// 	{
-// 		printf("%s", node->cmd->args[i]);
-// 		i++;
-// 	}
-// 	printASTb(node->right);
-// }
+// Function to print the AST in postfix order (for demonstration purposes)
+void printASTb(t_ast* node) {
+	if (node == NULL)
+		return;
+	printASTb(node->left);
+	printf("%s ", node->cmd->content);
+	int i = 0;
+	while (node->cmd->args && i < node->cmd->nb_args)
+	{
+		printf("%s", node->cmd->args[i]);
+		i++;
+	}
+	printASTb(node->right);
+}
 
-// void printSpaces(int count) {
-//     for (int i = 0; i < count; i++)
-//         printf(" ");
-// }
+void printSpaces(int count) {
+    for (int i = 0; i < count; i++)
+        printf(" ");
+}
 
-// void printASTHelper(t_ast* node, int depth, int isRight) {
-// 	if (node == NULL)
-// 		return;
+void printASTHelper(t_ast* node, int depth, int isRight) {
+	if (node == NULL)
+		return;
 
-// 	int INDENTATION_SIZE = 4;
-// 	depth += INDENTATION_SIZE;
-// 	printASTHelper(node->right, depth, 1);
-// 	printSpaces(depth - INDENTATION_SIZE);
+	int INDENTATION_SIZE = 4;
+	depth += INDENTATION_SIZE;
+	printASTHelper(node->right, depth, 1);
+	printSpaces(depth - INDENTATION_SIZE);
 
-// 	if (isRight)
-// 		printf("┌─");
-// 	else
-// 	{
-// 		printf("└─");
-// 	}
-// 	printf("%s ", node->cmd->content);
-// 	int i = 0;
-// 	while (node->cmd->args && i < node->cmd->nb_args + 1)
-// 	{
-// 		printf("%s ", node->cmd->args[i]);
-// 		i++;
-// 	}
-// 	printf("\n");
-// 	printASTHelper(node->left, depth, 0);
-// }
+	if (isRight)
+		printf("┌─");
+	else
+	{
+		printf("└─");
+	}
+	printf("%s ", node->cmd->content);
+	int i = 0;
+	while (node->cmd->args && i < node->cmd->nb_args + 1)
+	{
+		printf("%s ", node->cmd->args[i]);
+		i++;
+	}
+	printf("\n");
+	printASTHelper(node->left, depth, 0);
+}
 
-// void printAST(t_ast* root) {
-// 	printf("root: %s\n", root->cmd->content);
-//     printASTHelper(root, 0, 0);
-// }
+void printAST(t_ast* root) {
+	printf("root: %s\n", root->cmd->content);
+    printASTHelper(root, 0, 0);
+}
 
-// int main(int argc, char **argv, char **env) {
-// 	//char command[] = "cmd1 || ( cmd2 && ( cmd3 || cmd4 ) )";
-// 	// char command[] = "( 1 && 2 ) || ( ( 3 || 4 || 5 ) && ( 6 || 7 ) ) && 8";
-// 	//char command[] = "( cmd3 || cmd4 ) && cmd5";
-// 	//char command[] = "cmd1 || ( cmd3 || cmd4 ) && cmd5";
-// 	//char command[] = "( cmd3 || cmd4 ) | cmd5";
-// 	//char command[] = "cmd1 > e && cmd2 && cmd3 > d > f3";
-// 	//char command[] = "(echo h && echo k) > fichier";
-// 	(void)argc;
-// 	(void)argv;
-// 	printf("%s\n", env[0]);
-// 	//char command[] = "echo a > fichier1 && echo c || cat fichier && echo rawr > fichier2 > fichier3";
-// 	// char command[] = "echo New line < output.txt";
-// 	// char command[] = "echo a > f > g > e";
-// 	//char command[] = "echo a > f1 && echo b || cat f1 && echo c > f2 > f3";
-// 	//char command[] = "echo c && (echo a && cat << EOF) > f1";
-// 	//char command[] = "(echo a && echo b) && (echo d && ((echo bruh  > 3 && echo rawr) && echo r)) >> f > c | cat";
-// 	//char command[] = "(echo a && echo b) && (echo bruh && echo rawr) | cat";
-// 	//char command[] = "(echo a && echo b) && (echo bruh  > 3 && echo rawr) >> f > c | cat";
-// 	//char command[] = "echo a | echo c >> f | echo m > f2 | cat ll";
-// 	//char command[] = "echo a > '' > f2 | echo c";
-// 	char command[] = "cmd arg << LIMITER | cmd1 >> file | echo pipe";
-// 	int count;
-// 	t_env *lst_env = spy_env(env);
-// 	t_token *t = tokenize(command, lst_env);
-// 	print_list_tok(t);
-// 	t_cmd *tokens = transform_into_tab(t, &count);
-// 	int i = 0;
-// 	printf("----------------------------------------\n");
-// 	while(tokens && i < count)
-// 	{
-// 		printf("%s\t", tokens[i].content);
-// 		i++;
-// 	}
-// 	printf("\n-----------count : %d--------------------\n", count);
-// 	t_border *b = malloc(sizeof(t_border));
-// 	int n = 0;
-// 	b->start = &n;
-// 	b->end = count - 1;
-// 	t_ast* root = build_ast(tokens, b);
-// 	printAST(root);
-// 	printf("\n");
+int main(int argc, char **argv, char **env) {
+	//char command[] = "cmd1 || ( cmd2 && ( cmd3 || cmd4 ) )";
+	// char command[] = "( 1 && 2 ) || ( ( 3 || 4 || 5 ) && ( 6 || 7 ) ) && 8";
+	//char command[] = "( cmd3 || cmd4 ) && cmd5";
+	//char command[] = "cmd1 || ( cmd3 || cmd4 ) && cmd5";
+	//char command[] = "( cmd3 || cmd4 ) | cmd5";
+	//char command[] = "cmd1 > e && cmd2 && cmd3 > d > f3";
+	//char command[] = "(echo h && echo k) > fichier";
+	(void)argc;
+	(void)argv;
+	printf("%s\n", env[0]);
+	//char command[] = "echo a > fichier1 && echo c || cat fichier && echo rawr > fichier2 > fichier3";
+	// char command[] = "echo New line < output.txt";
+	// char command[] = "echo a > f > g > e";
+	//char command[] = "echo a > f1 && echo b || cat f1 && echo c > f2 > f3";
+	//char command[] = "echo c && (echo a && cat << EOF) > f1";
+	//char command[] = "(echo a && echo b) && (echo d && ((echo bruh  > 3 && echo rawr) && echo r)) >> f > c | cat";
+	//char command[] = "(echo a && echo b) && (echo bruh && echo rawr) | cat";
+	//char command[] = "(echo a && echo b) && (echo bruh  > 3 && echo rawr) >> f > c | cat";
+	//char command[] = "echo a | echo c >> f | echo m > f2 | cat ll";
+	//char command[] = "echo a > '' > f2 | echo c";
+	//char command[] = "cmd arg << LIMITER | cmd1 >> file | echo pipe";
+	char command[] = "ls && cat << EOF1 -e << EOF2";
+	int count;
+	t_env *lst_env = spy_env(env);
+	t_token *t = tokenize(command, lst_env);
+	print_list_tok(t);
+	t_cmd *tokens = transform_into_tab(t, &count);
+	int i = 0;
+	printf("----------------------------------------\n");
+	while(tokens && i < count)
+	{
+		printf("%s\t", tokens[i].content);
+		i++;
+	}
+	printf("\n-----------count : %d--------------------\n", count);
+	t_border *b = malloc(sizeof(t_border));
+	int n = 0;
+	b->start = &n;
+	b->end = count - 1;
+	t_ast* root = build_ast(tokens, b);
+	printAST(root);
+	printf("\n");
 
-// 	free_ast(root);
-// 	i = 0;
-// 	while (i < count)
-// 		free(tokens[i++].content);
-// 	free(tokens);
-// 	return 0;
-// }
+	free_ast(root);
+	i = 0;
+	while (i < count)
+		free(tokens[i++].content);
+	free(tokens);
+	return 0;
+}
 
 /*------------------------------------FUNCTIONS TO DELETE-----------------------------------------------------*/

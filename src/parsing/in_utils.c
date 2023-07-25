@@ -50,10 +50,13 @@ void	init_op(t_cmd *cmd, t_token *t)
 	cmd->nb_args = 0;
 }
 
+
+
 t_cmd	*transform_into_tab(t_token *t, int *count)
 {
 	t_cmd	*cmd;
 	t_token	*tmp;
+	
 	int		i;
 
 	(void)tmp;

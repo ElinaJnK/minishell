@@ -90,3 +90,28 @@ void	free_lst_tok(t_token **lst_tok)
 		*lst_tok = tmp;
 	}
 }
+
+int	is_heredoc(t_token *lst_tok)
+{
+	t_token *tmp;
+
+	tmp = lst_tok;
+	if (!lst_tok)
+		return (0);
+	while (tmp->next)
+		tmp = tmp->next;
+	if (tmp->type == DREDIR2 || tmp->type == DREDIR2_E)
+		return (1);
+	return (0);
+}
+t_token	*last_elem(t_token *lst_tok)
+{
+	t_token *tmp;
+
+	tmp = lst_tok;
+	if (!lst_tok)
+		return (NULL);
+	while (tmp->next)
+		tmp = tmp->next;
+	return (tmp);
+}

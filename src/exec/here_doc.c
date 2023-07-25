@@ -34,3 +34,21 @@ int	open_here_doc(int *pipe_fds, char *limiter)
 	read_stdin(pipe_fds[1], limiter);
 	return (EXIT_SUCCESS);
 }
+
+void	quoted(char *line, t_token **lst_tok)
+{
+	int		i;
+	t_token	*last;
+
+	i = 0;
+	last = last_elem(*lst_tok);
+	while (line[i] && !is_op(line + i) && !is_fb(line + i))
+	{
+		if (line[i] == '\'' || line[i] == '"')
+		{
+			last->type = DREDIR2_E;
+			return ;
+		}
+		i++;
+	}
+}

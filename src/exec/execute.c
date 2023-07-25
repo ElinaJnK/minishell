@@ -120,14 +120,14 @@ void	exec_here(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 	exec_ast(root->left, pipe_fds1[0], output_fd, lst_env);
 }
 
-void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
+void exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 {
 	if (root == NULL)
-		return ;
+		return;
 	if (root->left == NULL && root->right == NULL)
 	{
 		exec_com(root, input_fd, output_fd, lst_env);
-		return ;
+		return;
 	}
 	if (root->cmd->type == AND)
 		exec_and(root, input_fd, output_fd, lst_env);
@@ -135,86 +135,89 @@ void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 		exec_or(root, input_fd, output_fd, lst_env);
 	else if (root->cmd->type == PIPE)
 		exec_pipe(root, input_fd, output_fd, lst_env);
-	else if (root->cmd->type == REDIR || root->cmd->type == REDIR2
-		|| root->cmd->type == DREDIR)
+	else if (root->cmd->type == REDIR || root->cmd->type == REDIR2 || root->cmd->type == DREDIR)
 		exec_redir(root, input_fd, output_fd, lst_env);
 	else if (root->cmd->type == DREDIR2)
 		exec_here(root, input_fd, output_fd, lst_env);
 }
 
-void printSpaces(int count) {
-    for (int i = 0; i < count; i++)
-        printf(" ");
-}
+// void printSpaces(int count)
+// {
+// 	for (int i = 0; i < count; i++)
+// 		printf(" ");
+// }
 
-void printASTHelper(t_ast* node, int depth, int isRight) {
-	if (node == NULL)
-		return;
+// void printASTHelper(t_ast *node, int depth, int isRight)
+// {
+// 	if (node == NULL)
+// 		return;
 
-	int INDENTATION_SIZE = 4;
-	depth += INDENTATION_SIZE;
-	printASTHelper(node->right, depth, 1);
-	printSpaces(depth - INDENTATION_SIZE);
+// 	int INDENTATION_SIZE = 4;
+// 	depth += INDENTATION_SIZE;
+// 	printASTHelper(node->right, depth, 1);
+// 	printSpaces(depth - INDENTATION_SIZE);
 
-	if (isRight)
-		printf("┌─");
-	else
-	{
-		printf("└─");
-	}
-	printf("%s ", node->cmd->content);
-	int i = 0;
-	while (node->cmd->args && i < node->cmd->nb_args + 1)
-	{
-		printf("%s ", node->cmd->args[i]);
-		i++;
-	}
-	printf("\n");
-	printASTHelper(node->left, depth, 0);
-}
+// 	if (isRight)
+// 		printf("┌─");
+// 	else
+// 	{
+// 		printf("└─");
+// 	}
+// 	printf("%s ", node->cmd->content);
+// 	int i = 0;
+// 	while (node->cmd->args && i < node->cmd->nb_args + 1)
+// 	{
+// 		printf("%s ", node->cmd->args[i]);
+// 		i++;
+// 	}
+// 	printf("\n");
+// 	printASTHelper(node->left, depth, 0);
+// }
 
-void printAST(t_ast* root) {
-	printf("root: %s\n", root->cmd->content);
-    printASTHelper(root, 0, 0);
-}
+// void printAST(t_ast *root)
+// {
+// 	printf("root: %s\n", root->cmd->content);
+// 	printASTHelper(root, 0, 0);
+// }
 
-int main(int argc, char **argv, char **env) {
-	(void)argc;
-	(void)argv;
-	//char command[] = "echo a && echo b | echo c";
-	//char command[] = "echo a | echo c >> f | echo m > f2 | cat ll";
-	//char command[] = "cat << EOF << hello << bye > f << EOF > g";
-	//char command[] = "(echo a && echo b) && (echo d && ((echo bruh  > 3 && echo rawr) && echo r)) >> f > c | cat";
-	//char command[] = "(echo a v && echo \"hello world\") && (echo bruh && echo rawr) | cat";
-	//char command[] = "cat << EOF << hello << bye > f > g";
-	char command[] = "cat << EOF << hello << bye > f";
-	//char command[] = "echo a > f > g >> a";
-	//char command[] = "(echo $USER'$user' && echo b)";
-	int count;
-	t_env *lst_env = spy_env(env);
-	t_token *t = tokenize(ft_strdup(command), lst_env);
-	print_list_tok(t);
-	t_cmd *tokens = transform_into_tab(t, &count);
-	int i = 0;
-	printf("----------------------------------------\n");
-	while(tokens && i < count)
-	{
-		printf("%s\t", tokens[i].content);
-		i++;
-	}
-	printf("\n-----------count : %d--------------------\n", count);
-	t_border *b = malloc(sizeof(t_border));
-	int n = 0;
-	b->start = &n;
-	b->end = count - 1;
-	t_ast* root = build_ast(tokens, b);
-	printAST(root);
-	printf("\n");
-	exec_ast(root, STDIN_FILENO, STDOUT_FILENO, lst_env);
-	free_ast(root);
-	i = 0;
-	while (i < count)
-		free(tokens[i++].content);
-	free(tokens);
-	return 0;
-}
+// // int main(int argc, char **argv, char **env)
+// // {
+// // 	(void)argc;
+// // 	(void)argv;
+// // 	// char command[] = "echo a && echo b | echo c";
+// // 	// char command[] = "echo a | echo c >> f | echo m > f2 | cat ll";
+// // 	// char command[] = "cat << EOF << hello << bye > f << EOF > g";
+// // 	// char command[] = "(echo a && echo b) && (echo d && ((echo bruh  > 3 && echo rawr) && echo r)) >> f > c | cat";
+// // 	// char command[] = "(echo a v && echo \"hello world\") && (echo bruh && echo rawr) | cat";
+// // 	// char command[] = "cat << EOF << hello << bye > f > g";
+// // 	char command[] = "cat << $USER ";
+// // 	// char command[] = "echo a > f > g >> a";
+// // 	// char command[] = "(echo $USER'$user' && echo b)";
+// // 	int count;
+// // 	t_env *lst_env = spy_env(env);
+// // 	t_token *t = tokenize(ft_strdup(command), lst_env);
+// // 	print_list_tok(t);
+// // 	t_cmd *tokens = transform_into_tab(t, &count);
+// // 	int i = 0;
+// // 	printf("----------------------------------------\n");
+// // 	while (tokens && i < count)
+// // 	{
+// // 		printf("%s\t", tokens[i].content);
+// // 		i++;
+// // 	}
+// // 	printf("\n-----------count : %d--------------------\n", count);
+// // 	t_border *b = malloc(sizeof(t_border));
+// // 	int n = 0;
+// // 	b->start = &n;
+// // 	b->end = count - 1;
+// // 	t_ast *root = build_ast(tokens, b);
+// // 	printAST(root);
+// // 	printf("\n");
+// // 	exec_ast(root, STDIN_FILENO, STDOUT_FILENO, lst_env);
+// // 	free_ast(root);
+// // 	i = 0;
+// // 	while (i < count)
+// // 		free(tokens[i++].content);
+// // 	free(tokens);
+// // 	return 0;
+// // }

@@ -62,7 +62,10 @@ t_token	*tokenize(char *line, t_env *lst_env)
 	tok = init_param(&lst_tok, &q_flag, &i);
 	while ((size_t)i < ft_strlen(line))
 	{
-		if (*(line + i) == '$' && q_flag != 1)
+		if (lst_tok && last_elem(lst_tok)->type == DREDIR2)
+			quoted(line + i, &lst_tok);
+		if (*(line + i) == '$' && q_flag != 1
+			&& !is_heredoc(lst_tok))
 			line = expansion(line, &i, lst_env);
 		else if (is_op(line + i) || is_fb(line + i) || line[i] == ' ')
 		{
@@ -112,7 +115,8 @@ void print_list_tok(t_token *lst_tok)
 // 	// ( smpl_cmd && smpl_cmd || smpl_cmd ) | smpl_cmd
 // 	//lst_tok = tokenize("(echo '$bye' && echo $nym || echo $user ) | cat -e");
 // 	lst_env = spy_env(env);
-// 	char *str = ft_strdup("echo \"'$user'$USER$USER'$USER'\"$user\"\" && echo $USER | cat -e || (export vat=42 && echo lol)");
+// 	//char *str = ft_strdup("echo \"'$user'$USER$USER'$USER'\"$user\"\" && echo $USER | cat -e || (export vat=42 && echo lol)");
+// 	char *str = ft_strdup("cat << $USER << $US'ER' << \"$USER\" > f << \"EOF E\"OF | cat << EOF > g");
 // 	lst_tok = tokenize(str, lst_env);
 // 	// lst_tok = tokenize("echo hello is $USER");
 // 	printf("Testing 1 2 1 2, the mic is on\n");

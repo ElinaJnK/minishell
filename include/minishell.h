@@ -25,12 +25,21 @@ enum e_token
 	DREDIR2,
 	OPEN_PAR,
 	CLOSE_PAR,
+	DREDIR2_E
 };
+
+typedef struct s_error
+{
+	char 	*error;
+	int		num;
+	struct s_error *next;
+}	t_error;
 
 typedef struct s_token
 {
 	char			*content;
 	int				type;
+	t_error			*error;
 	struct s_token	*next;
 }	t_token;
 
@@ -40,6 +49,10 @@ typedef struct s_cmd
 	char	**args;
 	int		nb_args;
 	int		type;
+	t_error	*error;
+	int		input;
+	int		output;
+	int		pipe_fds[2];
 }	t_cmd;
 
 typedef struct s_border
@@ -116,6 +129,9 @@ int		is_fb(char *line);
 int		get_type(char *tok);
 t_token	*new_token(char *content, int type);
 void	free_lst_tok(t_token **lst_tok);
+int		is_heredoc(t_token *lst_tok);
+t_token	*last_elem(t_token *lst_tok);
+void	quoted(char *line, t_token **tok);
 
 /*----execution----*/
 char	*get_command_path(char *command, t_env *env);
