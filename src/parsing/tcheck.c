@@ -21,7 +21,9 @@ void	check_tok(t_token *lst_tok)
 
 	tmp = lst_tok;
 	p = 0;
-	if (!tmp || ((tmp->type >= 1 && tmp->type <= 3) || tmp->type == 9))
+	if (!tmp)
+		return ;
+	if (!tmp || ((tmp->type >= 1 && tmp->type <= 3) || tmp->type == CLOSE_PAR))
 		failure_parse("tcheque error", lst_tok);
 	while (tmp && tmp->next)
 	{

@@ -104,6 +104,7 @@ int	is_heredoc(t_token *lst_tok)
 		return (1);
 	return (0);
 }
+
 t_token	*last_elem(t_token *lst_tok)
 {
 	t_token *tmp;

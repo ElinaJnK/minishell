@@ -45,28 +45,3 @@ t_token	*heredoc(t_token *head)
 	new->next = tmp;
 	return (new);
 }
-
-t_token *redir(t_token *t)
-{
-	t_token *tmp;
-
-	tmp = t;
-	while (tmp && (tmp->type == REDIR || tmp->type == CMD))
-}
-
-t_token	*clean_up(t_token *t)
-{
-	t_token	*tmp;
-
-	tmp = t;
-	if (!t)
-		return (NULL);
-	while (tmp)
-	{
-		if (tmp->type == DREDIR2 || tmp->type == DREDIR2_E)
-			tmp->next = heredoc(tmp);
-		if (tmp->type == REDIR)
-			tmp->next = redir(tmp);
-		tmp = tmp->next;
-	}
-}

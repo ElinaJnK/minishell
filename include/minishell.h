@@ -23,9 +23,9 @@ enum e_token
 	REDIR2,
 	DREDIR,
 	DREDIR2,
+	DREDIR2_E,
 	OPEN_PAR,
 	CLOSE_PAR,
-	DREDIR2_E
 };
 
 typedef struct s_error
@@ -50,9 +50,6 @@ typedef struct s_cmd
 	int		nb_args;
 	int		type;
 	t_error	*error;
-	int		input;
-	int		output;
-	int		pipe_fds[2];
 }	t_cmd;
 
 typedef struct s_border

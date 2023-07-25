@@ -82,6 +82,66 @@ t_token	*tokenize(char *line, t_env *lst_env)
 	return (add_rest(&lst_tok, tok, q_flag), check_tok(lst_tok), lst_tok);
 }
 
+void	merge(t_token **res, t_token *cmd, t_token *redirs)
+{
+	t_token	*tmp;
+
+	tmp = NULL;
+	if (!*res)
+	{
+		*res = cmd;
+		tmp = last_elem(*res);
+		if (!tmp)
+			*res = redirs;
+		else
+			tmp->next = redirs;
+		return ;
+	}
+	tmp = last_elem(*res);
+	tmp->next = cmd;
+	tmp = last_elem(*res);
+	tmp->next = redirs;
+}
+
+t_token	*tokenize_bise(t_token *tok)
+{
+	t_token *cmds;
+	t_token	*redirs;
+	t_token	*res;
+	t_token	*tmp;
+
+	tmp = tok;
+	res = NULL;
+	cmds = NULL;
+	redirs = NULL;
+	if (!tok)
+		return (NULL);
+	while (tmp)
+	{
+		if (tmp->type == CMD)
+			add_back_tok(&cmds, new_token(tmp->content, tmp->type));
+		else if (tmp->type >= REDIR && tmp->type <= DREDIR2_E && tmp->next)
+		{
+			add_back_tok(&redirs, new_token(tmp->next->content, tmp->type));
+			tmp = tmp->next;
+		}
+		else
+		{
+			merge(&res, cmds, redirs);
+			cmds = NULL;
+			redirs = NULL;
+			add_back_tok(&res, new_token(tmp->content, tmp->type));
+		}
+		tmp = tmp->next;
+	}
+	merge(&res, cmds, redirs);
+	cmds = NULL;
+	redirs = NULL;
+	if (tok)
+		free_lst_tok(&tok);
+	return (res);
+}
+
 /*------------------------------------FUNCTIONS TO DELETE-----------------------------------------------------*/
 
 void print_list_tok(t_token *lst_tok)
@@ -94,33 +154,41 @@ void print_list_tok(t_token *lst_tok)
 	while (temp)
 	{
 		printf("[%s, %d]->", temp->content, temp->type);
-		// printf("[%s]->", temp->content);
+		//printf("[%s]->", temp->content);
 		temp = temp->next;
 		size++;
-		printf("\n");
+		//printf("\n");
 	}
-	printf("-----size of lst_tok : %d------\n", size);
+	printf("\n-----size of lst_tok : %d------\n", size);
 }
 
-// int	main(int ac, char **av, char **env)
-// {
-// 	t_token	*lst_tok;
-// 	t_env	*lst_env;
+int	main(int ac, char **av, char **env)
+{
+	t_token	*lst_tok;
+	t_token *lst_bise;
+	t_env	*lst_env;
 
-// 	(void)av;
-// 	(void)ac;
-// 	// lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
-// 	//lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
-// 	//lst_tok = tokenize("(((echo '$bye')) && cd dossier||echo $user ) | cat -e");	
-// 	// ( smpl_cmd && smpl_cmd || smpl_cmd ) | smpl_cmd
-// 	//lst_tok = tokenize("(echo '$bye' && echo $nym || echo $user ) | cat -e");
-// 	lst_env = spy_env(env);
-// 	//char *str = ft_strdup("echo \"'$user'$USER$USER'$USER'\"$user\"\" && echo $USER | cat -e || (export vat=42 && echo lol)");
-// 	char *str = ft_strdup("cat << $USER << $US'ER' << \"$USER\" > f << \"EOF E\"OF | cat << EOF > g");
-// 	lst_tok = tokenize(str, lst_env);
-// 	// lst_tok = tokenize("echo hello is $USER");
-// 	printf("Testing 1 2 1 2, the mic is on\n");
-// 	print_list_tok(lst_tok);
-// 	return (0);
-// }
+	(void)av;
+	(void)ac;
+	// lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
+	//lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
+	//lst_tok = tokenize("(((echo '$bye')) && cd dossier||echo $user ) | cat -e");	
+	// ( smpl_cmd && smpl_cmd || smpl_cmd ) | smpl_cmd
+	//lst_tok = tokenize("(echo '$bye' && echo $nym || echo $user ) | cat -e");
+	lst_env = spy_env(env);
+	//char *str = ft_strdup("echo \"'$user'$USER$USER'$USER'\"$user\"\" && echo $USER | cat -e || (export vat=42 && echo lol)");
+	//char *str = ft_strdup("cat << $USER << $US'ER' << \"$USER\" > f << \"EOF E\"OF | cat << EOF > g");
+	//char *str = ft_strdup("(ls && cat) << EOF");
+	char *str = ft_strdup(" ");
+	//char *str = ft_strdup("ls > f -la");
+	//char *str = ft_strdup("((ls > f -la) && echo a >> f) << EOF | cat");
+	lst_tok = tokenize(str, lst_env);
+	print_list_tok(lst_tok);
+	lst_bise = tokenize_bise(lst_tok);
+	print_list_tok(lst_bise);
+	// lst_tok = tokenize("echo hello is $USER");
+	//printf("Testing 1 2 1 2, the mic is on\n");
+	//print_list_tok(lst_tok);
+	return (0);
+}
 /*------------------------------------FUNCTIONS TO DELETE-----------------------------------------------------*/
