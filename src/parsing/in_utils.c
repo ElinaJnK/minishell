@@ -24,6 +24,8 @@ void	fill_cmd(t_cmd *cmd, t_token **t)
 	i = 0;
 	cmd->content = (*t)->content;
 	cmd->type = (*t)->type;
+	cmd->output = 1;
+	cmd->input = 0;
 	cmd->nb_args = 0;
 	while (tmp && tmp->type == CMD)
 	{
@@ -46,39 +48,47 @@ void	init_op(t_cmd *cmd, t_token *t)
 {
 	cmd->content = t->content;
 	cmd->type = t->type;
+	cmd->output = 1;
+	cmd->input = 0;
 	cmd->args = NULL;
 	cmd->nb_args = 0;
 }
 
-void	fill_redir(t_cmd *cmd, t_token **t)
+void	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
 {
-	int		pipe_fds[2];
+	int	pipe_fds[2];
 
+	cmd->content = NULL;
+	cmd->output = 1;
+	cmd->input = 0;
+	cmd->args = NULL;
+	cmd->nb_args = 0;
 	while (*t && !((*t)->type >= AND && (*t)->type <= PIPE)
 		&& !((*t)->type >= OPEN_PAR && (*t)->type <= CLOSE_PAR))
 	{
-		if ((*t)->type == REDIR || (*t)->type == REDIR2)
-		{
-			cmd->content = (*t)->content;
-			cmd->type = (*t)->type;
-		}
+		if ((*t)->type == REDIR)
+			cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_TRUNC,
+					0644);
+		else if ((*t)->type == REDIR2)
+			cmd->input = open((*t)->content, O_RDONLY | O_CREAT | O_TRUNC,
+					0644);
 		else if ((*t)->type == DREDIR)
-		{
-			//append
-		}
+			cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_APPEND,
+					0644);
 		else if ((*t)->type == DREDIR2 || (*t)->type == DREDIR2_E)
 		{
-			open_here_doc(pipe_fds, (*t)->content);
-			cmd->type = (*t)->type;
+			open_here_doc(pipe_fds, (*t)->content, (*t)->type, env);
+			cmd->input = pipe_fds[0];
 		}
+		if (cmd->output < 0 || cmd->input < 0)
+			return (failure_parse("open failed", *t));
+		cmd->type = (*t)->type;
+		cmd->content = (*t)->content;
 		*t = (*t)->next;
 	}
-	cmd->input = get_content(pipe_fds[0]);
-	cmd->output = get_content(pipe_fds[1]);
 }
 
-
-t_cmd	*transform_into_tab(t_token *t, int *count)
+t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
 {
 	t_cmd	*cmd;
 	t_token	*tmp;
@@ -95,7 +105,7 @@ t_cmd	*transform_into_tab(t_token *t, int *count)
 		if (t->type == CMD)
 			fill_cmd(&cmd[i], &t);
 		else if (t->type >= REDIR && t->type <= DREDIR2_E)
-			fill_redir(&cmd[i], &t);
+			fill_redir(&cmd[i], &t, env);
 		else if (t->type != CMD)
 		{
 			init_op(&cmd[i], t);

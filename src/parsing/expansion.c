@@ -58,7 +58,7 @@ char	*expand_env(char *line, int *i, t_env *env)
 		&& line[end] != ' ')
 		end++;
 	end--;
-	var = search_var(line + *i + 1, end - *i, env);
+	var = search_var(line + *i + 1, end - *i - 1, env);
 	newline = insert_into_line(line, var, *i, end);
 	return (newline);
 }

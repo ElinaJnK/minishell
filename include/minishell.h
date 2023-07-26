@@ -50,6 +50,8 @@ typedef struct s_cmd
 	int		nb_args;
 	int		type;
 	t_error	*error;
+	int		input;
+	int		output;
 }	t_cmd;
 
 typedef struct s_border
@@ -91,6 +93,7 @@ void	failure_exec(const char *message);
 /*----parsing functions----*/
 //void	read_stdin(char *limiter);
 t_token	*tokenize(char *line, t_env *lst_env);
+t_token	*tokenize_bise(t_token *tok);
 void	check_tok(t_token *lst_tok);
 
 /*----parsing help functions----*/
@@ -108,7 +111,7 @@ t_ast	*build_ast(t_cmd *tokens, t_border *b);
 char	*expansion(char *line, int *i, t_env *env);
 
 /*----in-utils-----*/
-t_cmd	*transform_into_tab(t_token *t, int *count);
+t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env);
 
 /*----spy-env----*/
 void	add_back_env(t_env **lst_env, t_env *new);
@@ -136,7 +139,7 @@ void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env);
 void	exec_com(t_ast *node, int input_fd, int output_fd, t_env *lst_env);
 
 /*---here doc----*/
-int		open_here_doc(int *pipe_fds, char *limiter);
+int		open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env);
 
 /*----signal----*/
 void catch_the_signal(int *pipe_fds);

@@ -44,14 +44,6 @@ void	ast_redir(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 		*current = node;
 		*root = node;
 	}
-	else if ((*current)->cmd->type == DREDIR2)
-	{
-		tmp = (*root)->right;
-		node = create_node(&tokens[start]);
-		(*root)->right = node;
-		node->left = tmp;
-		*current = node;
-	}
 	else
 	{
 		tmp = (*current)->right;
@@ -125,14 +117,12 @@ t_ast	*build_ast(t_cmd *tokens, t_border *b)
 			ast_in_par(tokens, &root, &current, &(t_border){&i, b->end});
 		else if (tokens[i].type == AND || tokens[i].type == OR)
 			ast_op(tokens, &root, &current, i);
-		else if ((tokens[i].type >= REDIR && tokens[i].type <= DREDIR2))
+		else if ((tokens[i].type >= REDIR && tokens[i].type <= DREDIR2_E))
 			ast_redir(tokens, &root, &current, i);
 		else if (tokens[i].type == PIPE)
 			ast_pipe(tokens, &root, &current, i);
 		else
 			ast_cmd(tokens, &root, &current, i);
-		if (current)
-			printf("curr : %s\n", current->cmd->content);
 		i++;
 	}
 	return (root);
@@ -140,7 +130,7 @@ t_ast	*build_ast(t_cmd *tokens, t_border *b)
 
 /*------------------------------------FUNCTIONS TO DELETE-----------------------------------------------------*/
 
-// Function to print the AST in postfix order (for demonstration purposes)
+//Function to print the AST in postfix order (for demonstration purposes)
 // void printASTb(t_ast* node) {
 // 	if (node == NULL)
 // 		return;
@@ -213,12 +203,19 @@ t_ast	*build_ast(t_cmd *tokens, t_border *b)
 // 	//char command[] = "echo a | echo c >> f | echo m > f2 | cat ll";
 // 	//char command[] = "echo a > '' > f2 | echo c";
 // 	//char command[] = "cmd arg << LIMITER | cmd1 >> file | echo pipe";
-// 	char command[] = "ls && cat << EOF1 -e << EOF2";
+// 	//char command[] = "ls && cat << EOF1 -e << EOF2";
+// 	//char command[] = "((ls > f -la) > f && echo a << f) << EOF | cat";
+// 	char command[] = "ls << EOF -la";
+// 	//char command[] = "> f ls > g -la < input";
 // 	int count;
 // 	t_env *lst_env = spy_env(env);
 // 	t_token *t = tokenize(command, lst_env);
 // 	print_list_tok(t);
-// 	t_cmd *tokens = transform_into_tab(t, &count);
+
+// 	t_token	*lst_bise = tokenize_bise(t);
+// 	print_list_tok(lst_bise);
+	
+// 	t_cmd *tokens = transform_into_tab(lst_bise, &count, lst_env);
 // 	int i = 0;
 // 	printf("----------------------------------------\n");
 // 	while(tokens && i < count)
@@ -233,9 +230,9 @@ t_ast	*build_ast(t_cmd *tokens, t_border *b)
 // 	b->end = count - 1;
 // 	t_ast* root = build_ast(tokens, b);
 // 	printAST(root);
-// 	printf("\n");
+// 	// printf("\n");
 
-// 	free_ast(root);
+// 	// free_ast(root);
 // 	i = 0;
 // 	while (i < count)
 // 		free(tokens[i++].content);
