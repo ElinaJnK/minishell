@@ -36,10 +36,17 @@ void	exec_pipe(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 	exec_ast(root->right, pipe_fds[0], output_fd, lst_env);
 }
 
-void	exec_redir(t_ast *root, t_env *lst_env)
+void	exec_redir(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 {
 	if (root->left)
-		exec_ast(root->left, root->cmd->input, root->cmd->output, lst_env);
+	{
+		if (root->cmd->input != STDIN_FILENO && root->cmd->output != STDOUT_FILENO)
+			exec_ast(root->left, root->cmd->input, root->cmd->output, lst_env);
+		else if (root->cmd->input != STDIN_FILENO)
+			exec_ast(root->left, root->cmd->input, output_fd, lst_env);
+		else if (root->cmd->output != STDOUT_FILENO)
+			exec_ast(root->left, input_fd, root->cmd->output, lst_env);
+	}
 }
 
 
@@ -47,8 +54,10 @@ void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 {
 	if (root == NULL)
 		return ;
-	if (root->left == NULL && root->right == NULL)
+	if (root->left == NULL && root->right == NULL
+		&& !(root->cmd->type >= REDIR && root->cmd->type <= DREDIR2_E))
 	{
+
 		exec_com(root, input_fd, output_fd, lst_env);
 		return ;
 	}
@@ -59,7 +68,7 @@ void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 	else if (root->cmd->type == PIPE)
 		exec_pipe(root, input_fd, output_fd, lst_env);
 	else if (root->cmd->type >= REDIR && root->cmd->type <= DREDIR2_E)
-		exec_redir(root, lst_env);
+		exec_redir(root, input_fd, output_fd, lst_env);
 }
 
 void printSpaces(int count)
@@ -111,9 +120,16 @@ int main(int argc, char **argv, char **env)
 	// char command[] = "(echo a && echo b) && (echo d && ((echo bruh  > 3 && echo rawr) && echo r)) >> f > c | cat";
 	// char command[] = "(echo a v && echo \"hello world\") && (echo bruh && echo rawr) | cat";
 	// char command[] = "cat << EOF << hello << bye > f > g";
-	char *command = ft_strdup("cat << \'$USER\' ");
-	//char command[] = "ls << EOF -la";
-	// char command[] = "echo a > f > g >> a";
+	//char *command = ft_strdup("cat << \'$USER\' ");
+	char *command = ft_strdup("(echo a && echo b && echo d > f1) > f2 > f3 >> f4");
+	command = ft_strdup("ls | grep f > fichier | wc -l > f << EOF | cat");
+	command = ft_strdup("ls << EOF > f >> gateau | (echo a && echo b) | wc -l");
+	command = ft_strdup("< Makefile cat > /dev/stdout | ls");
+	// A GERER
+	//command = ft_strdup("(echo \"&&  ||  |\") && (echo \"&&  ||  |\")");
+	command = ft_strdup("echo \"");
+	//char *command = ft_strdup("&&");
+	//char command[] = "echo a > f > g >> a";
 	// char command[] = "(echo $USER'$user' && echo b)";
 	int count;
 	t_env *lst_env = spy_env(env);
@@ -137,6 +153,11 @@ int main(int argc, char **argv, char **env)
 	b->start = &n;
 	b->end = count - 1;
 	t_ast *root = build_ast(tokens, b);
+	if (root == NULL)
+	{
+		printf("root is NULL\n");
+		return 1;
+	}
 	printAST(root);
 	printf("\n");
 	exec_ast(root, STDIN_FILENO, STDOUT_FILENO, lst_env);

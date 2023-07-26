@@ -312,3 +312,8 @@ cat << $USER > f
 ls > f2 > f1 > f0
 bash: f1: Permission denied
 f0 N'EST PAS CREE
+
+
+// A GERER
+	command = ft_strdup("echo \"&&\"");
+	

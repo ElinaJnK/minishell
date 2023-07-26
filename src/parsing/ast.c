@@ -98,6 +98,18 @@ void	ast_pipe(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 		ast_op(tokens, root, current, start);
 }
 
+void	otherwise(t_cmd *tokens, t_ast **root, t_ast **current, int i)
+{
+	if (tokens[i].type == AND || tokens[i].type == OR)
+		ast_op(tokens, root, current, i);
+	else if ((tokens[i].type >= REDIR && tokens[i].type <= DREDIR2_E))
+		ast_redir(tokens, root, current, i);
+	else if (tokens[i].type == PIPE)
+		ast_pipe(tokens, root, current, i);
+	else
+		ast_cmd(tokens, root, current, i);
+}
+
 t_ast	*build_ast(t_cmd *tokens, t_border *b)
 {
 	t_ast	*root;
@@ -115,14 +127,8 @@ t_ast	*build_ast(t_cmd *tokens, t_border *b)
 			root = current;
 		if (tokens[i].type == OPEN_PAR)
 			ast_in_par(tokens, &root, &current, &(t_border){&i, b->end});
-		else if (tokens[i].type == AND || tokens[i].type == OR)
-			ast_op(tokens, &root, &current, i);
-		else if ((tokens[i].type >= REDIR && tokens[i].type <= DREDIR2_E))
-			ast_redir(tokens, &root, &current, i);
-		else if (tokens[i].type == PIPE)
-			ast_pipe(tokens, &root, &current, i);
 		else
-			ast_cmd(tokens, &root, &current, i);
+			otherwise(tokens, &root, &current, i);
 		i++;
 	}
 	return (root);

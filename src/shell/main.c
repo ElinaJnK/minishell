@@ -5,7 +5,26 @@ void	failure(const char *message)
 	perror(message);
 	exit(EXIT_FAILURE);
 }
+/*
+void	tchitat()
+{
+	char	*line;
 
+	line = readline("> ");
+	while (line && ft_strncmp(line, limiter, ft_max(ft_strlen(line) - 1,
+			ft_strlen(limiter)) != 0)
+	{
+		add_history(line);
+		
+	}
+}
+
+int	main(int ac, char **av, char **env)
+{
+	if (!*env)
+		return (failure("No environment"), 1);
+	
+}*/
 // // on peut reprendre cette fonction mais on doit faire le parsing sur la ligne
 // void	read_stdin(char *limiter)
 // {

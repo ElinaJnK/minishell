@@ -16,10 +16,7 @@ void	update_tok(char *line, t_token **tok, int *q_flag, t_token *lst_tok)
 void	add_rest(t_token **lst_tok, t_token *tok, int q_flag)
 {
 	if (q_flag == 0 && tok != NULL && tok->content[0] != '\0')
-	{
-		tok->type = get_type(tok->content);
 		add_back_tok(lst_tok, tok);
-	}
 	else if (q_flag == 1 || q_flag == 2)
 	{
 		free(tok);
@@ -52,6 +49,27 @@ void	meta_tok(char *line, int *i, t_token **lst_tok)
 		free(tok);
 }
 
+void	is_true_op(char *line, int *i, t_token **tok, t_token **lst_tok)
+{
+	if (is_op(line + *i) || is_fb(line + *i))
+	{
+		if (is_op(line + *i) || is_fb(line + *i) == DREDIR2
+			|| is_fb(line + *i) == DREDIR2)
+		{
+			(*tok)->content = ft_addchr((*tok)->content, line[(*i)++],
+					*lst_tok);
+			(*tok)->content = ft_addchr((*tok)->content, line[(*i)++],
+					*lst_tok);
+		}
+		else
+			(*tok)->content = ft_addchr((*tok)->content, line[(*i)++],
+					*lst_tok);
+		(*tok)->type = 0;
+	}
+	else
+		(*tok)->content = ft_addchr((*tok)->content, line[*i], *lst_tok);
+}
+
 t_token	*tokenize(char *line, t_env *lst_env)
 {
 	t_token	*lst_tok;
@@ -62,6 +80,15 @@ t_token	*tokenize(char *line, t_env *lst_env)
 	tok = init_param(&lst_tok, &q_flag, &i);
 	while ((size_t)i < ft_strlen(line))
 	{
+		// if (line[i] == '\\' && line[i + 1] != '\0')
+		// {
+		// 	tok->content = ft_addchr(tok->content, line[i + 1], lst_tok);
+		// 	tok->type = 0;
+		// 	i++;
+		// }
+		// if (line[i] == '\\')
+		// 	printf("here\n");
+		// printf("line[%d] = %c\n", i, line[i]);
 		if (lst_tok && last_elem(lst_tok)->type == DREDIR2)
 			quoted(line + i, &lst_tok);
 		if (*(line + i) == '$' && q_flag != 1
@@ -72,7 +99,7 @@ t_token	*tokenize(char *line, t_env *lst_env)
 			if (q_flag == 0 && tok != NULL && tok->content[0] != '\0')
 				doo(&lst_tok, &tok);
 			else if (q_flag == 1 || q_flag == 2)
-				tok->content = ft_addchr(tok->content, line[i], lst_tok);
+				is_true_op(line, &i, &tok, &lst_tok);
 			meta_tok(line, &i, &lst_tok);
 		}
 		update_tok(line + i, &tok, &q_flag, lst_tok);

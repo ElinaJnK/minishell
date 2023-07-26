@@ -59,8 +59,6 @@ void	add_back_tok(t_token **lst_tok, t_token *new)
 	while (tmp->next)
 		tmp = tmp->next;
 	tmp->next = new;
-	if (new && new->type == CMD)
-		new->type = get_type(new->content);
 }
 
 t_token	*new_token(char *content, int type)
