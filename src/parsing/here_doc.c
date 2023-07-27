@@ -7,7 +7,7 @@ int	ft_max(int a, int b)
 	return (b);
 }
 
-void	read_stdin(int fd, char *limiter, int type, t_env *env)
+int	read_stdin(int fd, char *limiter, int type, t_env *env)
 {
 	char	*line;
 	char	*tmp;
@@ -25,7 +25,11 @@ void	read_stdin(int fd, char *limiter, int type, t_env *env)
 			while (line[i])
 			{
 				if (line[i] == '$')
+				{
 					line = expansion(line, &i, env);
+					if (!line)
+						return (EXIT_FAILURE);
+				}
 				i++;
 			}
 			if (line[i - 1] != '\n')
@@ -44,14 +48,14 @@ void	read_stdin(int fd, char *limiter, int type, t_env *env)
 	if (line)
 		free(line);
 	close(fd);
+	return (EXIT_SUCCESS);
 }
 
 int	open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env)
 {
 	if (pipe(pipe_fds) < 0)
 		failure("pipe");
-	read_stdin(pipe_fds[1], limiter, type, env);
-	return (EXIT_SUCCESS);
+	return (read_stdin(pipe_fds[1], limiter, type, env));
 }
 
 void	quoted(char *line, t_token **lst_tok)

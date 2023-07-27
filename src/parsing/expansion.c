@@ -1,15 +1,5 @@
 #include "minishell.h"
 
-void	failure_exp(const char *message, char *line, t_env *env)
-{
-	if (env)
-		free_lst_env(&env);
-	if (line)
-		free(line);
-	perror(message);
-	exit(EXIT_FAILURE);
-}
-
 char	*insert_into_line(char *line, char *var, int start, int end)
 {
 	char	*newline;
@@ -73,6 +63,6 @@ char	*expansion(char *line, int *i, t_env *env)
 	if (line && line[end])
 		newline = expand_env(line, &end, env);
 	else if (!newline)
-		failure_exp("Error in expansion", line, env);
+		return (NULL);
 	return (newline);
 }

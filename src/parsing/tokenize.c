@@ -80,20 +80,15 @@ t_token	*tokenize(char *line, t_env *lst_env)
 	tok = init_param(&lst_tok, &q_flag, &i);
 	while ((size_t)i < ft_strlen(line))
 	{
-		// if (line[i] == '\\' && line[i + 1] != '\0')
-		// {
-		// 	tok->content = ft_addchr(tok->content, line[i + 1], lst_tok);
-		// 	tok->type = 0;
-		// 	i++;
-		// }
-		// if (line[i] == '\\')
-		// 	printf("here\n");
-		// printf("line[%d] = %c\n", i, line[i]);
 		if (lst_tok && last_elem(lst_tok)->type == DREDIR2)
 			quoted(line + i, &lst_tok);
 		if (*(line + i) == '$' && q_flag != 1
 			&& !is_heredoc(lst_tok))
+		{
 			line = expansion(line, &i, lst_env);
+			if (!line)
+				return (NULL);
+		}	
 		else if (is_op(line + i) || is_fb(line + i) || line[i] == ' ')
 		{
 			if (q_flag == 0 && tok != NULL && tok->content[0] != '\0')

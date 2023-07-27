@@ -54,7 +54,7 @@ void	init_op(t_cmd *cmd, t_token *t)
 	cmd->nb_args = 0;
 }
 
-void	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
+int	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
 {
 	int	pipe_fds[2];
 
@@ -77,15 +77,18 @@ void	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
 					0644);
 		else if ((*t)->type == DREDIR2 || (*t)->type == DREDIR2_E)
 		{
-			open_here_doc(pipe_fds, (*t)->content, (*t)->type, env);
+			if (open_here_doc(pipe_fds, (*t)->content, (*t)->type, env)
+				== EXIT_FAILURE)
+				return (failure_parse("open_here_doc failed"), EXIT_FAILURE); 
 			cmd->input = pipe_fds[0];
 		}
 		if (cmd->output < 0 || cmd->input < 0)
-			return (failure_parse("open failed", *t));
+			return (failure_parse("open failed"), EXIT_FAILURE);
 		cmd->type = (*t)->type;
 		cmd->content = ft_strdup((*t)->content);
 		*t = (*t)->next;
 	}
+	return (EXIT_SUCCESS);
 }
 
 // int	in_lst(t_token *seen, int type)

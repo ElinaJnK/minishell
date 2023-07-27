@@ -2,10 +2,10 @@
 
 void	failure_exec(const char *message)
 {
-	if (root)
-		free_ast(root);
-	if (cmds)
-		free_cmds(cmds, count);
+	// if (root)
+	// 	free_ast(root);
+	// if (cmds)
+	// 	free_cmds(cmds, count);
 	perror(message);
 	exit(EXIT_FAILURE);
 }
