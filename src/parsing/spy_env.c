@@ -42,15 +42,21 @@ t_env	*spy_env(char **env)
 	t_env	*lst_env;
 	char	**elem;
 	int		i;
+	int		j;
 
 	i = 0;
+	j = 0;
 	lst_env = NULL;
 	if (!env)
 		return (NULL);
 	while (env && env[i])
 	{
 		elem = get_env(env[i]);
-		add_back_env(&lst_env, new_env(elem[0], elem[1]));
+		add_back_env(&lst_env, new_env(ft_strdup(elem[0]), ft_strdup(elem[1])));
+		j = 0;
+		while (j < 3)
+			free(elem[j++]);
+		free(elem);
 		i++;
 	}
 	return (lst_env);

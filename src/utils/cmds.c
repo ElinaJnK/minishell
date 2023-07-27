@@ -21,7 +21,8 @@ void	free_cmds(t_cmd *cmds, int count)
 				}
 				free(cmds[i].args);
 			}
-			free(cmds[i++].content);
+			if (cmds[i].content)
+				free(cmds[i++].content);
 		}
 		free(cmds);
 	}

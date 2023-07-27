@@ -32,11 +32,13 @@ void	fill_cmd(t_cmd *cmd, t_token **t)
 		(cmd->nb_args)++;
 		tmp = tmp->next;
 	}
+	printf("nb args : %d\n", cmd->nb_args);
 	cmd->args = (char **)malloc(sizeof(char *) * (cmd->nb_args + 2));
 	if (!cmd->args)
 		return (failure_parse("malloc in abr creation", *t));
-	while (*t && (*t)->type == CMD && i < cmd->nb_args + 1)
+	while (t && *t && (*t)->type == CMD && i < cmd->nb_args + 1)
 	{
+		printf("(*t)->content : %s\n", (*t)->content);
 		cmd->args[i] = ft_strdup((*t)->content);
 		*t = (*t)->next;
 		i++;

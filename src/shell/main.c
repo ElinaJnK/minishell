@@ -25,13 +25,11 @@ void	tchitat_stdin(char *limiter, t_env *lst_env)
 		failure("Error in malloc allocation");
 	line = readline("$ ");
 	while (line && ft_strncmp(line, limiter, ft_max(ft_strlen(line) - 1,
-			ft_strlen(limiter))) != 0)
+				ft_strlen(limiter))) != 0)
 	{
 		add_history(line);
 		t = tokenize(line, lst_env);
-		print_list_tok(t);
 		t = tokenize_bise(t);
-		print_list_tok(t);
 		cmds = transform_into_tab(t, &count, lst_env);
 		i = 0;
 		b->start = &i;
@@ -41,13 +39,16 @@ void	tchitat_stdin(char *limiter, t_env *lst_env)
 			exec_ast(root, STDIN_FILENO, STDOUT_FILENO, lst_env);
 		if (root)
 			free_ast(root);
-		free_cmds(cmds, count);
+		if (cmds)
+			free_cmds(cmds, count);
 		if (line)
 			free(line);
+		root = NULL;
+		t = NULL;
+		cmds = NULL;
+		rl_on_new_line();
 		line = readline("$ ");
 	}
-	// if (t)
-	// 	free_lst_tok(&t);
 	if (root)
 		free_ast(root);
 	if (cmds)
@@ -68,6 +69,9 @@ int	main(int ac, char **av, char **env)
 		return (failure("No environment"), 1);
 	lst_env = spy_env(env);
 	tchitat_stdin("exit", lst_env);
+	if (lst_env)
+		free_lst_env(&lst_env);
+	rl_clear_history();
 	return (0);
 }
 

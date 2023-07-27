@@ -34,8 +34,8 @@ t_token	*init_tok(t_token *lst_tok)
 	content = (char *)malloc(sizeof(char));
 	if (!content)
 		return (failure_parse("Error: malloc", lst_tok), NULL);
+	content[0] = '\0';
 	tok = new_token(content, 0);
-	tok->content[0] = '\0';
 	tok->type = 0;
 	tok->next = NULL;
 	return (tok);

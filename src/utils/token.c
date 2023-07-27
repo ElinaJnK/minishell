@@ -83,7 +83,8 @@ void	free_lst_tok(t_token **lst_tok)
 	while (*lst_tok)
 	{
 		tmp = (*lst_tok)->next;
-		free((*lst_tok)->content);
+		if ((*lst_tok)->content)
+			free((*lst_tok)->content);
 		free(*lst_tok);
 		*lst_tok = tmp;
 	}
