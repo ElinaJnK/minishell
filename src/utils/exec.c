@@ -2,6 +2,10 @@
 
 void	failure_exec(const char *message)
 {
+	if (root)
+		free_ast(root);
+	if (cmds)
+		free_cmds(cmds, count);
 	perror(message);
 	exit(EXIT_FAILURE);
 }
@@ -14,7 +18,7 @@ void	execution(int pid, t_cmd *cmd, t_env *lst_env)
 	env = env_to_tab(lst_env);
 	path = get_command_path(cmd->content, lst_env);
 	if (!path)
-		failure("path");
+		failure_exec("path");
 	if (execve(path, cmd->args, env) < 0)
 		failure("execve");
 	else if (pid < 0)

@@ -32,13 +32,11 @@ void	fill_cmd(t_cmd *cmd, t_token **t)
 		(cmd->nb_args)++;
 		tmp = tmp->next;
 	}
-	printf("nb args : %d\n", cmd->nb_args);
 	cmd->args = (char **)malloc(sizeof(char *) * (cmd->nb_args + 2));
 	if (!cmd->args)
 		return (failure_parse("malloc in abr creation", *t));
-	while (t && *t && (*t)->type == CMD && i < cmd->nb_args + 1)
+	while (*t && (*t)->type == CMD && i < cmd->nb_args + 1)
 	{
-		printf("(*t)->content : %s\n", (*t)->content);
 		cmd->args[i] = ft_strdup((*t)->content);
 		*t = (*t)->next;
 		i++;
@@ -90,12 +88,75 @@ void	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
 	}
 }
 
+// int	in_lst(t_token *seen, int type)
+// {
+// 	t_token	*tmp;
+
+// 	tmp = seen;
+// 	while (tmp)
+// 	{
+// 		if (tmp->type == type)
+// 			return (1);
+// 	}
+// 	return (0);
+// }
+
+// int	get_len_lst(t_token *t)
+// {
+// 	t_token	*tmp;
+// 	t_token	*seen;
+// 	int		size;
+
+// 	tmp = t;
+// 	size = 0;
+// 	seen = NULL;
+// 	while (tmp)
+// 	{
+// 		// count the redirs
+// 		while (tmp && !(tmp->type >= AND && t->type <= PIPE)
+// 			&& !(t->type >= OPEN_PAR && t->type <= CLOSE_PAR))
+// 		{
+// 			if (t->type == REDIR && in_lst(seen, t->type) == 0)
+// 			{
+// 				size++;
+// 				add_back_tok(&seen, new_token(ft_strdup(t->content), t->type));
+// 			}
+// 			else if (t->type == REDIR2 && in_lst(seen, t->type) == 0)
+// 			{
+// 				size++;
+// 				add_back_tok(&seen, new_token(ft_strdup(t->content), t->type));
+// 			}
+// 			else if (t->type == DREDIR && in_lst(seen, t->type) == 0)
+// 			{
+// 				size++;
+// 				add_back_tok(&seen, new_token(ft_strdup(t->content), t->type));
+// 			}
+// 			else if ((t->type == DREDIR2 || t->type == DREDIR2_E) && in_lst(seen, t->type) == 0)
+// 			{
+// 				size++;
+// 				add_back_tok(&seen, new_token(ft_strdup(t->content), t->type));
+// 			}
+// 			else
+// 				size++;
+// 			tmp->next;
+// 		}
+// 		size++;
+// 		if (seen)
+// 			free_lst_tok(&seen);
+// 		tmp = tmp->next;
+// 	}
+// 	if (seen)
+// 		free_lst_tok(&seen);
+// 	return (size);
+// }
+
 t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
 {
 	t_cmd	*cmd;
 	t_token	*tmp;
 	int		i;
 
+	//printf("Does it work ?? : %d\n", get_len_lst(t));
 	cmd = malloc(sizeof(t_cmd) * (lst_size_tok(t) + 1));
 	if (!cmd)
 		return (failure_parse("cmd is NULL in-utils", t), NULL);

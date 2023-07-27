@@ -14,7 +14,7 @@ void	free_cmds(t_cmd *cmds, int count)
 			j = 0;
 			if (cmds[i].args)
 			{
-				while (cmds[i].args[j] && j < cmds[i].nb_args)
+				while (cmds[i].args[j] && j <= cmds[i].nb_args)
 				{
 					free(cmds[i].args[j]);
 					j++;

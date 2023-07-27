@@ -78,7 +78,7 @@ void	free_lst_tok(t_token **lst_tok)
 {
 	t_token	*tmp;
 
-	if (!lst_tok)
+	if (!*lst_tok)
 		return ;
 	while (*lst_tok)
 	{

@@ -6,7 +6,6 @@ void	failure(const char *message)
 	exit(EXIT_FAILURE);
 }
 
-
 void	tchitat_stdin(char *limiter, t_env *lst_env)
 {
 	char		*line;
