@@ -22,7 +22,7 @@ void	fill_cmd(t_cmd *cmd, t_token **t)
 
 	tmp = (*t)->next;
 	i = 0;
-	cmd->content = (*t)->content;
+	cmd->content = ft_strdup((*t)->content);
 	cmd->type = (*t)->type;
 	cmd->output = 1;
 	cmd->input = 0;
@@ -37,7 +37,7 @@ void	fill_cmd(t_cmd *cmd, t_token **t)
 		return (failure_parse("malloc in abr creation", *t));
 	while (*t && (*t)->type == CMD && i < cmd->nb_args + 1)
 	{
-		cmd->args[i] = (*t)->content;
+		cmd->args[i] = ft_strdup((*t)->content);
 		*t = (*t)->next;
 		i++;
 	}
@@ -46,7 +46,7 @@ void	fill_cmd(t_cmd *cmd, t_token **t)
 
 void	init_op(t_cmd *cmd, t_token *t)
 {
-	cmd->content = t->content;
+	cmd->content = ft_strdup(t->content);
 	cmd->type = t->type;
 	cmd->output = 1;
 	cmd->input = 0;
@@ -70,7 +70,7 @@ void	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
 			cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_TRUNC,
 					0644);
 		else if ((*t)->type == REDIR2)
-			cmd->input = open((*t)->content, O_RDONLY | O_CREAT | O_TRUNC,
+			cmd->input = open((*t)->content, O_RDONLY | O_CREAT,
 					0644);
 		else if ((*t)->type == DREDIR)
 			cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_APPEND,
@@ -83,7 +83,7 @@ void	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
 		if (cmd->output < 0 || cmd->input < 0)
 			return (failure_parse("open failed", *t));
 		cmd->type = (*t)->type;
-		cmd->content = (*t)->content;
+		cmd->content = ft_strdup((*t)->content);
 		*t = (*t)->next;
 	}
 }
@@ -94,7 +94,6 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
 	t_token	*tmp;
 	int		i;
 
-	(void)tmp;
 	cmd = malloc(sizeof(t_cmd) * (lst_size_tok(t) + 1));
 	if (!cmd)
 		return (failure_parse("cmd is NULL in-utils", t), NULL);
@@ -113,7 +112,8 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
 		}
 		i++;
 	}
-	//free_lst_tok(&tmp);
+	if (tmp)
+		free_lst_tok(&tmp);
 	*count = i;
 	cmd[i].content = NULL;
 	cmd[i].type = -1;

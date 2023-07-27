@@ -5,26 +5,72 @@ void	failure(const char *message)
 	perror(message);
 	exit(EXIT_FAILURE);
 }
-/*
-void	tchitat()
-{
-	char	*line;
 
-	line = readline("> ");
+
+void	tchitat_stdin(char *limiter, t_env *lst_env)
+{
+	char		*line;
+	t_token		*t;
+	t_cmd		*cmds;
+	t_border	*b;
+	int			count;
+	t_ast		*root;
+	int			i;
+
+	root = NULL;
+	t = NULL;
+	cmds = NULL;
+	b = malloc(sizeof(t_border));
+	if (!b)
+		failure("Error in malloc allocation");
+	line = readline("$ ");
 	while (line && ft_strncmp(line, limiter, ft_max(ft_strlen(line) - 1,
-			ft_strlen(limiter)) != 0)
+			ft_strlen(limiter))) != 0)
 	{
 		add_history(line);
-		
+		t = tokenize(line, lst_env);
+		print_list_tok(t);
+		t = tokenize_bise(t);
+		print_list_tok(t);
+		cmds = transform_into_tab(t, &count, lst_env);
+		i = 0;
+		b->start = &i;
+		b->end = count - 1;
+		root = build_ast(cmds, b);
+		if (root)
+			exec_ast(root, STDIN_FILENO, STDOUT_FILENO, lst_env);
+		if (root)
+			free_ast(root);
+		free_cmds(cmds, count);
+		if (line)
+			free(line);
+		line = readline("$ ");
 	}
+	// if (t)
+	// 	free_lst_tok(&t);
+	if (root)
+		free_ast(root);
+	if (cmds)
+		free_cmds(cmds, count);
+	if (line)
+		free(line);
+	if (b)
+		free(b);
 }
 
 int	main(int ac, char **av, char **env)
 {
+	t_env	*lst_env;
+
+	(void)ac;
+	(void)av;
 	if (!*env)
 		return (failure("No environment"), 1);
-	
-}*/
+	lst_env = spy_env(env);
+	tchitat_stdin("exit", lst_env);
+	return (0);
+}
+
 // // on peut reprendre cette fonction mais on doit faire le parsing sur la ligne
 // void	read_stdin(char *limiter)
 // {
@@ -66,3 +112,62 @@ int	main(int ac, char **av, char **env)
 // 		return (ft_putstr_fd("Error\n", 1), 1);
 // 	read_stdin("exit");
 // }
+
+/*int main(int argc, char **argv, char **env)
+{
+	(void)argc;
+	(void)argv;
+	// char command[] = "echo a && echo b | echo c";
+	// char command[] = "echo a | echo c >> f | echo m > f2 | cat ll";
+	// char command[] = "cat << EOF << hello << bye > f << EOF > g";
+	// char command[] = "(echo a && echo b) && (echo d && ((echo bruh  > 3 && echo rawr) && echo r)) >> f > c | cat";
+	// char command[] = "(echo a v && echo \"hello world\") && (echo bruh && echo rawr) | cat";
+	// char command[] = "cat << EOF << hello << bye > f > g";
+	//char *command = ft_strdup("cat << \'$USER\' ");
+	char *command = ft_strdup("(echo a && echo b && echo d > f1) > f2 > f3 >> f4");
+	command = ft_strdup("ls | grep f > fichier | wc -l > f << EOF | cat");
+	command = ft_strdup("ls << EOF > f >> gateau | (echo a && echo b) | wc -l");
+	command = ft_strdup("< Makefile cat > /dev/stdout | ls");
+	// A GERER
+	command = ft_strdup("(echo \"&&  ||  |\") && (echo \"&&  ||  |\")");
+	//command = ft_strdup("echo \"");
+	//char *command = ft_strdup("&&");
+	//char command[] = "echo a > f > g >> a";
+	// char command[] = "(echo $USER'$user' && echo b)";
+	int count;
+	t_env *lst_env = spy_env(env);
+	t_token *t = tokenize(ft_strdup(command), lst_env);
+	print_list_tok(t);
+
+	t_token	*lst_bise = tokenize_bise(t);
+	print_list_tok(lst_bise);
+
+	t_cmd *tokens = transform_into_tab(lst_bise, &count, lst_env);
+	int i = 0;
+	printf("----------------------------------------\n");
+	while (tokens && i < count)
+	{
+		printf("%s\t", tokens[i].content);
+		i++;
+	}
+	printf("\n-----------count : %d--------------------\n", count);
+	t_border *b = malloc(sizeof(t_border));
+	int n = 0;
+	b->start = &n;
+	b->end = count - 1;
+	t_ast *root = build_ast(tokens, b);
+	if (root == NULL)
+	{
+		printf("root is NULL\n");
+		return 1;
+	}
+	printAST(root);
+	printf("\n");
+	exec_ast(root, STDIN_FILENO, STDOUT_FILENO, lst_env);
+	free_ast(root);
+	i = 0;
+	while (i < count)
+		free(tokens[i++].content);
+	free(tokens);
+	return 0;
+}*/

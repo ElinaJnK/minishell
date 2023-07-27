@@ -112,6 +112,7 @@ char	*expansion(char *line, int *i, t_env *env);
 
 /*----in-utils-----*/
 t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env);
+int		ft_max(int a, int b);
 
 /*----spy-env----*/
 void	add_back_env(t_env **lst_env, t_env *new);
@@ -132,6 +133,7 @@ void	free_lst_tok(t_token **lst_tok);
 int		is_heredoc(t_token *lst_tok);
 t_token	*last_elem(t_token *lst_tok);
 void	quoted(char *line, t_token **tok);
+void	free_cmds(t_cmd *cmds, int count);
 
 /*----execution----*/
 char	*get_command_path(char *command, t_env *env);

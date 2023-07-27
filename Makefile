@@ -20,7 +20,8 @@ SOURCES_PARSING 	=	ast.c		\
 
 SOURCES_SHELL 		=	main.c		\
 
-SOURCES_UTILS 		=	env.c		\
+SOURCES_UTILS 		=	cmds.c		\
+						env.c		\
 						exec.c		\
 						token.c		\
 						tree.c		\
