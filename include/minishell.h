@@ -2,7 +2,7 @@
 #define MINISHELL_H
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
+#include <dirent.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -12,6 +12,7 @@
 #include <signal.h>
 /*---to delete after tests----*/
 #include <string.h>
+#include <stdio.h>
 
 enum e_token
 {
@@ -120,6 +121,7 @@ t_env	*spy_env(char **env);
 t_env	*new_env(char *name, char *value);
 char	**env_to_tab(t_env *lst_env);
 void	free_lst_env(t_env **lst_env);
+void	update_env(t_env *lst_env, char *name, char *value);
 
 /*----utils----*/
 void	generate_pipes(int *pipe_fds, int num_pipes);
@@ -139,10 +141,11 @@ void	free_cmds(t_cmd *cmds, int count);
 char	*get_command_path(char *command, t_env *env);
 void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env);
 void	exec_com(t_ast *node, int input_fd, int output_fd, t_env *lst_env);
+int    *exit_status(void);
 
 /*---here doc----*/
 int		open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env);
 
 /*----signal----*/
-void catch_the_signal(int *pipe_fds);
+void catch_the_signal();
 #endif

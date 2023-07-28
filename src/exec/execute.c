@@ -1,5 +1,12 @@
 #include <minishell.h>
 
+int    *exit_status(void)
+{
+    static int    exit_s = 0;
+
+    return (&exit_s);
+}
+
 void	exec_and(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 {
 	int	status;
@@ -7,6 +14,7 @@ void	exec_and(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 	status = 0;
 	exec_ast(root->left, input_fd, output_fd, lst_env);
 	wait(&status);
+	*exit_status() = WEXITSTATUS(status);
 	if (WEXITSTATUS(status) == 0)
 		exec_ast(root->right, input_fd, output_fd, lst_env);
 }
@@ -18,6 +26,7 @@ void	exec_or(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 	status = 0;
 	exec_ast(root->left, input_fd, output_fd, lst_env);
 	wait(&status);
+	*exit_status() = WEXITSTATUS(status);
 	if (WEXITSTATUS(status) != 0)
 		exec_ast(root->right, input_fd, output_fd, lst_env);
 }
@@ -33,6 +42,7 @@ void	exec_pipe(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 	exec_ast(root->left, input_fd, pipe_fds[1], lst_env);
 	close(pipe_fds[1]);
 	wait(&status);
+	*exit_status() = WEXITSTATUS(status);
 	exec_ast(root->right, pipe_fds[0], output_fd, lst_env);
 }
 
@@ -57,7 +67,6 @@ void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 	if (root->left == NULL && root->right == NULL
 		&& !(root->cmd->type >= REDIR && root->cmd->type <= DREDIR2_E))
 	{
-
 		exec_com(root, input_fd, output_fd, lst_env);
 		return ;
 	}
@@ -121,12 +130,12 @@ void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 // 	// char command[] = "(echo a v && echo \"hello world\") && (echo bruh && echo rawr) | cat";
 // 	// char command[] = "cat << EOF << hello << bye > f > g";
 // 	//char *command = ft_strdup("cat << \'$USER\' ");
-// 	char *command = ft_strdup("(echo a && echo b && echo d > f1) > f2 > f3 >> f4");
-// 	command = ft_strdup("ls | grep f > fichier | wc -l > f << EOF | cat");
-// 	command = ft_strdup("ls << EOF > f >> gateau | (echo a && echo b) | wc -l");
-// 	command = ft_strdup("< Makefile cat > /dev/stdout | ls");
+// 	char *command = ft_strdup("echo lolo$?haha");
+// 	// command = ft_strdup("ls | grep f > fichier | wc -l > f << EOF | cat");
+// 	// command = ft_strdup("ls << EOF > f >> gateau | (echo a && echo b) | wc -l");
+// 	// command = ft_strdup("< Makefile cat > /dev/stdout | ls");
 // 	// A GERER
-// 	command = ft_strdup("(echo \"&&  ||  |\") && (echo \"&&  ||  |\")");
+// 	// command = ft_strdup("(echo \"&&  ||  |\") && (echo \"&&  ||  |\")");
 // 	//command = ft_strdup("echo \"");
 // 	//char *command = ft_strdup("&&");
 // 	//char command[] = "echo a > f > g >> a";

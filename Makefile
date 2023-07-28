@@ -11,14 +11,16 @@ SOURCES_EXEC		=	execute.c	\
 
 SOURCES_PARSING 	=	ast.c		\
 						expansion.c	\
+						here_doc.c	\
 						in_utils.c	\
 						spy_env.c	\
 						tcheck.c	\
 						tok_tik.c	\
 						tokenize.c	\
-						here_doc.c	\
+						wildcard.c	\
 
 SOURCES_SHELL 		=	main.c		\
+						#signal.c 	\
 
 SOURCES_UTILS 		=	cmds.c		\
 						env.c		\

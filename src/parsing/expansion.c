@@ -43,12 +43,22 @@ char	*expand_env(char *line, int *i, t_env *env)
 	int		end;
 
 	end = *i + 1;
-	while (*(line + end) && !is_op(line + end) && !is_fb(line + end)
-		&& line[end] != '$' && line[end] != '\'' && line[end] != '\"'
-		&& line[end] != ' ')
-		end++;
-	end--;
-	var = search_var(line + *i + 1, end - *i - 1, env);
+	if (*(line + *i + 1) == '?')
+	{
+		end = *i + 1;
+		var = ft_itoa(*exit_status());
+		if (!var)
+			return (NULL);
+	}
+	else
+	{
+		while (*(line + end) && !is_op(line + end) && !is_fb(line + end)
+			&& line[end] != '$' && line[end] != '\'' && line[end] != '\"'
+			&& line[end] != ' ')
+			end++;
+		end--;
+			var = search_var(line + *i + 1, end - *i - 1, env);
+	}
 	newline = insert_into_line(line, var, *i, end);
 	return (newline);
 }

@@ -22,14 +22,22 @@ void	tchitat_stdin(char *limiter, t_env *lst_env)
 	b = malloc(sizeof(t_border));
 	if (!b)
 		failure("Error in malloc allocation");
+	//catch_the_signal();
 	line = readline("$ ");
-	while (line && ft_strncmp(line, limiter, ft_max(ft_strlen(line) - 1,
-				ft_strlen(limiter))) != 0)
+	while (1)
 	{
-		add_history(line);
-		t = tokenize(line, lst_env);
+		//add_history(line);
+		if (!line || ft_strncmp(line, limiter, ft_max(ft_strlen(line) - 1,
+				ft_strlen(limiter))) == 0)
+			break ;
+		char *tmp = ft_strdup(line);
+		t = tokenize(tmp, lst_env);
+		//free(tmp);
 		t = tokenize_bise(t);
-		cmds = transform_into_tab(t, &count, lst_env);
+		if (t && lst_env)
+			cmds = transform_into_tab(t, &count, lst_env);
+		if (!cmds)
+			failure("Error in parsing");
 		i = 0;
 		b->start = &i;
 		b->end = count - 1;
@@ -45,7 +53,7 @@ void	tchitat_stdin(char *limiter, t_env *lst_env)
 		root = NULL;
 		t = NULL;
 		cmds = NULL;
-		rl_on_new_line();
+		// rl_on_new_line();
 		line = readline("$ ");
 	}
 	if (root)
@@ -70,8 +78,8 @@ int	main(int ac, char **av, char **env)
 	tchitat_stdin("exit", lst_env);
 	if (lst_env)
 		free_lst_env(&lst_env);
-	rl_clear_history();
-	return (0);
+	//rl_clear_history();
+	return (*exit_status());
 }
 
 // // on peut reprendre cette fonction mais on doit faire le parsing sur la ligne

@@ -316,4 +316,8 @@ f0 N'EST PAS CREE
 
 // A GERER
 	command = ft_strdup("echo \"&&\"");
+# WILDCARD *
+- if "" nothing changes
+- if *12 no pattern found, take the star as any character
+- if pattern found, replace with pattern
 	
