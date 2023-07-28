@@ -47,8 +47,7 @@ void	execution(int pid, t_cmd *cmd, int output_fd, t_env *lst_env)
 	char	**env;
 
 	env = env_to_tab(lst_env);
-	if (is_builtin(cmd
-	, output_fd, lst_env) == EXIT_SUCCESS)
+	if (is_builtin(cmd, output_fd, lst_env) == EXIT_SUCCESS)
 		return ;
 	if (is_paf(cmd->content))
 		path = cmd->content;
