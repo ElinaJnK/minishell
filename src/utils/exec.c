@@ -24,30 +24,31 @@ int	is_paf(char *cmd)
 	return (0);
 }
 
-int	is_builtin(t_cmd *cmd, t_env *lst_env)
+int	is_builtin(t_cmd *cmd, int output_fd, t_env *lst_env)
 {
-	if (ft_strcmp(cmd->content, "cd"))
-		return (exec_cd(cmd, lst_env));
-	if (ft_strcmp(cmd->content, "echo"))
-		return (exec_echo(cmd, lst_env));
-	if (ft_strcmp(cmd->content, "env"))
-		return (exec_env(cmd, lst_env));
-	else if (ft_strcmp(cmd->content, "export"))
+	if (ft_strncmp(cmd->content, "cd", ft_strlen(cmd->content) + 1))
+		return (exec_cd(cmd));
+	if (ft_strncmp(cmd->content, "echo", ft_strlen(cmd->content) + 1))
+		return (exec_echo(cmd, output_fd));
+	if (ft_strncmp(cmd->content, "env", ft_strlen(cmd->content) + 1))
+		return (exec_env(cmd, output_fd, lst_env));
+	else if (ft_strncmp(cmd->content, "export", ft_strlen(cmd->content) + 1))
 		return (exec_export(cmd, lst_env));
-	else if (ft_strcmp(cmd->content, "pwd"))
-		return (exec_pwd(cmd, lst_env));
-	else if (ft_strcmp(cmd->content, "unset"))
+	else if (ft_strncmp(cmd->content, "pwd", ft_strlen(cmd->content) + 1))
+		return (exec_pwd(cmd));
+	else if (ft_strncmp(cmd->content, "unset", ft_strlen(cmd->content) + 1))
 		return (exec_unset(cmd, lst_env));
 	return (EXIT_FAILURE);
 }
 
-void	execution(int pid, t_cmd *cmd, t_env *lst_env)
+void	execution(int pid, t_cmd *cmd, int output_fd, t_env *lst_env)
 {
 	char	*path;
 	char	**env;
 
 	env = env_to_tab(lst_env);
-	if (is_builtin(cmd->content, lst_env) == EXIT_SUCCESS)
+	if (is_builtin(cmd
+	, output_fd, lst_env) == EXIT_SUCCESS)
 		return ;
 	if (is_paf(cmd->content))
 		path = cmd->content;
@@ -60,11 +61,6 @@ void	execution(int pid, t_cmd *cmd, t_env *lst_env)
 	else if (pid < 0)
 		failure("pid");
 }
-// /blabla/ls
-// cherche ls
-// cmp path pr ls et path donne
-// 
-// si le path est pas le mm alors il donne a execve
 
 void	exec_com(t_ast *node, int input_fd, int output_fd, t_env *lst_env)
 {
@@ -86,7 +82,7 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_env *lst_env)
 			dup2(output_fd, STDOUT_FILENO);
 			close(output_fd);
 		}
-		execution(pid, node->cmd, lst_env);
+		execution(pid, node->cmd, output_fd, lst_env);
 		failure_exec("fork error");
 	}
 	else

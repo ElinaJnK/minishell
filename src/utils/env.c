@@ -85,3 +85,28 @@ void	free_lst_env(t_env **lst_env)
 		*lst_env = tmp;
 	}
 }
+
+void	lst_del_env(t_env *lst_env, char *name)
+{
+	t_env	*tmp;
+	t_env	*prev;
+
+	tmp = lst_env;
+	prev = NULL;
+	while (tmp)
+	{
+		if (!ft_strncmp(tmp->name, name, ft_strlen(tmp->name) + 1))
+		{
+			if (prev)
+				prev->next = tmp->next;
+			else
+				lst_env = tmp->next;
+			free(tmp->name);
+			free(tmp->value);
+			free(tmp);
+			return ;
+		}
+		prev = tmp;
+		tmp = tmp->next;
+	}
+}

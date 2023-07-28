@@ -1,12 +1,11 @@
 #include "minishell.h"
 
-
 int	check_name(char *name)
 {
 	int	i;
 
 	i = 0;
-	if (!name || !ft_isalpha(name[0]))
+	if (!name || (!ft_isalpha(name[0]) && name[0] != '_'))
 		return (EXIT_FAILURE);
 	while (name[i])
 	{
@@ -34,17 +33,17 @@ int	check_env(char **env)
 int	exec_export(t_cmd *cmd, t_env *lst_env)
 {
 	char	**env;
-	int 	i;
+	int		i;
 
 	env = NULL;
 	i = 1;
 	if (!cmd || cmd->nb_args == 0)
-		return (failure_exec("bash: export"), EXIT_FAILURE);
+		return (failure_exec("bash"), EXIT_FAILURE);
 	while (cmd->args[i])
 	{
-		env = ft_split(cmd->args[i], '=');
+		env = get_env(cmd->args[i]);
 		if (check_env(env) == EXIT_FAILURE)
-			return (failure_exec("bash: export", EXIT_FAILURE));
+			return (failure_exec("bash"), EXIT_FAILURE);
 		lst_add_env(lst_env, env[0], env[1]);
 		free(env[0]);
 		free(env[1]);

@@ -59,7 +59,6 @@ void	exec_redir(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 	}
 }
 
-
 void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env)
 {
 	if (root == NULL)

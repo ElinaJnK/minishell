@@ -118,6 +118,7 @@ int		ft_max(int a, int b);
 /*----spy-env----*/
 void	add_back_env(t_env **lst_env, t_env *new);
 t_env	*spy_env(char **env);
+char	**get_env(char *data);
 t_env	*new_env(char *name, char *value);
 char	**env_to_tab(t_env *lst_env);
 void	free_lst_env(t_env **lst_env);
@@ -141,10 +142,18 @@ void	free_cmds(t_cmd *cmds, int count);
 char	*get_command_path(char *command, t_env *env);
 void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env);
 void	exec_com(t_ast *node, int input_fd, int output_fd, t_env *lst_env);
-int    *exit_status(void);
+int		*exit_status(void);
 
 /*---here doc----*/
 int		open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env);
+
+/*----builtins----*/
+int		exec_cd(t_cmd *cmd);
+int		exec_echo(t_cmd *cmd, int fd_out);
+int		exec_env(t_cmd *cmd, int fd_out, t_env *lst_env);
+int		exec_export(t_cmd *cmd, t_env *lst_env);
+int		exec_pwd(t_cmd *cmd);
+int		exec_unset(t_cmd *cmd, t_env *lst_env);
 
 /*----signal----*/
 void catch_the_signal();

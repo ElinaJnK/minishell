@@ -27,9 +27,9 @@ void	tchitat_stdin(char *limiter, t_env *lst_env)
 	while (1)
 	{
 		//add_history(line);
-		if (!line || ft_strncmp(line, limiter, ft_max(ft_strlen(line) - 1,
-				ft_strlen(limiter))) == 0)
-			break ;
+		// if (!line || ft_strncmp(line, limiter, ft_max(ft_strlen(line) - 1,
+		// 		ft_strlen(limiter))) == 0)
+		// 	break ;
 		char *tmp = ft_strdup(line);
 		t = tokenize(tmp, lst_env);
 		//free(tmp);
