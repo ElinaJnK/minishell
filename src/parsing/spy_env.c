@@ -63,6 +63,7 @@ t_env	*spy_env(char **env)
 }
 
 /*-------------------------------------TESTS-----------------------*/
+
 // void print_list_env(t_env *lst_env)
 // {
 // 	t_env *temp;

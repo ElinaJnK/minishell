@@ -15,15 +15,17 @@ void	tchitat_stdin(char *limiter, t_env *lst_env)
 	int			count;
 	t_ast		*root;
 	int			i;
+	t_all		*all;
 
 	root = NULL;
 	t = NULL;
 	cmds = NULL;
+	(void)limiter;
 	b = malloc(sizeof(t_border));
 	if (!b)
 		failure("Error in malloc allocation");
 	//catch_the_signal();
-	line = readline("$ ");
+	line = readline("(▼・ᴥ・▼)$ ");
 	while (1)
 	{
 		//add_history(line);
@@ -34,6 +36,7 @@ void	tchitat_stdin(char *limiter, t_env *lst_env)
 		t = tokenize(tmp, lst_env);
 		//free(tmp);
 		t = tokenize_bise(t);
+		t = tokenize_crise(t);
 		if (t && lst_env)
 			cmds = transform_into_tab(t, &count, lst_env);
 		if (!cmds)
@@ -42,8 +45,11 @@ void	tchitat_stdin(char *limiter, t_env *lst_env)
 		b->start = &i;
 		b->end = count - 1;
 		root = build_ast(cmds, b);
-		if (root)
-			exec_ast(root, STDIN_FILENO, STDOUT_FILENO, lst_env);
+		if (root && cmds && lst_env)
+		{
+			all = build_all(cmds, root, lst_env, count);
+			exec_ast(all->ast, STDIN_FILENO, STDOUT_FILENO, all);
+		}
 		if (root)
 			free_ast(root);
 		if (cmds)
@@ -54,7 +60,7 @@ void	tchitat_stdin(char *limiter, t_env *lst_env)
 		t = NULL;
 		cmds = NULL;
 		// rl_on_new_line();
-		line = readline("$ ");
+		line = readline("(▼・ᴥ・▼)$ ");
 	}
 	if (root)
 		free_ast(root);

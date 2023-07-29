@@ -19,3 +19,14 @@ void	free_ast(t_ast *node)
 	free_ast(node->right);
 	free(node);
 }
+
+void	free_all(t_all *all)
+{
+	if (all)
+	{
+		free_ast(all->ast);
+		free_cmds(all->cmd, all->count);
+		free_lst_env(&all->env);
+	}
+	free(all);
+}

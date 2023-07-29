@@ -134,6 +134,20 @@ t_ast	*build_ast(t_cmd *tokens, t_border *b)
 	return (root);
 }
 
+t_all	*build_all(t_cmd *tokens, t_ast *root, t_env *lst_env, int count)
+{
+	t_all	*all;
+
+	all = malloc(sizeof(t_all));
+	if (!all)
+		return (NULL);
+	all->ast = root;
+	all->cmd = tokens;
+	all->env = lst_env;
+	all->count = count;
+	return (all);
+}
+
 /*------------------------------------FUNCTIONS TO DELETE-----------------------------------------------------*/
 
 //Function to print the AST in postfix order (for demonstration purposes)

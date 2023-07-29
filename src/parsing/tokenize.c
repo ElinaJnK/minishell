@@ -165,6 +165,43 @@ t_token	*tokenize_bise(t_token *tok)
 	return (res);
 }
 
+t_token	*tokenize_crise(t_token *tok)
+{
+	t_token	*tmp;
+	char	*pwd;
+	t_token	*res;
+	int		flag;
+
+	pwd = getcwd(NULL, 0);
+	tmp = tok;
+	flag = 0;
+	while (tmp)
+	{
+		if (tmp->type == CMD && tmp->next)
+		{
+			add_back_tok(&res, new_token(ft_strdup(tmp->content), tmp->type));
+			tmp = tmp->next;
+			while (tmp && tmp->type == CMD)
+			{
+				process_wild(tmp->content, pwd, &res, &flag);
+				if (flag == 0)
+					add_back_tok(&res, new_token(ft_strdup(tmp->content), tmp->type));
+				else if (flag == 1)
+					flag = 0;
+				tmp = tmp->next;
+			}
+		}
+		else
+		{
+			add_back_tok(&res, new_token(ft_strdup(tmp->content), tmp->type));
+			tmp = tmp->next;
+		}
+	}
+	if (tok)
+		free_lst_tok(&tok);
+	return (res);
+}
+
 /*------------------------------------FUNCTIONS TO DELETE-----------------------------------------------------*/
 
 void print_list_tok(t_token *lst_tok)

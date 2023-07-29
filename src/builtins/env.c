@@ -10,7 +10,7 @@ void	free_tab(char **tab)
 	free(tab);
 }
 
-int	exec_env(t_cmd *cmd, int fd_out, t_env *lst_env)
+int		exec_env(t_cmd *cmd, int fd_out, t_env *lst_env)
 {
 	int		i;
 	char	**res;

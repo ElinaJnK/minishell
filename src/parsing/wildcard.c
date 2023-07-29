@@ -22,11 +22,10 @@ int	wildcard_match(const char *str, const char *pattern)
 	return (0);
 }
 
-void	process_wild(const char *pattern, const char *path)
+void	process_wild(const char *pattern, const char *path, t_token **tok, int *flag)
 {
 	DIR				*dir;
 	struct dirent	*entry;
-	//char			*subpath;
 
 	dir = opendir(path);
 	if (!dir)
@@ -41,15 +40,11 @@ void	process_wild(const char *pattern, const char *path)
 			&& ft_strncmp(entry->d_name, "..", 3) != 0)
 		{
 			if (wildcard_match(entry->d_name, pattern))
-				printf("%s\n", entry->d_name);
-			// if (entry->d_type == DT_DIR)
-			// {
-			//     subpath = malloc(sizeof(char) * 100);
-			//     snprintf(subpath, sizeof(subpath), "%s/%s", path,
-			//              entry->d_name);
-			//     process_wild(pattern, subpath);
-			//     free(subpath);
-			// }
+			{
+				add_back_tok(tok, new_token(ft_strdup(entry->d_name), CMD));
+				*flag = 1;
+			}
+				//printf("%s\n", entry->d_name);
 		}
 		entry = readdir(dir);
 	}

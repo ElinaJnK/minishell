@@ -10,6 +10,7 @@
 #include <readline/history.h>
 #include "../libft/libft.h"
 #include <signal.h>
+#include <errno.h>
 /*---to delete after tests----*/
 #include <string.h>
 #include <stdio.h>
@@ -40,7 +41,6 @@ typedef struct s_token
 {
 	char			*content;
 	int				type;
-	t_error			*error;
 	struct s_token	*next;
 }	t_token;
 
@@ -50,7 +50,6 @@ typedef struct s_cmd
 	char	**args;
 	int		nb_args;
 	int		type;
-	t_error	*error;
 	int		input;
 	int		output;
 }	t_cmd;
@@ -75,6 +74,14 @@ typedef struct s_env
 	struct s_env	*next;
 }	t_env;
 
+typedef struct s_all
+{
+	t_env	*env;
+	t_ast	*ast;
+	t_cmd	*cmd;
+	int		count;
+}	t_all;
+
 typedef struct s_sig
 {
 	int		ctrlc;
@@ -95,6 +102,7 @@ void	failure_exec(const char *message);
 //void	read_stdin(char *limiter);
 t_token	*tokenize(char *line, t_env *lst_env);
 t_token	*tokenize_bise(t_token *tok);
+t_token	*tokenize_crise(t_token *tok);
 void	check_tok(t_token *lst_tok);
 
 /*----parsing help functions----*/
@@ -102,6 +110,10 @@ t_token	*init_param(t_token **lst_tok, int *q_flag, int *i);
 void	doo(t_token	**lst_tok, t_token **tok);
 t_token	*init_tok(t_token *lst_tok);
 char	*ft_addchr(char *s1, char c, t_token *lst_tok);
+t_all	*build_all(t_cmd *tokens, t_ast *root, t_env *lst_env, int count);
+
+/*----wildcard----*/
+void	process_wild(const char *pattern, const char *path, t_token **tok, int *flag);
 
 /*----ast tree----*/
 void	free_ast(t_ast *a);
@@ -123,6 +135,7 @@ t_env	*new_env(char *name, char *value);
 char	**env_to_tab(t_env *lst_env);
 void	free_lst_env(t_env **lst_env);
 void	update_env(t_env *lst_env, char *name, char *value);
+void	lst_del_env(t_env *lst_env, char *name);
 
 /*----utils----*/
 void	generate_pipes(int *pipe_fds, int num_pipes);
@@ -137,11 +150,12 @@ int		is_heredoc(t_token *lst_tok);
 t_token	*last_elem(t_token *lst_tok);
 void	quoted(char *line, t_token **tok);
 void	free_cmds(t_cmd *cmds, int count);
+void	free_all(t_all *all);
 
 /*----execution----*/
 char	*get_command_path(char *command, t_env *env);
-void	exec_ast(t_ast *root, int input_fd, int output_fd, t_env *lst_env);
-void	exec_com(t_ast *node, int input_fd, int output_fd, t_env *lst_env);
+void	exec_ast(t_ast *root, int input_fd, int output_fd, t_all *all);
+void	exec_com(t_ast *node, int input_fd, int output_fd, t_all *all);
 int		*exit_status(void);
 
 /*---here doc----*/
@@ -154,6 +168,8 @@ int		exec_env(t_cmd *cmd, int fd_out, t_env *lst_env);
 int		exec_export(t_cmd *cmd, t_env *lst_env);
 int		exec_pwd(t_cmd *cmd);
 int		exec_unset(t_cmd *cmd, t_env *lst_env);
+int		exec_exit(t_cmd *cmd, t_all *all, int ft_out);
+
 
 /*----signal----*/
 void catch_the_signal();
