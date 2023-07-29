@@ -135,7 +135,8 @@ t_env	*new_env(char *name, char *value);
 char	**env_to_tab(t_env *lst_env);
 void	free_lst_env(t_env **lst_env);
 void	update_env(t_env *lst_env, char *name, char *value);
-void	lst_del_env(t_env *lst_env, char *name);
+void	lst_del_env(t_env **lst_env, char *name);
+int		lst_size_env(t_env *lst);
 
 /*----utils----*/
 void	generate_pipes(int *pipe_fds, int num_pipes);
@@ -155,7 +156,7 @@ void	free_all(t_all *all);
 /*----execution----*/
 char	*get_command_path(char *command, t_env *env);
 void	exec_ast(t_ast *root, int input_fd, int output_fd, t_all *all);
-void	exec_com(t_ast *node, int input_fd, int output_fd, t_all *all);
+void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all);
 int		*exit_status(void);
 
 /*---here doc----*/
@@ -165,9 +166,9 @@ int		open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env);
 int		exec_cd(t_cmd *cmd);
 int		exec_echo(t_cmd *cmd, int fd_out);
 int		exec_env(t_cmd *cmd, int fd_out, t_env *lst_env);
-int		exec_export(t_cmd *cmd, t_env *lst_env);
+int		exec_export(t_cmd *cmd, t_env **lst_env);
 int		exec_pwd(t_cmd *cmd);
-int		exec_unset(t_cmd *cmd, t_env *lst_env);
+int		exec_unset(t_cmd *cmd, t_env **lst_env);
 int		exec_exit(t_cmd *cmd, t_all *all, int ft_out);
 
 

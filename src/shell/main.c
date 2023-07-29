@@ -6,7 +6,21 @@ void	failure(const char *message)
 	exit(EXIT_FAILURE);
 }
 
-void	tchitat_stdin(char *limiter, t_env *lst_env)
+void print_list_env(t_env *lst_env)
+{
+	t_env *temp;
+
+	temp = lst_env;
+	while (temp)
+	{
+		printf("%s  =   %s", temp->name, temp->value);
+		// printf("[%s]->", temp->content);
+		temp = temp->next;
+		printf("\n");
+	}
+}
+
+void	tchitat_stdin(char *limiter, t_all **all)
 {
 	char		*line;
 	t_token		*t;
@@ -15,7 +29,6 @@ void	tchitat_stdin(char *limiter, t_env *lst_env)
 	int			count;
 	t_ast		*root;
 	int			i;
-	t_all		*all;
 
 	root = NULL;
 	t = NULL;
@@ -33,22 +46,24 @@ void	tchitat_stdin(char *limiter, t_env *lst_env)
 		// 		ft_strlen(limiter))) == 0)
 		// 	break ;
 		char *tmp = ft_strdup(line);
-		t = tokenize(tmp, lst_env);
+		t = tokenize(tmp, (*all)->env);
 		//free(tmp);
 		t = tokenize_bise(t);
 		t = tokenize_crise(t);
-		if (t && lst_env)
-			cmds = transform_into_tab(t, &count, lst_env);
+		if (t && (*all)->env)
+			cmds = transform_into_tab(t, &count, (*all)->env);
 		if (!cmds)
 			failure("Error in parsing");
 		i = 0;
 		b->start = &i;
 		b->end = count - 1;
 		root = build_ast(cmds, b);
-		if (root && cmds && lst_env)
+		if (root && cmds && (*all)->env)
 		{
-			all = build_all(cmds, root, lst_env, count);
-			exec_ast(all->ast, STDIN_FILENO, STDOUT_FILENO, all);
+			(*all)->cmd = cmds;
+			(*all)->ast = root;
+			(*all)->count = count;
+			exec_ast((*all)->ast, STDIN_FILENO, STDOUT_FILENO, *all);
 		}
 		if (root)
 			free_ast(root);
@@ -75,16 +90,23 @@ void	tchitat_stdin(char *limiter, t_env *lst_env)
 int	main(int ac, char **av, char **env)
 {
 	t_env	*lst_env;
+	t_all	*all;
 
 	(void)ac;
 	(void)av;
+	if (ac != 1 || av[1])
+	{
+		printf("This program does not accept arguments\n");
+		exit(0);
+	}
 	if (!*env)
 		return (failure("No environment"), 1);
 	lst_env = spy_env(env);
-	tchitat_stdin("exit", lst_env);
+	all = build_all(NULL, NULL, lst_env, 0);
+	tchitat_stdin("exit", &all);
 	if (lst_env)
 		free_lst_env(&lst_env);
-	//rl_clear_history();
+	rl_clear_history();
 	return (*exit_status());
 }
 

@@ -66,7 +66,7 @@ void	exec_ast(t_ast *root, int input_fd, int output_fd, t_all *all)
 	if (root->left == NULL && root->right == NULL
 		&& !(root->cmd->type >= REDIR && root->cmd->type <= DREDIR2_E))
 	{
-		exec_com(root, input_fd, output_fd, all);
+		exec_com(root, input_fd, output_fd, &all);
 		return ;
 	}
 	if (root->cmd->type == AND)

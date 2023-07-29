@@ -35,11 +35,11 @@ int	do_builtin(t_cmd *cmd, int output_fd, t_all *all)
 	else if (!ft_strncmp(cmd->content, "exit", ft_strlen(cmd->content) + 1))
 		return (exec_exit(cmd, all, output_fd));
 	else if (!ft_strncmp(cmd->content, "export", ft_strlen(cmd->content) + 1))
-		return (exec_export(cmd, all->env));
+		return (exec_export(cmd, &(all->env)));
 	else if (!ft_strncmp(cmd->content, "pwd", ft_strlen(cmd->content) + 1))
 		return (exec_pwd(cmd));
 	else if (!ft_strncmp(cmd->content, "unset", ft_strlen(cmd->content) + 1))
-		return (exec_unset(cmd, all->env));
+		return (exec_unset(cmd, &(all->env)));
 	return (EXIT_FAILURE);
 }
 
@@ -70,7 +70,10 @@ int	execution(int pid, t_cmd *cmd, int output_fd, t_all *all)
 	else
 		path = get_command_path(cmd->content, all->env);
 	if (!path)
-		failure_exec("bash");
+	{
+		*exit_status() = EXIT_FAILURE;
+		failure("bash");
+	}
 	if (execve(path, cmd->args, env) < 0)
 		failure("bash");
 	else if (pid < 0)
@@ -78,14 +81,14 @@ int	execution(int pid, t_cmd *cmd, int output_fd, t_all *all)
 	return (EXIT_FAILURE);
 }
 
-void	exec_com(t_ast *node, int input_fd, int output_fd, t_all *all)
+void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 {
 	pid_t	pid;
 	int		status;
 
 	if (is_builtin(node->cmd))
 	{
-		*exit_status() = do_builtin(node->cmd, output_fd, all);
+		*exit_status() = do_builtin(node->cmd, output_fd, *all);
 		return ;
 	}
 	pid = fork();
@@ -103,7 +106,7 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all *all)
 			dup2(output_fd, STDOUT_FILENO);
 			close(output_fd);
 		}
-		if (execution(pid, node->cmd, output_fd, all) == EXIT_FAILURE)
+		if (execution(pid, node->cmd, output_fd, *all) == EXIT_FAILURE)
 			failure_exec("fork error");
 	}
 	else

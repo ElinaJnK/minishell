@@ -23,7 +23,7 @@ char	**env_to_tab(t_env *lst_env)
 	char	*str;
 
 	env = (char **)malloc(sizeof(char *) * (lst_size_env(lst_env) + 1));
-	if (!env)
+	if (!env || !lst_env)
 		return (failure("lst_env: env not properly malloc'd"), NULL);
 	tmp = lst_env;
 	i = 0;
@@ -64,8 +64,8 @@ t_env	*new_env(char *name, char *value)
 	el = malloc(sizeof(t_env));
 	if (!el)
 		failure("malloc error");
-	el->name = name;
-	el->value = value;
+	el->name = ft_strdup(name);
+	el->value = ft_strdup(value);
 	el->next = NULL;
 	return (el);
 }
@@ -86,27 +86,37 @@ void	free_lst_env(t_env **lst_env)
 	}
 }
 
-void	lst_del_env(t_env *lst_env, char *name)
+void	lst_del_env(t_env **lst_env, char *name)
 {
-	t_env	*tmp;
-	t_env	*prev;
+	t_env *temp;
+	t_env *prev;
 
-	tmp = lst_env;
+	temp = *lst_env;
 	prev = NULL;
-	while (tmp)
+	if (!*lst_env || !name)
+		return ;
+	while (temp)
 	{
-		if (!ft_strncmp(tmp->name, name, ft_strlen(tmp->name) + 1))
+		// printf("temp name : %s name :%s\n", temp->name, name);
+		if (ft_strncmp(temp->name, name, ft_strlen(temp->name) + 1) == 0)
 		{
 			if (prev)
-				prev->next = tmp->next;
+				prev->next = temp->next;
 			else
-				lst_env = tmp->next;
-			free(tmp->name);
-			free(tmp->value);
-			free(tmp);
-			return ;
+				*lst_env = temp->next;
+			// free(temp->name);
+			// free(temp->value);
+			free(temp);
+			if (prev)
+				temp = prev->next;
+			else
+				temp = *lst_env;
+			// printf("The beginning is %s\n", (*lst_env)->name);
 		}
-		prev = tmp;
-		tmp = tmp->next;
+		else
+		{
+			prev = temp;
+			temp = temp->next;
+		}
 	}
-}
+}	

@@ -22,15 +22,15 @@ char	*insert_into_line(char *line, char *var, int start, int end)
 	return (newline);
 }
 
-char	*search_var(char *var, int size, t_env *env)
+char	*search_var(char *var, t_env *env)
 {
 	t_env	*tmp;
 
 	tmp = env;
 	while (tmp)
 	{
-		if (ft_strncmp(tmp->name, var, size) == 0)
-			return (tmp->value);
+		if (ft_strncmp(tmp->name, var, ft_strlen(var) + 1) == 0)
+			return (ft_strdup(tmp->value));
 		tmp = tmp->next;
 	}
 	return (ft_strdup(""));
@@ -57,7 +57,7 @@ char	*expand_env(char *line, int *i, t_env *env)
 			&& line[end] != ' ')
 			end++;
 		end--;
-			var = search_var(line + *i + 1, end - *i - 1, env);
+		var = search_var(line + *i + 1, env);
 	}
 	newline = insert_into_line(line, var, *i, end);
 	return (newline);

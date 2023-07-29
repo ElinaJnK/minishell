@@ -175,6 +175,7 @@ t_token	*tokenize_crise(t_token *tok)
 	pwd = getcwd(NULL, 0);
 	tmp = tok;
 	flag = 0;
+	res = NULL;
 	while (tmp)
 	{
 		if (tmp->type == CMD && tmp->next)

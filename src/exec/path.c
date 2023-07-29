@@ -56,5 +56,7 @@ char	*get_command_path(char *command, t_env *env)
 		}
 		tmp = tmp->next;
 	}
+	if (!path)
+		return (NULL);
 	return (find_path(path, command));
 }

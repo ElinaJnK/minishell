@@ -27,7 +27,6 @@ int	exec_exit(t_cmd *cmd, t_all *all, int fd_out)
 		if (cmd->nb_args >= 2 || is_num(cmd->args[1]) == EXIT_FAILURE)
 		{
 			*exit_status() = EXIT_FAILURE;
-			//errno = EXIT_FAILURE;
 			perror("exit");
 			return (EXIT_FAILURE);
 		}

@@ -30,7 +30,7 @@ int	check_env(char **env)
 	return (EXIT_SUCCESS);
 }
 
-int		exec_export(t_cmd *cmd, t_env *lst_env)
+int		exec_export(t_cmd *cmd, t_env **lst_env)
 {
 	char	**env;
 	int		i;
@@ -44,7 +44,7 @@ int		exec_export(t_cmd *cmd, t_env *lst_env)
 		env = get_env(cmd->args[i]);
 		if (check_env(env) == EXIT_FAILURE)
 			return (failure_exec("bash"), EXIT_FAILURE);
-		add_back_env(&lst_env, new_env(env[0], env[1]));
+		add_back_env(lst_env, new_env(env[0], env[1]));
 		free(env[0]);
 		free(env[1]);
 		free(env);
