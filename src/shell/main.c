@@ -47,7 +47,7 @@ void	tchitat_stdin(char *limiter, t_all **all)
 		// 	break ;
 		char *tmp = ft_strdup(line);
 		t = tokenize(tmp, (*all)->env);
-		//free(tmp);
+		free(tmp);
 		t = tokenize_bise(t);
 		t = tokenize_crise(t);
 		if (t && (*all)->env)

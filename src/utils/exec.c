@@ -72,6 +72,22 @@ int	execution(int pid, t_cmd *cmd, int output_fd, t_all *all)
 	if (!path)
 	{
 		*exit_status() = EXIT_FAILURE;
+		if (cmd)
+		{
+			if (cmd->args)
+			{
+				int j = 0;
+				while (cmd->args[j] && j <= cmd->nb_args)
+				{
+					free(cmd->args[j]);
+					j++;
+				}
+				free(cmd->args);
+			}
+			if (cmd->content)
+				free(cmd->content);
+			free(cmd);
+		}
 		failure("bash");
 	}
 	if (execve(path, cmd->args, env) < 0)

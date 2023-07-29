@@ -173,6 +173,8 @@ t_token	*tokenize_crise(t_token *tok)
 	int		flag;
 
 	pwd = getcwd(NULL, 0);
+	if (!pwd)
+		return (failure("pwd doesnt work"), NULL);
 	tmp = tok;
 	flag = 0;
 	res = NULL;
@@ -186,7 +188,8 @@ t_token	*tokenize_crise(t_token *tok)
 			{
 				process_wild(tmp->content, pwd, &res, &flag);
 				if (flag == 0)
-					add_back_tok(&res, new_token(ft_strdup(tmp->content), tmp->type));
+					add_back_tok(&res, new_token(ft_strdup(tmp->content),
+							tmp->type));
 				else if (flag == 1)
 					flag = 0;
 				tmp = tmp->next;
@@ -198,6 +201,7 @@ t_token	*tokenize_crise(t_token *tok)
 			tmp = tmp->next;
 		}
 	}
+	free(pwd);
 	if (tok)
 		free_lst_tok(&tok);
 	return (res);

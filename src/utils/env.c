@@ -64,8 +64,10 @@ t_env	*new_env(char *name, char *value)
 	el = malloc(sizeof(t_env));
 	if (!el)
 		failure("malloc error");
-	el->name = ft_strdup(name);
-	el->value = ft_strdup(value);
+	// el->name = ft_strdup(name);
+	// el->value = ft_strdup(value);
+	el->name = name;
+	el->value = value;
 	el->next = NULL;
 	return (el);
 }

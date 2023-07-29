@@ -45,8 +45,8 @@ int		exec_export(t_cmd *cmd, t_env **lst_env)
 		if (check_env(env) == EXIT_FAILURE)
 			return (failure_exec("bash"), EXIT_FAILURE);
 		add_back_env(lst_env, new_env(env[0], env[1]));
-		free(env[0]);
-		free(env[1]);
+		// free(env[0]);
+		// free(env[1]);
 		free(env);
 		i++;
 	}
