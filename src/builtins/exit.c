@@ -35,7 +35,8 @@ int	exec_exit(t_cmd *cmd, t_all *all, int fd_out)
 			return (EXIT_FAILURE);
 		}
 	}
-	ft_putstr_fd("Exiting our minishell, bye bye ! ﾟ･:*｡(ꈍᴗꈍ)ε｀*)~｡*:･ﾟ", fd_out);
+	ft_putstr_fd("Exiting our minishell, bye bye ! ﾟ･:*｡(ꈍᴗꈍ)ε｀*)~｡*:･ﾟ",
+		fd_out);
 	free_all(all);
 	exit(*exit_status());
 }

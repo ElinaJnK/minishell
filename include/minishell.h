@@ -137,6 +137,7 @@ void	free_lst_env(t_env **lst_env);
 void	update_env(t_env *lst_env, char *name, char *value);
 void	lst_del_env(t_env **lst_env, char *name);
 int		lst_size_env(t_env *lst);
+void	free_tab(char **tab);
 
 /*----utils----*/
 void	generate_pipes(int *pipe_fds, int num_pipes);

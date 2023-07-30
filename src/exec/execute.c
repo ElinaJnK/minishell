@@ -50,7 +50,8 @@ void	exec_redir(t_ast *root, int input_fd, int output_fd, t_all *all)
 {
 	if (root->left)
 	{
-		if (root->cmd->input != STDIN_FILENO && root->cmd->output != STDOUT_FILENO)
+		if (root->cmd->input != STDIN_FILENO && root->cmd->output
+			!= STDOUT_FILENO)
 			exec_ast(root->left, root->cmd->input, root->cmd->output, all);
 		else if (root->cmd->input != STDIN_FILENO)
 			exec_ast(root->left, root->cmd->input, output_fd, all);

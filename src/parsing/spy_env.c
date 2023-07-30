@@ -6,7 +6,7 @@ void	failure_env(const char *message, char **elem)
 
 	i = 0;
 	while (elem && elem[i])
-		free(elem[i]);
+		free(elem[i++]);
 	if (elem)
 		free(elem);
 	perror(message);
@@ -19,21 +19,31 @@ char	**get_env(char *data)
 	int		i;
 
 	i = 0;
+	if (!data)
+		return (NULL);
 	elem = malloc(sizeof(char *) * 3);
-	if (!elem || !data)
-	{
-		failure_env("malloc of elem, data is NULL", NULL);
-	}
+	if (!elem)
+		return (failure_env("malloc of elem, data is NULL", NULL), NULL);
 	elem[2] = NULL;
 	while (data[i] && data[i] != '=')
 		i++;
 	elem[0] = malloc(sizeof(char) * (i + 1));
 	if (!elem[0])
 	{
+		free(elem);
 		failure_env("malloc of elem[0] is NULL", elem);
+		return (NULL);
 	}
 	ft_strlcpy(elem[0], data, i + 1);
+	//printf("\n\nELEM[0] = %s\n\n\n", elem[0]);
 	elem[1] = ft_strdup(data + i + 1);
+	if (!elem[1])
+	{
+		free(elem[0]);
+		free(elem);
+		failure_env("malloc of elem[1] is NULL", elem);
+		return (NULL);
+	}
 	return (elem);
 }
 
@@ -42,21 +52,24 @@ t_env	*spy_env(char **env)
 	t_env	*lst_env;
 	char	**elem;
 	int		i;
-	int		j;
 
 	i = 0;
-	j = 0;
 	lst_env = NULL;
 	if (!env)
 		return (NULL);
 	while (env && env[i])
 	{
 		elem = get_env(env[i]);
+		if (!elem)
+			return (NULL);
 		add_back_env(&lst_env, new_env(elem[0], elem[1]));
-		j = 0;
-		// while (j < 3)
+		// int	j;
+
+		// j = 0;
+		// while (elem && elem[j])
 		// 	free(elem[j++]);
-		free(elem);
+		if (elem)
+			free(elem);
 		i++;
 	}
 	return (lst_env);

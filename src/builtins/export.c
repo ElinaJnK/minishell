@@ -19,14 +19,11 @@ int	check_name(char *name)
 
 int	check_env(char **env)
 {
-	int	i;
-
-	i = 0;
 	if (!env)
 		return (EXIT_FAILURE);
 	if (env[2] || check_name(env[0]) == EXIT_FAILURE
 		|| check_name(env[1]) == EXIT_FAILURE)
-		return (EXIT_FAILURE);
+		return (free(env), EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
@@ -45,8 +42,6 @@ int		exec_export(t_cmd *cmd, t_env **lst_env)
 		if (check_env(env) == EXIT_FAILURE)
 			return (failure_exec("bash"), EXIT_FAILURE);
 		add_back_env(lst_env, new_env(env[0], env[1]));
-		// free(env[0]);
-		// free(env[1]);
 		free(env);
 		i++;
 	}

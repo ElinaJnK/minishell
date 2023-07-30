@@ -106,7 +106,7 @@ int	main(int ac, char **av, char **env)
 	tchitat_stdin("exit", &all);
 	if (lst_env)
 		free_lst_env(&lst_env);
-	rl_clear_history();
+	//rl_clear_history();
 	return (*exit_status());
 }
 
