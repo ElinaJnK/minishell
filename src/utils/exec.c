@@ -65,6 +65,7 @@ int	execution(int pid, t_cmd *cmd, t_all *all)
 	return (free(path), free_tab(env), EXIT_FAILURE);
 }
 
+
 void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 {
 	pid_t	pid;
@@ -94,15 +95,16 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 		}
 		if (execution(pid, node->cmd, *all) == EXIT_FAILURE)
 			failure_exec("bash");
-		//exit(EXIT_SUCCESS);
+		exit(EXIT_SUCCESS);
 	}
 	else
 	{
 		waitpid(pid, &status, 0);
 		*exit_status() = WEXITSTATUS(status);
-		 if (input_fd != STDIN_FILENO)
+		if (input_fd != STDIN_FILENO)
             close(input_fd);
         if (output_fd != STDOUT_FILENO)
             close(output_fd);
 	}
 }
+

@@ -68,9 +68,9 @@ t_env	*new_env(char *name, char *value)
 	el->value = ft_strdup(value);
 	el->next = NULL;
 	if (name)
-        free(name);
-    if (value)
-        free(value);
+		free(name);
+	if (value)
+		free(value);
 	return (el);
 }
 
@@ -92,8 +92,8 @@ void	free_lst_env(t_env **lst_env)
 
 void	lst_del_env(t_env **lst_env, char *name)
 {
-	t_env *temp;
-	t_env *prev;
+	t_env	*temp;
+	t_env	*prev;
 
 	temp = *lst_env;
 	prev = NULL;
@@ -101,21 +101,17 @@ void	lst_del_env(t_env **lst_env, char *name)
 		return ;
 	while (temp)
 	{
-		// printf("temp name : %s name :%s\n", temp->name, name);
 		if (ft_strncmp(temp->name, name, ft_strlen(temp->name) + 1) == 0)
 		{
 			if (prev)
 				prev->next = temp->next;
 			else
 				*lst_env = temp->next;
-			// free(temp->name);
-			// free(temp->value);
 			free(temp);
 			if (prev)
 				temp = prev->next;
 			else
 				temp = *lst_env;
-			// printf("The beginning is %s\n", (*lst_env)->name);
 		}
 		else
 		{

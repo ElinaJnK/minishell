@@ -53,8 +53,8 @@ int	init_op(t_cmd *cmd, t_token *t)
 	if (!cmd->content)
 		return (EXIT_FAILURE);
 	cmd->type = t->type;
-	cmd->output = 1;
-	cmd->input = 0;
+	cmd->output = STDOUT_FILENO;
+	cmd->input = STDIN_FILENO;
 	cmd->args = NULL;
 	cmd->nb_args = 0;
 	return (EXIT_SUCCESS);

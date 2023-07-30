@@ -20,7 +20,7 @@ void print_list_env(t_env *lst_env)
 	}
 }
 
-void	tchitat_stdin(char *limiter, t_all **all)
+void	tchitat_stdin(t_all **all)
 {
 	char		*line;
 	t_token		*t;
@@ -33,7 +33,6 @@ void	tchitat_stdin(char *limiter, t_all **all)
 	root = NULL;
 	t = NULL;
 	cmds = NULL;
-	(void)limiter;
 	b = malloc(sizeof(t_border));
 	if (!b)
 		failure("Error in malloc allocation");
@@ -42,12 +41,7 @@ void	tchitat_stdin(char *limiter, t_all **all)
 	while (1)
 	{
 		//add_history(line);
-		// if (!line || ft_strncmp(line, limiter, ft_max(ft_strlen(line) - 1,
-		// 		ft_strlen(limiter))) == 0)
-		// 	break ;
-		char *tmp = ft_strdup(line);
-		t = tokenize(tmp, (*all)->env);
-		free(tmp);
+		t = tokenize(line, (*all)->env);
 		t = tokenize_bise(t);
 		t = tokenize_crise(t);
 		if (t && (*all)->env)
@@ -103,7 +97,7 @@ int	main(int ac, char **av, char **env)
 		return (failure("No environment"), 1);
 	lst_env = spy_env(env);
 	all = build_all(NULL, NULL, lst_env, 0);
-	tchitat_stdin("exit", &all);
+	tchitat_stdin(&all);
 	if (lst_env)
 		free_lst_env(&lst_env);
 	//rl_clear_history();

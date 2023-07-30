@@ -15,21 +15,23 @@ char	*insert_into_line(char *line, char *var, int start, int end)
 	two = ft_strjoin(one, var);
 	three = ft_substr(line, end + 1, ft_strlen(line) - end);
 	newline = ft_strjoin(two, three);
-	free(line);
+	//free(line);
 	free(one);
 	free(two);
 	free(three);
+	free(var);
 	return (newline);
 }
 
-char	*search_var(char *var, t_env *env)
+char	*search_var(char *var, int size, t_env *env)
 {
 	t_env	*tmp;
 
 	tmp = env;
 	while (tmp)
 	{
-		if (ft_strncmp(tmp->name, var, ft_strlen(var) + 1) == 0)
+		if (ft_strncmp(tmp->name, var, size) == 0
+			&& ft_strlen(tmp->name) == (size_t)size)
 			return (ft_strdup(tmp->value));
 		tmp = tmp->next;
 	}
@@ -57,7 +59,7 @@ char	*expand_env(char *line, int *i, t_env *env)
 			&& line[end] != ' ')
 			end++;
 		end--;
-		var = search_var(line + *i + 1, env);
+		var = search_var(line + *i + 1, end - *i, env);
 	}
 	newline = insert_into_line(line, var, *i, end);
 	return (newline);
