@@ -23,7 +23,7 @@ int	check_env(char **env)
 		return (EXIT_FAILURE);
 	if (env[2] || check_name(env[0]) == EXIT_FAILURE)
 	//	|| check_name(env[1]) == EXIT_FAILURE)
-		return (free(env), EXIT_FAILURE);
+		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
@@ -43,12 +43,11 @@ int		exec_export(t_cmd *cmd, t_env **lst_env, int output_fd)
 		env = get_env(cmd->args[i]);
 		if (check_env(env) == EXIT_FAILURE)
 		{
-			// if (env)
-			// 	free(env);
+			free_tab(env);
 			return (ft_putstr_fd("bash: export: not a valid identifier\n", output_fd), EXIT_FAILURE);
 		}
 		add_back_env(lst_env, new_env(env[0], env[1]));
-		free(env);
+		free_tab(env);
 		i++;
 	}
 	return (EXIT_SUCCESS);
