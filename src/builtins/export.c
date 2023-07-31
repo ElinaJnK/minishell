@@ -19,7 +19,7 @@ int	check_name(char *name)
 
 int	check_env(char **env)
 {
-	if (!env)
+	if (!env || !env[0] || !env[1])
 		return (EXIT_FAILURE);
 	if (env[2] || check_name(env[0]) == EXIT_FAILURE)
 	//	|| check_name(env[1]) == EXIT_FAILURE)
@@ -27,17 +27,37 @@ int	check_env(char **env)
 	return (EXIT_SUCCESS);
 }
 
+void	put_string(char **str, int output_fd)
+{
+	int		i;
+	char	*res;
+
+	i = 0;
+	while (str[i])
+	{
+		res = ft_strjoin("export ", str[i]);
+		if (res)
+		{
+			ft_putendl_fd(res, output_fd);
+			free(res);
+		}
+		i++;
+	}
+}
+
 int		exec_export(t_cmd *cmd, t_env **lst_env, int output_fd)
 {
 	char	**env;
+	char	**env_error;
 	int		i;
 
 	env = NULL;
 	i = 1;
-	// here when we do bash export we need to give the environment
-	// with export at first, we need to print that lol
 	if (!cmd || cmd->nb_args == 0)
-		return (ft_putstr_fd("bash", output_fd), EXIT_FAILURE);
+	{
+		env_error = env_to_tab(*lst_env);
+		return (put_string(env_error, output_fd), free_tab(env_error), EXIT_FAILURE);
+	}
 	while (cmd->args[i])
 	{
 		env = get_env(cmd->args[i]);

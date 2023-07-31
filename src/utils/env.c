@@ -22,8 +22,10 @@ char	**env_to_tab(t_env *lst_env)
 	int		i;
 	char	*str;
 
+	if (!lst_env)
+		return (NULL);
 	env = (char **)malloc(sizeof(char *) * (lst_size_env(lst_env) + 1));
-	if (!env || !lst_env)
+	if (!env)
 		return (failure("lst_env: env not properly malloc'd"), NULL);
 	tmp = lst_env;
 	i = 0;
