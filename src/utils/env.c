@@ -101,17 +101,22 @@ void	lst_del_env(t_env **lst_env, char *name)
 		return ;
 	while (temp)
 	{
-		if (ft_strncmp(temp->name, name, ft_strlen(temp->name) + 1) == 0)
+		if (ft_strncmp(temp->name, name, ft_strlen(name) + 1) == 0)
 		{
 			if (prev)
 				prev->next = temp->next;
 			else
 				*lst_env = temp->next;
+			if (temp->name)
+				free(temp->name);
+			if (temp->value)
+				free(temp->value);
 			free(temp);
 			if (prev)
 				temp = prev->next;
 			else
 				temp = *lst_env;
+			break ;
 		}
 		else
 		{

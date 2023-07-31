@@ -52,11 +52,21 @@ void	exec_redir(t_ast *root, int input_fd, int output_fd, t_all *all)
 	{
 		if (root->cmd->input != STDIN_FILENO && root->cmd->output
 			!= STDOUT_FILENO)
+		{
 			exec_ast(root->left, root->cmd->input, root->cmd->output, all);
+			// close(root->cmd->input);
+			// close(root->cmd->output);
+		}
 		else if (root->cmd->input != STDIN_FILENO)
+		{
 			exec_ast(root->left, root->cmd->input, output_fd, all);
+			// close(root->cmd->input);
+		}
 		else if (root->cmd->output != STDOUT_FILENO)
+		{
 			exec_ast(root->left, input_fd, root->cmd->output, all);
+			// close(root->cmd->output);
+		}
 	}
 }
 

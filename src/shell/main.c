@@ -63,8 +63,9 @@ void	tchitat_stdin(t_all **all)
 			free_ast(root);
 		if (cmds)
 			free_cmds(cmds, count);
-		if (line)
-			free(line);
+		//printf("line : %s\n", line);
+		// if (line)
+		// 	free(line);
 		root = NULL;
 		t = NULL;
 		cmds = NULL;
@@ -98,9 +99,10 @@ int	main(int ac, char **av, char **env)
 	lst_env = spy_env(env);
 	all = build_all(NULL, NULL, lst_env, 0);
 	tchitat_stdin(&all);
-	if (lst_env)
-		free_lst_env(&lst_env);
-	//rl_clear_history();
+	//if (lst_env)
+	//	free_lst_env(&lst_env);
+	free_all(all);
+	rl_clear_history();
 	return (*exit_status());
 }
 

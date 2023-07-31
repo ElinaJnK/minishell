@@ -7,8 +7,6 @@ void	ast_in_par(t_cmd *tokens, t_ast **root, t_ast **cur, t_border *b)
 	int		p_count;
 	t_ast	*subtree;
 
-	if (*root || *cur)
-		;
 	p_count = 1;
 	j = *b->start;
 	while (j++ <= b->end)
@@ -27,6 +25,8 @@ void	ast_in_par(t_cmd *tokens, t_ast **root, t_ast **cur, t_border *b)
 	else
 		(*cur)->right = subtree;
 	*b->start = j;
+	if (*root || *cur)
+		return ;
 }
 
 void	ast_redir(t_cmd *tokens, t_ast **root, t_ast **current, int start)
@@ -34,8 +34,6 @@ void	ast_redir(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 	t_ast	*node;
 	t_ast	*tmp;
 
-	if (*root || *current)
-		;
 	tmp = NULL;
 	node = create_node(&tokens[start]);
 	if (*current == NULL)
@@ -54,19 +52,21 @@ void	ast_redir(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 		node->left = tmp;
 		*current = node;
 	}
+	if (*root || *current)
+		return ;
 }
 
 void	ast_cmd(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 {
 	t_ast	*node;
 
-	if (*root || *current)
-		;
 	node = create_node(&tokens[start]);
 	if (*current == NULL)
 		*root = node;
 	else
 		(*current)->right = node;
+	if (*root || *current)
+		return ;
 }
 
 void	ast_op(t_cmd *tokens, t_ast **root, t_ast **current, int start)

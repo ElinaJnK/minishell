@@ -101,7 +101,7 @@ t_token	*tokenize(char *line, t_env *lst_env)
 		if (line[i] != '\0' && !is_op(line + i) && !is_fb(line + i))
 			i++;
 	}
-	return (add_rest(&lst_tok, tok, q_flag), check_tok(lst_tok), lst_tok);
+	return (add_rest(&lst_tok, tok, q_flag), check_tok(lst_tok), free(line), lst_tok);
 }
 
 void	merge(t_token **res, t_token *cmd, t_token *redirs)

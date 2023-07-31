@@ -133,6 +133,8 @@ t_env	*spy_env(char **env);
 char	**get_env(char *data);
 t_env	*new_env(char *name, char *value);
 char	**env_to_tab(t_env *lst_env);
+
+
 void	free_lst_env(t_env **lst_env);
 void	update_env(t_env *lst_env, char *name, char *value);
 void	lst_del_env(t_env **lst_env, char *name);

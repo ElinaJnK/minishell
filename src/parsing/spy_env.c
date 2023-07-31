@@ -63,11 +63,6 @@ t_env	*spy_env(char **env)
 		if (!elem)
 			return (NULL);
 		add_back_env(&lst_env, new_env(elem[0], elem[1]));
-		// int	j;
-
-		// j = 0;
-		// while (elem && elem[j])
-		// 	free(elem[j++]);
 		if (elem)
 			free(elem);
 		i++;
