@@ -76,9 +76,10 @@ typedef struct s_env
 
 typedef struct s_all
 {
-	t_env	*env;
-	t_ast	*ast;
-	t_cmd	*cmd;
+	t_env		*env;
+	t_ast		*ast;
+	t_cmd		*cmd;
+	t_border	*b;
 	int		count;
 }	t_all;
 
@@ -107,7 +108,7 @@ void	check_tok(t_token *lst_tok);
 
 /*----parsing help functions----*/
 t_token	*init_param(t_token **lst_tok, int *q_flag, int *i);
-void	doo(t_token	**lst_tok, t_token **tok);
+t_token	*doo(t_token **lst_tok, t_token *tok);
 t_token	*init_tok(t_token *lst_tok);
 char	*ft_addchr(char *s1, char c, t_token *lst_tok);
 t_all	*build_all(t_cmd *tokens, t_ast *root, t_env *lst_env, int count);
@@ -166,11 +167,11 @@ int		*exit_status(void);
 int		open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env);
 
 /*----builtins----*/
-int		exec_cd(t_cmd *cmd);
+int		exec_cd(t_cmd *cmd, int output_fd);
 int		exec_echo(t_cmd *cmd, int fd_out);
 int		exec_env(t_cmd *cmd, int fd_out, t_env *lst_env);
-int		exec_export(t_cmd *cmd, t_env **lst_env);
-int		exec_pwd(t_cmd *cmd);
+int		exec_export(t_cmd *cmd, t_env **lst_env, int output_fd);
+int		exec_pwd(t_cmd *cmd, int output_fd);
 int		exec_unset(t_cmd *cmd, t_env **lst_env);
 int		exec_exit(t_cmd *cmd, t_all *all, int ft_out);
 

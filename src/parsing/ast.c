@@ -115,6 +115,7 @@ t_ast	*build_ast(t_cmd *tokens, t_border *b)
 	t_ast	*root;
 	t_ast	*current;
 	int		i;
+	// t_border	*border;
 
 	if (*b->start > b->end)
 		return (NULL);
@@ -126,7 +127,15 @@ t_ast	*build_ast(t_cmd *tokens, t_border *b)
 		if (!root)
 			root = current;
 		if (tokens[i].type == OPEN_PAR)
+		{
+			// border = malloc(sizeof(t_border));
+			// border->start = &i;
+			// border->end = b->end;
 			ast_in_par(tokens, &root, &current, &(t_border){&i, b->end});
+			// ast_in_par(tokens, &root, &current, border);
+			// free(border->start);
+			// free(border);
+		}
 		else
 			otherwise(tokens, &root, &current, i);
 		i++;

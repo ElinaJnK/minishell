@@ -33,7 +33,7 @@ int		exec_env(t_cmd *cmd, int fd_out, t_env *lst_env)
 
 	i = 0;
 	if (!cmd || !lst_env)
-		return (failure_exec("No environment"), EXIT_FAILURE);
+		return (ft_putstr_fd("bash: env: env not defined\n", fd_out), EXIT_FAILURE);
 	res = env_to_tab(lst_env);
 	if (!res)
 		return (EXIT_FAILURE);

@@ -17,7 +17,7 @@ int	is_paf(char *cmd)
 int	do_builtin(t_cmd *cmd, int output_fd, t_all *all)
 {
 	if (!ft_strncmp(cmd->content, "cd", ft_strlen("cd") + 1))
-		return (exec_cd(cmd));
+		return (exec_cd(cmd, output_fd));
 	else if (!ft_strncmp(cmd->content, "echo", ft_strlen("echo") + 1))
 		return (exec_echo(cmd, output_fd));
 	else if (!ft_strncmp(cmd->content, "env", ft_strlen("env") + 1))
@@ -25,9 +25,9 @@ int	do_builtin(t_cmd *cmd, int output_fd, t_all *all)
 	else if (!ft_strncmp(cmd->content, "exit", ft_strlen("exit") + 1))
 		return (exec_exit(cmd, all, output_fd));
 	else if (!ft_strncmp(cmd->content, "export", ft_strlen("export") + 1))
-		return (exec_export(cmd, &(all->env)));
+		return (exec_export(cmd, &(all->env), output_fd));
 	else if (!ft_strncmp(cmd->content, "pwd", ft_strlen("pwd") + 1))
-		return (exec_pwd(cmd));
+		return (exec_pwd(cmd, output_fd));
 	else if (!ft_strncmp(cmd->content, "unset", ft_strlen("unset") + 1))
 		return (exec_unset(cmd, &(all->env)));
 	return (EXIT_FAILURE);
@@ -59,7 +59,10 @@ int	execution(int pid, t_cmd *cmd, t_all *all)
 	else
 		path = get_command_path(cmd->content, all->env);
 	if (!path)
-		return (free_tab(env), EXIT_FAILURE);
+	{
+		if (execve(cmd->content, cmd->args, env) < 0 || pid < 0)
+			return (free_tab(env), EXIT_FAILURE);
+	}
 	if (execve(path, cmd->args, env) < 0 || pid < 0)
 		return (free(path), free_tab(env), EXIT_FAILURE);
 	return (free(path), free_tab(env), EXIT_FAILURE);
@@ -94,8 +97,13 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 			close(output_fd);
 		}
 		if (execution(pid, node->cmd, *all) == EXIT_FAILURE)
+		{
+			//*exit_status() = EXIT_FAILURE;
+			free_all(*all);
 			failure_exec("bash");
-		exit(EXIT_SUCCESS);
+		}
+		//free_all(*all);
+		//exit(EXIT_SUCCESS);
 	}
 	else
 	{

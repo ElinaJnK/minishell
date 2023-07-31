@@ -25,7 +25,6 @@ void	tchitat_stdin(t_all **all)
 	char		*line;
 	t_token		*t;
 	t_cmd		*cmds;
-	t_border	*b;
 	int			count;
 	t_ast		*root;
 	int			i;
@@ -33,9 +32,6 @@ void	tchitat_stdin(t_all **all)
 	root = NULL;
 	t = NULL;
 	cmds = NULL;
-	b = malloc(sizeof(t_border));
-	if (!b)
-		failure("Error in malloc allocation");
 	//catch_the_signal();
 	line = readline("(▼・ᴥ・▼)$ ");
 	while (1)
@@ -49,9 +45,9 @@ void	tchitat_stdin(t_all **all)
 		if (!cmds)
 			failure("Error in parsing");
 		i = 0;
-		b->start = &i;
-		b->end = count - 1;
-		root = build_ast(cmds, b);
+		(*all)->b->start = &i;
+		(*all)->b->end = count - 1;
+		root = build_ast(cmds, (*all)->b);
 		if (root && cmds && (*all)->env)
 		{
 			(*all)->cmd = cmds;
@@ -59,33 +55,29 @@ void	tchitat_stdin(t_all **all)
 			(*all)->count = count;
 			exec_ast((*all)->ast, STDIN_FILENO, STDOUT_FILENO, *all);
 		}
-		if (root)
-			free_ast(root);
 		if (cmds)
 			free_cmds(cmds, count);
-		//printf("line : %s\n", line);
-		// if (line)
-		// 	free(line);
+		if (root)
+			free_ast(root);
 		root = NULL;
 		t = NULL;
 		cmds = NULL;
 		// rl_on_new_line();
 		line = readline("(▼・ᴥ・▼)$ ");
 	}
-	if (root)
-		free_ast(root);
-	if (cmds)
-		free_cmds(cmds, count);
+	// if (root)
+	// 	free_ast(root);
+	// if (cmds)
+	// 	free_cmds(cmds, count);
 	if (line)
 		free(line);
-	if (b)
-		free(b);
 }
 
 int	main(int ac, char **av, char **env)
 {
-	t_env	*lst_env;
-	t_all	*all;
+	t_env		*lst_env;
+	t_all		*all;
+	t_border	*b;
 
 	(void)ac;
 	(void)av;
@@ -97,7 +89,11 @@ int	main(int ac, char **av, char **env)
 	if (!*env)
 		return (failure("No environment"), 1);
 	lst_env = spy_env(env);
+	b = malloc(sizeof(t_border));
+	if (!b)
+		failure("Error in malloc allocation");
 	all = build_all(NULL, NULL, lst_env, 0);
+	all->b = b;
 	tchitat_stdin(&all);
 	//if (lst_env)
 	//	free_lst_env(&lst_env);

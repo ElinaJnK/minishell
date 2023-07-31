@@ -9,40 +9,26 @@ int    *exit_status(void)
 
 void	exec_and(t_ast *root, int input_fd, int output_fd, t_all *all)
 {
-	int	status;
-
-	status = 0;
 	exec_ast(root->left, input_fd, output_fd, all);
-	wait(&status);
-	*exit_status() = WEXITSTATUS(status);
-	if (WEXITSTATUS(status) == 0)
+	if (*exit_status() == 0)
 		exec_ast(root->right, input_fd, output_fd, all);
 }
 
 void	exec_or(t_ast *root, int input_fd, int output_fd, t_all *all)
 {
-	int	status;
-
-	status = 0;
 	exec_ast(root->left, input_fd, output_fd, all);
-	wait(&status);
-	*exit_status() = WEXITSTATUS(status);
-	if (WEXITSTATUS(status) != 0)
+	if (*exit_status() != 0)
 		exec_ast(root->right, input_fd, output_fd, all);
 }
 
 void	exec_pipe(t_ast *root, int input_fd, int output_fd, t_all *all)
 {
 	int	pipe_fds[2];
-	int	status;
 
-	status = 0;
 	if (pipe(pipe_fds) < 0)
 		failure_exec("fork error");
 	exec_ast(root->left, input_fd, pipe_fds[1], all);
 	close(pipe_fds[1]);
-	wait(&status);
-	*exit_status() = WEXITSTATUS(status);
 	exec_ast(root->right, pipe_fds[0], output_fd, all);
 }
 

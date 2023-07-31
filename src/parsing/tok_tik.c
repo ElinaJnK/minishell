@@ -12,13 +12,19 @@ char	*ft_addchr(char *s1, char c, t_token *lst_tok)
 	size_t	s1l;
 	char	*join;
 
+	// if (!s1)
+	// 	failure_parse("Error: malloc", lst_tok);
 	if (!s1)
-		failure_parse("Error: malloc", lst_tok);
-	s1l = ft_strlen(s1);
+		s1l = 0;
+	else
+	{
+		s1l = ft_strlen(s1);
+	}
 	join = (char *)malloc(sizeof(char) * (s1l + 2));
 	if (!join)
 		failure_parse("Error: malloc", lst_tok);
-	ft_memcpy(join, s1, s1l);
+	if (s1)
+		ft_memcpy(join, s1, s1l);
 	join[s1l] = c;
 	join[s1l + 1] = '\0';
 	if (s1)
@@ -29,6 +35,7 @@ char	*ft_addchr(char *s1, char c, t_token *lst_tok)
 t_token	*init_tok(t_token *lst_tok)
 {
 	t_token	*tok;
+	//(void)lst_tok;
 	char	*content;
 
 	content = (char *)malloc(sizeof(char));
@@ -46,11 +53,13 @@ t_token	*init_param(t_token **lst_tok, int *q_flag, int *i)
 	*lst_tok = NULL;
 	*q_flag = 0;
 	*i = 0;
-	return (init_tok(*lst_tok));
+	// return (init_tok(*lst_tok));
+	return (new_token(NULL, 0));
 }
 
-void	doo(t_token	**lst_tok, t_token **tok)
+t_token	*doo(t_token **lst_tok, t_token *tok)
 {
-	add_back_tok(lst_tok, *tok);
-	*tok = init_tok(*lst_tok);
+	add_back_tok(lst_tok, tok);
+	//return (init_tok(*lst_tok));
+	return (new_token(NULL, 0));
 }

@@ -14,7 +14,7 @@ int		exec_echo(t_cmd *cmd, int fd_out)
 	n_option = 0;
 	i = 1;
 	if (!cmd || !cmd->args)
-		return (failure_exec("Error: echo doesn't exist"), EXIT_FAILURE);
+		return (ft_putstr_fd("bash: echo: echo not defined\n", fd_out), EXIT_FAILURE);
 	if (cmd->args[1] && !ft_strncmp(cmd->args[1], "-n", 3))
 	{
 		n_option = 1;

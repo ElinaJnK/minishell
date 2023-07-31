@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-void	update_tok(char *line, t_token **tok, int *q_flag, t_token *lst_tok)
+void	update_tok(char *line, char **content, int *q_flag, t_token *lst_tok)
 {
 	if (*line == '"' && *q_flag == 0)
 		*q_flag = 2;
@@ -9,17 +9,17 @@ void	update_tok(char *line, t_token **tok, int *q_flag, t_token *lst_tok)
 	else if ((*line == '"' && *q_flag == 2)
 		|| (*line == '\'' && *q_flag == 1))
 		*q_flag = 0;
-	else if (*line != ' ' && !is_op(line) && !is_fb(line))
-		(*tok)->content = ft_addchr((*tok)->content, *line, lst_tok);
+	else if (*line != ' ' && !is_op(line) && !is_fb(line) && *line != '\0')
+		*content = ft_addchr(*content, *line, lst_tok);
 }
 
-void	add_rest(t_token **lst_tok, t_token *tok, int q_flag)
+void	add_rest(t_token **lst_tok, char *content, int q_flag)
 {
-	if (q_flag == 0 && tok != NULL && tok->content[0] != '\0')
-		add_back_tok(lst_tok, tok);
+	if (q_flag == 0 && content && content[0] != '\0')
+		add_back_tok(lst_tok, new_token(content, 0));
 	else if (q_flag == 1 || q_flag == 2)
 	{
-		free(tok);
+		free(content);
 		failure_parse("Error: unclosed quote", *lst_tok);
 	}
 }
@@ -49,36 +49,38 @@ void	meta_tok(char *line, int *i, t_token **lst_tok)
 		free(tok);
 }
 
-void	is_true_op(char *line, int *i, t_token **tok, t_token **lst_tok)
+void	is_true_op(char *line, int *i, char **content, t_token **lst_tok)
 {
 	if (is_op(line + *i) || is_fb(line + *i))
 	{
 		if (is_op(line + *i) || is_fb(line + *i) == DREDIR2
 			|| is_fb(line + *i) == DREDIR2)
 		{
-			(*tok)->content = ft_addchr((*tok)->content, line[(*i)++],
+			*content = ft_addchr(*content, line[(*i)++],
 					*lst_tok);
-			(*tok)->content = ft_addchr((*tok)->content, line[(*i)++],
+			*content = ft_addchr(*content, line[(*i)++],
 					*lst_tok);
 		}
 		else
-			(*tok)->content = ft_addchr((*tok)->content, line[(*i)++],
+			*content = ft_addchr(*content, line[(*i)++],
 					*lst_tok);
-		(*tok)->type = 0;
 	}
 	else
-		(*tok)->content = ft_addchr((*tok)->content, line[*i], *lst_tok);
+		*content = ft_addchr(*content, line[*i], *lst_tok);
 }
 
 t_token	*tokenize(char *line, t_env *lst_env)
 {
 	t_token	*lst_tok;
-	t_token	*tok;
 	int		q_flag;
 	int		i;
+	char	*content;
 
-	tok = init_param(&lst_tok, &q_flag, &i);
-	while ((size_t)i < ft_strlen(line))
+	content = NULL;
+	lst_tok = NULL;
+	q_flag = 0;
+	i = 0;
+	while ((size_t)i < ft_strlen(line) && line[i])
 	{
 		if (lst_tok && last_elem(lst_tok)->type == DREDIR2)
 			quoted(line + i, &lst_tok);
@@ -91,17 +93,20 @@ t_token	*tokenize(char *line, t_env *lst_env)
 		}	
 		else if (is_op(line + i) || is_fb(line + i) || line[i] == ' ')
 		{
-			if (q_flag == 0 && tok != NULL && tok->content[0] != '\0')
-				doo(&lst_tok, &tok);
+			if (q_flag == 0 && content != NULL && content[0] != '\0')
+				{
+					add_back_tok(&lst_tok, new_token(content, 0));
+					content = NULL;
+				}
 			else if (q_flag == 1 || q_flag == 2)
-				is_true_op(line, &i, &tok, &lst_tok);
+				is_true_op(line, &i, &content, &lst_tok);
 			meta_tok(line, &i, &lst_tok);
 		}
-		update_tok(line + i, &tok, &q_flag, lst_tok);
+		update_tok(line + i, &content, &q_flag, lst_tok);
 		if (line[i] != '\0' && !is_op(line + i) && !is_fb(line + i))
 			i++;
 	}
-	return (add_rest(&lst_tok, tok, q_flag), check_tok(lst_tok), free(line), lst_tok);
+	return (add_rest(&lst_tok, content, q_flag), check_tok(lst_tok), free(line), lst_tok);
 }
 
 void	merge(t_token **res, t_token *cmd, t_token *redirs)

@@ -31,11 +31,11 @@ int	exec_exit(t_cmd *cmd, t_all *all, int fd_out)
 		if (cmd->nb_args >= 2 || is_num(cmd->args[1]) == EXIT_FAILURE)
 		{
 			*exit_status() = EXIT_FAILURE;
-			perror("exit");
+			ft_putstr_fd("bash: exit: too many arguments\n", fd_out);
 			return (EXIT_FAILURE);
 		}
 	}
-	ft_putstr_fd("Exiting our minishell, bye bye ! ﾟ･:*｡(ꈍᴗꈍ)ε｀*)~｡*:･ﾟ",
+	ft_putstr_fd("Exiting our minishell, bye bye ! ﾟ･:*｡(ꈍᴗꈍ)ε｀*)~｡*:･ﾟ\n",
 		fd_out);
 	free_all(all);
 	exit(*exit_status());
