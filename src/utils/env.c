@@ -69,10 +69,6 @@ t_env	*new_env(char *name, char *value)
 	el->name = ft_strdup(name);
 	el->value = ft_strdup(value);
 	el->next = NULL;
-	if (name)
-		free(name);
-	if (value)
-		free(value);
 	return (el);
 }
 

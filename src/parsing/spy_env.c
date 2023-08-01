@@ -35,15 +35,19 @@ char	**get_env(char *data)
 		return (NULL);
 	}
 	ft_strlcpy(elem[0], data, i + 1);
-	//printf("\n\nELEM[0] = %s\n\n\n", elem[0]);
-	elem[1] = ft_strdup(data + i + 1);
-	if (!elem[1])
+	if (data[i] == '=' && data[i + 1])
 	{
-		free(elem[0]);
-		free(elem);
-		failure_env("malloc of elem[1] is NULL", elem);
-		return (NULL);
+		elem[1] = ft_strdup(data + i + 1);
+		if (!elem[1])
+		{
+			free(elem[0]);
+			free(elem);
+			failure_env("malloc of elem[1] is NULL", elem);
+			return (NULL);
+		}
 	}
+	else
+		elem[1] = ft_strdup("");
 	return (elem);
 }
 
@@ -63,8 +67,7 @@ t_env	*spy_env(char **env)
 		if (!elem)
 			return (NULL);
 		add_back_env(&lst_env, new_env(elem[0], elem[1]));
-		if (elem)
-			free(elem);
+		free_tab(elem);
 		i++;
 	}
 	return (lst_env);

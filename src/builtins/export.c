@@ -53,7 +53,9 @@ int		exec_export(t_cmd *cmd, t_env **lst_env, int output_fd)
 
 	env = NULL;
 	i = 1;
-	if (!cmd || cmd->nb_args == 0)
+	if (!cmd)
+		return (ft_putstr_fd("bash: export: problem\n", output_fd), EXIT_FAILURE);
+	if (cmd->nb_args == 0)
 	{
 		env_error = env_to_tab(*lst_env);
 		return (put_string(env_error, output_fd), free_tab(env_error), EXIT_FAILURE);
@@ -63,8 +65,13 @@ int		exec_export(t_cmd *cmd, t_env **lst_env, int output_fd)
 		env = get_env(cmd->args[i]);
 		if (check_env(env) == EXIT_FAILURE)
 		{
+			
+			ft_putstr_fd("bash: export: ", output_fd);
+			if (env[0])
+				ft_putstr_fd(env[0], output_fd);
+			ft_putstr_fd(": not a valid identifier\n", output_fd);
 			free_tab(env);
-			return (ft_putstr_fd("bash: export: not a valid identifier\n", output_fd), EXIT_FAILURE);
+			return (EXIT_FAILURE);
 		}
 		add_back_env(lst_env, new_env(env[0], env[1]));
 		free_tab(env);
