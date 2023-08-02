@@ -143,8 +143,8 @@ void	tchitat_stdin(t_all **all)
 	while (1)
 	{
 		//add_history(line);
-		signal_prompt();
 		line = readline("(▼・ᴥ・▼)$ ");
+		signal_prompt();
 		root = NULL;
 		count = 0;
 		if (*line == '\n' || *line == '\0')
