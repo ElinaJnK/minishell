@@ -186,5 +186,9 @@ int		exec_exit(t_cmd *cmd, t_all *all, int ft_out);
 
 
 /*----signal----*/
-void catch_the_signal();
+void	signal_prompt(void);
+void	signal_exec(void);
+void	sig_child(void);
+
+
 #endif

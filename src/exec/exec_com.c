@@ -92,7 +92,10 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 	if (pid < 0)
 		failure_exec("fork error");
 	else if (pid == 0)
+	{
+		sig_child();
 		exec_child(node, input_fd, output_fd, all);
+	}
 	else
 	{
 		waitpid(pid, &status, 0);

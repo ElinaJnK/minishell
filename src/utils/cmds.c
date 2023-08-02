@@ -21,7 +21,6 @@ void	free_cmds(t_cmd *cmds, int count)
 				}
 				free(cmds[i].args);
 			}
-			printf("is being free'd : %s\n\n\n", cmds[i].content);
 			if (cmds[i].content)
 				free(cmds[i].content);
 			i++;

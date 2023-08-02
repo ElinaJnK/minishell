@@ -113,6 +113,8 @@ t_cmd	*return_command(char *line, t_all **all, int *count)
 	t_cmd		*cmds;
 	t_token		*t;
 
+	if (!line)
+		return (NULL);
 	cmds = NULL;
 	t = NULL;
 	t = tokenize(line, (*all)->env);
@@ -138,13 +140,18 @@ void	tchitat_stdin(t_all **all)
 	int			count;
 	t_ast		*root;
 
-	//catch_the_signal();
 	while (1)
 	{
 		//add_history(line);
+		signal_prompt();
+		line = readline("(▼・ᴥ・▼)$ ");
 		root = NULL;
 		count = 0;
-		line = readline("(▼・ᴥ・▼)$ ");
+		if (*line == '\n' || *line == '\0')
+		{
+			free(line);
+			line = NULL;
+		}
 		cmds = return_command(line, all, &count);
 		if (cmds)
 		{
@@ -156,10 +163,11 @@ void	tchitat_stdin(t_all **all)
 				(*all)->ast = root;
 				exec_ast((*all)->ast, STDIN_FILENO, STDOUT_FILENO, *all);
 			}
-			free_cmds(cmds, count);
+			free_cmds(cmds, (*all)->count);
 			if (root)
 				free_ast(root);
 		}
+		signal_exec();
 	}
 }
 

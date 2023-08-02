@@ -21,23 +21,23 @@ void	merge(t_token **res, t_token *cmd, t_token *redirs)
 	tmp->next = redirs;
 }
 
-void	restructure_tok(t_token *tmp, t_token **cmds, t_token **redirs,
+void	restructure_tok(t_token **tmp, t_token **cmds, t_token **redirs,
 		t_token **res)
 {
-	if (tmp->type == CMD)
-		add_back_tok(cmds, new_token(ft_strdup(tmp->content), tmp->type));
-	else if (tmp->type >= REDIR && tmp->type <= DREDIR2_E && tmp->next)
+	if ((*tmp)->type == CMD)
+		add_back_tok(cmds, new_token(ft_strdup((*tmp)->content), (*tmp)->type));
+	else if ((*tmp)->type >= REDIR && (*tmp)->type <= DREDIR2_E && (*tmp)->next)
 	{
-		add_back_tok(redirs, new_token(ft_strdup(tmp->next->content),
-				tmp->type));
-		tmp = tmp->next;
+		add_back_tok(redirs, new_token(ft_strdup((*tmp)->next->content),
+				(*tmp)->type));
+		*tmp = (*tmp)->next;
 	}
 	else
 	{
 		merge(res, *cmds, *redirs);
 		*cmds = NULL;
 		*redirs = NULL;
-		add_back_tok(res, new_token(ft_strdup(tmp->content), tmp->type));
+		add_back_tok(res, new_token(ft_strdup((*tmp)->content), (*tmp)->type));
 	}
 }
 
@@ -56,7 +56,7 @@ t_token	*tokenize_bise(t_token *tok)
 		return (NULL);
 	while (tmp)
 	{
-		restructure_tok(tmp, &cmds, &redirs, &res);
+		restructure_tok(&tmp, &cmds, &redirs, &res);
 		tmp = tmp->next;
 	}
 	merge(&res, cmds, redirs);

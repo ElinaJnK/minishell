@@ -27,7 +27,7 @@ SOURCES_PARSING 	=	build_ast.c	\
 						wildcard.c	\
 
 SOURCES_SHELL 		=	main.c		\
-						#signal.c 	\
+						signal.c 	\
 
 SOURCES_UTILS 		=	ast_type.c	\
 						ast_utils.c	\

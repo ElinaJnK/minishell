@@ -52,10 +52,12 @@ int	open_files(t_token **t, t_cmd *cmd, int *pipe_fds, t_env *env)
 
 int	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
 {
-	int	pipe_fds[2];
+	int		pipe_fds[2];
+	t_token	*prev;
 
 	if (init_op(cmd, NULL) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
+	prev = *t;
 	while (*t && !((*t)->type >= AND && (*t)->type <= PIPE)
 		&& !((*t)->type >= OPEN_PAR && (*t)->type <= CLOSE_PAR))
 	{
@@ -64,9 +66,10 @@ int	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
 		if (cmd->output < 0 || cmd->input < 0)
 			return (EXIT_FAILURE);
 		cmd->type = (*t)->type;
-		cmd->content = ft_strdup((*t)->content);
+		prev = *t;
 		*t = (*t)->next;
 	}
+	cmd->content = ft_strdup(prev->content);
 	return (EXIT_SUCCESS);
 }
 
@@ -104,24 +107,8 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
 	tmp = t;
 	while (t)
 	{
-		// if (define_types(&t, &cmd[i], env) == EXIT_FAILURE)
-		// 	return (free_cmds(cmd, *count), free_lst_tok(&tmp), NULL);
-		if (t->type == CMD)
-		{
-			if (fill_cmd(&cmd[i], &t) == EXIT_FAILURE)
-				return (free_cmds(cmd, *count), free_lst_tok(&tmp), NULL);
-		}
-		else if (t->type >= REDIR && t->type <= DREDIR2_E)
-		{
-			if (fill_redir(&cmd[i], &t, env) == EXIT_FAILURE)
-				return (free_cmds(cmd, *count), free_lst_tok(&tmp), NULL);
-		}
-		else if (t->type != CMD)
-		{
-			if (init_op(&cmd[i], t) == EXIT_FAILURE)
-				return (free_cmds(cmd, *count), free_lst_tok(&tmp), NULL);
-			t = t->next;
-		}
+		if (define_types(&t, &cmd[i], env) == EXIT_FAILURE)
+			return (free_cmds(cmd, *count), free_lst_tok(&tmp), NULL);
 		i++;
 	}
 	if (tmp)
