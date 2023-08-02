@@ -143,8 +143,10 @@ void	tchitat_stdin(t_all **all)
 	while (1)
 	{
 		//add_history(line);
-		line = readline("(▼・ᴥ・▼)$ ");
 		signal_prompt();
+		line = readline("(▼・ᴥ・▼)$ ");
+		if (!line)
+			return ;
 		root = NULL;
 		count = 0;
 		if (*line == '\n' || *line == '\0')
@@ -152,6 +154,7 @@ void	tchitat_stdin(t_all **all)
 			free(line);
 			line = NULL;
 		}
+		signal_exec();
 		cmds = return_command(line, all, &count);
 		if (cmds)
 		{
@@ -167,7 +170,6 @@ void	tchitat_stdin(t_all **all)
 			if (root)
 				free_ast(root);
 		}
-		signal_exec();
 	}
 }
 
