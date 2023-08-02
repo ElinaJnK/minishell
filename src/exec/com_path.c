@@ -1,5 +1,19 @@
 #include "minishell.h"
 
+int	is_paf(char *cmd)
+{
+	int	i;
+
+	i = 0;
+	while (cmd[i])
+	{
+		if (cmd[i] == '/')
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
 int	do_search_com(char *start, char *end, char *command, char *filepath)
 {
 	int	len;

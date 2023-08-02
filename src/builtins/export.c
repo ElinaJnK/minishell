@@ -22,20 +22,21 @@ int	check_env(char **env)
 	if (!env || !env[0] || !env[1])
 		return (EXIT_FAILURE);
 	if (env[2] || check_name(env[0]) == EXIT_FAILURE)
-	//	|| check_name(env[1]) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
-void	put_string(char **str, int output_fd)
+int	exp_no_arg(int output_fd, t_env *lst_env)
 {
 	int		i;
 	char	*res;
+	char	**env;
 
 	i = 0;
-	while (str[i])
+	env = env_to_tab(lst_env);
+	while (env[i])
 	{
-		res = ft_strjoin("export ", str[i]);
+		res = ft_strjoin("export ", env[i]);
 		if (res)
 		{
 			ft_putendl_fd(res, output_fd);
@@ -43,36 +44,37 @@ void	put_string(char **str, int output_fd)
 		}
 		i++;
 	}
+	free_tab(env);
+	return (EXIT_FAILURE);
 }
 
-int		exec_export(t_cmd *cmd, t_env **lst_env, int output_fd)
+int	env_error(char **env, int output_fd)
+{
+	ft_putstr_fd("bash: export: ", output_fd);
+	if (env[0])
+		ft_putstr_fd(env[0], output_fd);
+	ft_putstr_fd(": not a valid identifier\n", output_fd);
+	free_tab(env);
+	return (EXIT_FAILURE);
+}
+
+int	exec_export(t_cmd *cmd, t_env **lst_env, int output_fd)
 {
 	char	**env;
-	char	**env_error;
 	int		i;
 
 	env = NULL;
 	i = 1;
 	if (!cmd)
-		return (ft_putstr_fd("bash: export: problem\n", output_fd), EXIT_FAILURE);
+		return (ft_putstr_fd("bash: export: problem\n", output_fd),
+			EXIT_FAILURE);
 	if (cmd->nb_args == 0)
-	{
-		env_error = env_to_tab(*lst_env);
-		return (put_string(env_error, output_fd), free_tab(env_error), EXIT_FAILURE);
-	}
+		return (exp_no_arg(output_fd, *lst_env));
 	while (cmd->args[i])
 	{
 		env = get_env(cmd->args[i]);
 		if (check_env(env) == EXIT_FAILURE)
-		{
-			
-			ft_putstr_fd("bash: export: ", output_fd);
-			if (env[0])
-				ft_putstr_fd(env[0], output_fd);
-			ft_putstr_fd(": not a valid identifier\n", output_fd);
-			free_tab(env);
-			return (EXIT_FAILURE);
-		}
+			return (env_error(env, output_fd));
 		add_back_env(lst_env, new_env(env[0], env[1]));
 		free_tab(env);
 		i++;

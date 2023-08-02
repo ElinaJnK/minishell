@@ -1,20 +1,5 @@
 #include "minishell.h"
 
-int	lst_size_tok(t_token *lst)
-{
-	int		i;
-	t_token	*tmp;
-
-	i = 0;
-	tmp = lst;
-	while (tmp)
-	{
-		i++;
-		tmp = tmp->next;
-	}
-	return (i);
-}
-
 int	fill_cmd(t_cmd *cmd, t_token **t)
 {
 	t_token	*tmp;
@@ -22,11 +7,8 @@ int	fill_cmd(t_cmd *cmd, t_token **t)
 
 	tmp = (*t)->next;
 	i = 0;
-	cmd->content = ft_strdup((*t)->content);
-	cmd->type = (*t)->type;
-	cmd->output = 1;
-	cmd->input = 0;
-	cmd->nb_args = 0;
+	if (init_op(cmd, *t) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	while (tmp && tmp->type == CMD)
 	{
 		(cmd->nb_args)++;
@@ -47,16 +29,24 @@ int	fill_cmd(t_cmd *cmd, t_token **t)
 	return (EXIT_SUCCESS);
 }
 
-int	init_op(t_cmd *cmd, t_token *t)
+int	open_files(t_token **t, t_cmd *cmd, int *pipe_fds, t_env *env)
 {
-	cmd->content = ft_strdup(t->content);
-	if (!cmd->content)
-		return (EXIT_FAILURE);
-	cmd->type = t->type;
-	cmd->output = STDOUT_FILENO;
-	cmd->input = STDIN_FILENO;
-	cmd->args = NULL;
-	cmd->nb_args = 0;
+	if ((*t)->type == REDIR)
+		cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_TRUNC,
+				0644);
+	else if ((*t)->type == REDIR2)
+		cmd->input = open((*t)->content, O_RDONLY | O_CREAT,
+				0644);
+	else if ((*t)->type == DREDIR)
+		cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_APPEND,
+				0644);
+	else if ((*t)->type == DREDIR2 || (*t)->type == DREDIR2_E)
+	{
+		if (open_here_doc(pipe_fds, (*t)->content, (*t)->type, env)
+			== EXIT_FAILURE)
+			return (EXIT_FAILURE);
+		cmd->input = pipe_fds[0];
+	}
 	return (EXIT_SUCCESS);
 }
 
@@ -64,34 +54,38 @@ int	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
 {
 	int	pipe_fds[2];
 
-	cmd->content = NULL;
-	cmd->output = 1;
-	cmd->input = 0;
-	cmd->args = NULL;
-	cmd->nb_args = 0;
+	if (init_op(cmd, NULL) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	while (*t && !((*t)->type >= AND && (*t)->type <= PIPE)
 		&& !((*t)->type >= OPEN_PAR && (*t)->type <= CLOSE_PAR))
 	{
-		if ((*t)->type == REDIR)
-			cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_TRUNC,
-					0644);
-		else if ((*t)->type == REDIR2)
-			cmd->input = open((*t)->content, O_RDONLY | O_CREAT,
-					0644);
-		else if ((*t)->type == DREDIR)
-			cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_APPEND,
-					0644);
-		else if ((*t)->type == DREDIR2 || (*t)->type == DREDIR2_E)
-		{
-			if (open_here_doc(pipe_fds, (*t)->content, (*t)->type, env)
-				== EXIT_FAILURE)
-				return (EXIT_FAILURE);
-			cmd->input = pipe_fds[0];
-		}
+		if (open_files(t, cmd, pipe_fds, env) == EXIT_FAILURE)
+			return (EXIT_FAILURE);
 		if (cmd->output < 0 || cmd->input < 0)
 			return (EXIT_FAILURE);
 		cmd->type = (*t)->type;
 		cmd->content = ft_strdup((*t)->content);
+		*t = (*t)->next;
+	}
+	return (EXIT_SUCCESS);
+}
+
+int	define_types(t_token **t, t_cmd *cmd, t_env *env)
+{
+	if ((*t)->type == CMD)
+	{
+		if (fill_cmd(cmd, t) == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+	}
+	else if ((*t)->type >= REDIR && (*t)->type <= DREDIR2_E)
+	{
+		if (fill_redir(cmd, t, env) == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+	}
+	else if ((*t)->type != CMD)
+	{
+		if (init_op(cmd, *t) == EXIT_FAILURE)
+			return (EXIT_FAILURE);
 		*t = (*t)->next;
 	}
 	return (EXIT_SUCCESS);
@@ -105,11 +99,13 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
 
 	cmd = malloc(sizeof(t_cmd) * (lst_size_tok(t) + 1));
 	if (!cmd)
-		return (failure_parse("Malloc allocation failure", t), NULL);
+		return (failure_parse("Malloc allocation failure", t, NULL), NULL);
 	i = 0;
 	tmp = t;
 	while (t)
 	{
+		// if (define_types(&t, &cmd[i], env) == EXIT_FAILURE)
+		// 	return (free_cmds(cmd, *count), free_lst_tok(&tmp), NULL);
 		if (t->type == CMD)
 		{
 			if (fill_cmd(&cmd[i], &t) == EXIT_FAILURE)

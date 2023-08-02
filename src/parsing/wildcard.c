@@ -22,7 +22,8 @@ int	wildcard_match(const char *str, const char *pattern)
 	return (0);
 }
 
-void	process_wild(const char *pattern, const char *path, t_token **tok, int *flag)
+void	process_wild(const char *pattern, const char *path, t_token **tok,
+	int *flag)
 {
 	DIR				*dir;
 	struct dirent	*entry;
@@ -44,73 +45,8 @@ void	process_wild(const char *pattern, const char *path, t_token **tok, int *fla
 				add_back_tok(tok, new_token(ft_strdup(entry->d_name), CMD));
 				*flag = 1;
 			}
-				//printf("%s\n", entry->d_name);
 		}
 		entry = readdir(dir);
 	}
 	closedir(dir);
 }
-
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include <dirent.h>
-// #include <errno.h>
-
-// // Assuming you have wildcard_match function defined somewhere
-
-// typedef struct {
-//     char name[256]; // adjust size if necessary
-//     unsigned char type;
-// } DirEntry;
-
-// void process_wild(const char *pattern, const char *path) {
-//     DIR *dir;
-//     struct dirent *entry;
-//     char subpath[4096];  // Using a static buffer; adjust size as necessary
-//     DirEntry entries[4096]; // Again, this is static and assumes max 4096 entries per dir; adjust if necessary
-//     int entry_count = 0;
-
-//     dir = opendir(path);
-//     if (!dir) {
-//         perror("opendir");
-//         return;
-//     }
-
-//     // Store all entries
-//     while ((entry = readdir(dir)) != NULL) {
-//         if (strncmp(entry->d_name, ".", 1) != 0 && strncmp(entry->d_name, "..", 2) != 0) {
-//             strncpy(entries[entry_count].name, entry->d_name, sizeof(entries[entry_count].name));
-//             entries[entry_count].type = entry->d_type;
-//             entry_count++;
-//         }
-//     }
-//     closedir(dir);
-
-//     // Process stored entries
-//     for (int i = 0; i < entry_count; i++) {
-//         // Process regular files
-//         if (entries[i].type != DT_DIR && wildcard_match(entries[i].name, pattern)) {
-//             printf("%s/%s\n", path, entries[i].name);
-//         }
-//         // Process sub-directories
-//         else if (entries[i].type == DT_DIR) {
-//             snprintf(subpath, sizeof(subpath), "%s/%s", path, entries[i].name);
-//             process_wild(pattern, subpath);
-//         }
-//     }
-// }
-
-// int	main(void)
-// {
-// 	char	*pwd;
-
-// 	pwd = getcwd(NULL, 0);
-// 	printf("Match test1: %d\n", wildcard_match("hello", "h*lo"));
-// 	printf("Match test2: %d\n", wildcard_match("hello", "he*o"));
-// 	printf("Match test3: %d\n", wildcard_match("hello", "*"));
-// 	printf("Match test4: %d\n", wildcard_match("hello", "he*llo*"));
-// 	printf("Match test5: %d\n", wildcard_match("hello", "he*m"));
-// 	process_wild("*ea*", pwd);
-// 	return 0;
-// }

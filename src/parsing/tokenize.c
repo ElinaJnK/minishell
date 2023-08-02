@@ -1,26 +1,13 @@
 #include "minishell.h"
 
-void	update_tok(char *line, char **content, int *q_flag, t_token *lst_tok)
-{
-	if (*line == '"' && *q_flag == 0)
-		*q_flag = 2;
-	else if (*line == '\'' && *q_flag == 0)
-		*q_flag = 1;
-	else if ((*line == '"' && *q_flag == 2)
-		|| (*line == '\'' && *q_flag == 1))
-		*q_flag = 0;
-	else if (*line != ' ' && !is_op(line) && !is_fb(line) && *line != '\0')
-		*content = ft_addchr(*content, *line, lst_tok);
-}
-
-void	add_rest(t_token **lst_tok, char *content, int q_flag)
+void	add_rest(t_token **lst_tok, char *content, int q_flag, char *line)
 {
 	if (q_flag == 0 && content && content[0] != '\0')
 		add_back_tok(lst_tok, new_token(content, 0));
 	else if (q_flag == 1 || q_flag == 2)
 	{
 		free(content);
-		failure_parse("Error: unclosed quote", *lst_tok);
+		failure_parse("Error: unclosed quote", *lst_tok, line);
 	}
 }
 
@@ -30,7 +17,7 @@ void	meta_tok(char *line, int *i, t_token **lst_tok)
 
 	tok = malloc(sizeof(char));
 	if (!tok)
-		failure_parse("Error: malloc", *lst_tok);
+		failure_parse("Error: malloc", *lst_tok, line);
 	*tok = 0;
 	if (is_op(line + *i) || is_fb(line + *i) == 6 || is_fb(line + *i) == 7)
 	{
@@ -41,7 +28,7 @@ void	meta_tok(char *line, int *i, t_token **lst_tok)
 	}
 	else if (is_fb(line + *i))
 	{
-		tok = ft_addchr(tok, line[*i], *lst_tok);
+		tok = ft_addchr(tok, line[*i], *lst_tok, line);
 		add_back_tok(lst_tok, new_token(tok, get_type(tok)));
 		*i += 1;
 	}
@@ -49,216 +36,70 @@ void	meta_tok(char *line, int *i, t_token **lst_tok)
 		free(tok);
 }
 
-void	is_true_op(char *line, int *i, char **content, t_token **lst_tok)
+int	is_true_op(char *line, char *content, t_token **lst_tok)
 {
-	if (is_op(line + *i) || is_fb(line + *i))
+	int	i;
+
+	i = 0;
+	if (is_op(line) || is_fb(line))
 	{
-		if (is_op(line + *i) || is_fb(line + *i) == DREDIR2
-			|| is_fb(line + *i) == DREDIR2)
+		if (is_op(line) || is_fb(line) == DREDIR2
+			|| is_fb(line) == DREDIR2)
 		{
-			*content = ft_addchr(*content, line[(*i)++],
-					*lst_tok);
-			*content = ft_addchr(*content, line[(*i)++],
-					*lst_tok);
+			content = ft_addchr(content, *line, *lst_tok, line);
+			i++;
+			content = ft_addchr(content, *(line + 1), *lst_tok, line);
+			i++;
 		}
 		else
-			*content = ft_addchr(*content, line[(*i)++],
-					*lst_tok);
+		{
+			content = ft_addchr(content, *line, *lst_tok, line);
+			i = 1;
+		}
 	}
 	else
-		*content = ft_addchr(*content, line[*i], *lst_tok);
+		content = ft_addchr(content, *line, *lst_tok, line);
+	return (i);
+}
+
+int	handle_op(int q_flag, char *line, char **content, t_token **lst_tok)
+{
+	int	i;
+
+	i = 0;
+	if (q_flag == 0 && *content != NULL && *content[0] != '\0')
+	{
+		add_back_tok(lst_tok, new_token(*content, 0));
+		*content = NULL;
+	}
+	else if (q_flag == 1 || q_flag == 2)
+		i = is_true_op(line + i, *content, lst_tok);
+	return (i);
 }
 
 t_token	*tokenize(char *line, t_env *lst_env)
 {
-	t_token	*lst_tok;
+	t_token	*tok;
 	int		q_flag;
 	int		i;
 	char	*content;
 
-	content = NULL;
-	lst_tok = NULL;
-	q_flag = 0;
-	i = 0;
+	init_param(&content, &tok, &q_flag, &i);
 	while ((size_t)i < ft_strlen(line) && line[i])
 	{
-		if (lst_tok && last_elem(lst_tok)->type == DREDIR2)
-			quoted(line + i, &lst_tok);
-		if (*(line + i) == '$' && q_flag != 1
-			&& !is_heredoc(lst_tok))
-		{
-			line = expansion(line, &i, lst_env);
-			if (!line)
-				return (NULL);
-		}	
+		if (tok && last_elem(tok)->type == DREDIR2)
+			here_doc_q(line + i, &tok);
+		if (*(line + i) == '$' && q_flag != 1 && !is_heredoc(tok))
+			line = expansion(line, &i, lst_env, tok);
 		else if (is_op(line + i) || is_fb(line + i) || line[i] == ' ')
 		{
-			if (q_flag == 0 && content != NULL && content[0] != '\0')
-				{
-					add_back_tok(&lst_tok, new_token(content, 0));
-					content = NULL;
-				}
-			else if (q_flag == 1 || q_flag == 2)
-				is_true_op(line, &i, &content, &lst_tok);
-			meta_tok(line, &i, &lst_tok);
+			i += handle_op(q_flag, line + i, &content, &tok);
+			meta_tok(line, &i, &tok);
 		}
-		update_tok(line + i, &content, &q_flag, lst_tok);
+		update_tok(line + i, &content, &q_flag, tok);
 		if (line[i] != '\0' && !is_op(line + i) && !is_fb(line + i))
 			i++;
 	}
-	return (add_rest(&lst_tok, content, q_flag), check_tok(lst_tok), free(line), lst_tok);
+	return (add_rest(&tok, content, q_flag, line), check_tok(tok),
+		free(line), tok);
 }
-
-void	merge(t_token **res, t_token *cmd, t_token *redirs)
-{
-	t_token	*tmp;
-
-	tmp = NULL;
-	if (!*res)
-	{
-		*res = cmd;
-		tmp = last_elem(*res);
-		if (!tmp)
-			*res = redirs;
-		else
-			tmp->next = redirs;
-		return ;
-	}
-	tmp = last_elem(*res);
-	tmp->next = cmd;
-	tmp = last_elem(*res);
-	tmp->next = redirs;
-}
-
-t_token	*tokenize_bise(t_token *tok)
-{
-	t_token *cmds;
-	t_token	*redirs;
-	t_token	*res;
-	t_token	*tmp;
-
-	tmp = tok;
-	res = NULL;
-	cmds = NULL;
-	redirs = NULL;
-	if (!tok)
-		return (NULL);
-	while (tmp)
-	{
-		if (tmp->type == CMD)
-			add_back_tok(&cmds, new_token(ft_strdup(tmp->content), tmp->type));
-		else if (tmp->type >= REDIR && tmp->type <= DREDIR2_E && tmp->next)
-		{
-			add_back_tok(&redirs, new_token(ft_strdup(tmp->next->content),
-					tmp->type));
-			tmp = tmp->next;
-		}
-		else
-		{
-			merge(&res, cmds, redirs);
-			cmds = NULL;
-			redirs = NULL;
-			add_back_tok(&res, new_token(ft_strdup(tmp->content), tmp->type));
-		}
-		tmp = tmp->next;
-	}
-	merge(&res, cmds, redirs);
-	cmds = NULL;
-	redirs = NULL;
-	if (tok)
-		free_lst_tok(&tok);
-	return (res);
-}
-
-t_token	*tokenize_crise(t_token *tok)
-{
-	t_token	*tmp;
-	char	*pwd;
-	t_token	*res;
-	int		flag;
-
-	pwd = getcwd(NULL, 0);
-	if (!pwd)
-		return (failure("pwd doesnt work"), NULL);
-	tmp = tok;
-	flag = 0;
-	res = NULL;
-	while (tmp)
-	{
-		if (tmp->type == CMD && tmp->next)
-		{
-			add_back_tok(&res, new_token(ft_strdup(tmp->content), tmp->type));
-			tmp = tmp->next;
-			while (tmp && tmp->type == CMD)
-			{
-				process_wild(tmp->content, pwd, &res, &flag);
-				if (flag == 0)
-					add_back_tok(&res, new_token(ft_strdup(tmp->content),
-							tmp->type));
-				else if (flag == 1)
-					flag = 0;
-				tmp = tmp->next;
-			}
-		}
-		else
-		{
-			add_back_tok(&res, new_token(ft_strdup(tmp->content), tmp->type));
-			tmp = tmp->next;
-		}
-	}
-	free(pwd);
-	if (tok)
-		free_lst_tok(&tok);
-	return (res);
-}
-
-/*------------------------------------FUNCTIONS TO DELETE-----------------------------------------------------*/
-
-void print_list_tok(t_token *lst_tok)
-{
-	t_token *temp;
-	int		size = 0;
-
-	printf("-------------------------------\n");
-	temp = lst_tok;
-	while (temp)
-	{
-		printf("[%s, %d]->", temp->content, temp->type);
-		//printf("[%s]->", temp->content);
-		temp = temp->next;
-		size++;
-		//printf("\n");
-	}
-	printf("\n-----size of lst_tok : %d------\n", size);
-}
-
-// int	main(int ac, char **av, char **env)
-// {
-// 	t_token	*lst_tok;
-// 	t_token *lst_bise;
-// 	t_env	*lst_env;
-
-// 	(void)av;
-// 	(void)ac;
-// 	// lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
-// 	//lst_tok = tokenize("ech\'o\' hello&&(echo \"world\" || echo \"hello world\")");
-// 	//lst_tok = tokenize("(((echo '$bye')) && cd dossier||echo $user ) | cat -e");	
-// 	// ( smpl_cmd && smpl_cmd || smpl_cmd ) | smpl_cmd
-// 	//lst_tok = tokenize("(echo '$bye' && echo $nym || echo $user ) | cat -e");
-// 	lst_env = spy_env(env);
-// 	//char *str = ft_strdup("echo \"'$user'$USER$USER'$USER'\"$user\"\" && echo $USER | cat -e || (export vat=42 && echo lol)");
-// 	//char *str = ft_strdup("cat << $USER << $US'ER' << \"$USER\" > f << \"EOF E\"OF | cat << EOF > g");
-// 	//char *str = ft_strdup("(ls && cat) << EOF");
-// 	//char *str = ft_strdup(" ");
-// 	//char *str = ft_strdup("ls > f -la");
-// 	//char *str = ft_strdup("((ls > f -la) && echo a >> f) << EOF | cat");
-// 	lst_tok = tokenize(str, lst_env);
-// 	print_list_tok(lst_tok);
-// 	lst_bise = tokenize_bise(lst_tok);
-// 	print_list_tok(lst_bise);
-// 	// lst_tok = tokenize("echo hello is $USER");
-// 	//printf("Testing 1 2 1 2, the mic is on\n");
-// 	//print_list_tok(lst_tok);
-// 	return (0);
-// }
-/*------------------------------------FUNCTIONS TO DELETE-----------------------------------------------------*/

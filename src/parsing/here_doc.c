@@ -1,5 +1,31 @@
 #include "minishell.h"
 
+char	*here_doc_expand(char *line, t_env *env)
+{
+	int		i;
+	char	*tmp;
+
+	i = 0;
+	while ((size_t)i < ft_strlen(line) && line[i])
+	{
+		if (line[i] == '$')
+		{
+			line = expansion(line, &i, env, NULL);
+			if (!line)
+				return (NULL);
+		}
+		else
+			i++;
+	}
+	if (line[i - 1] != '\n')
+	{
+		tmp = line;
+		line = ft_strjoin(tmp, "\n");
+		free(tmp);
+	}
+	return (line);
+}
+
 int	ft_max(int a, int b)
 {
 	if (a > b)
@@ -10,10 +36,7 @@ int	ft_max(int a, int b)
 int	read_stdin(int fd, char *limiter, int type, t_env *env)
 {
 	char	*line;
-	char	*tmp;
-	int		i;
 
-	i = 0;
 	ft_putstr_fd("> ", 1);
 	line = get_next_line(0);
 	while (line && ft_strncmp(line, limiter, ft_max(ft_strlen(line) - 1,
@@ -21,23 +44,9 @@ int	read_stdin(int fd, char *limiter, int type, t_env *env)
 	{
 		if (type == DREDIR2)
 		{
-			i = 0;
-			while (line[i])
-			{
-				if (line[i] == '$')
-				{
-					line = expansion(line, &i, env);
-					if (!line)
-						return (EXIT_FAILURE);
-				}
-				i++;
-			}
-			if (line[i - 1] != '\n')
-			{
-				tmp = line;
-				line = ft_strjoin(tmp, "\n");
-				free(tmp);
-			}
+			line = here_doc_expand(line, env);
+			if (!line)
+				return (EXIT_FAILURE);
 		}
 		if (write(fd, line, ft_strlen(line)) < 0)
 			failure("write failed");
@@ -47,8 +56,7 @@ int	read_stdin(int fd, char *limiter, int type, t_env *env)
 	}
 	if (line)
 		free(line);
-	close(fd);
-	return (EXIT_SUCCESS);
+	return (close(fd), EXIT_SUCCESS);
 }
 
 int	open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env)
@@ -58,7 +66,7 @@ int	open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env)
 	return (read_stdin(pipe_fds[1], limiter, type, env));
 }
 
-void	quoted(char *line, t_token **lst_tok)
+void	here_doc_q(char *line, t_token **lst_tok)
 {
 	int		i;
 	t_token	*last;

@@ -13,6 +13,53 @@ void	failure_env(const char *message, char **elem)
 	exit(EXIT_FAILURE);
 }
 
+char	**env_to_tab(t_env *lst_env)
+{
+	char	**env;
+	t_env	*tmp;
+	int		i;
+	char	*str;
+
+	env = (char **)malloc(sizeof(char *) * (lst_size_env(lst_env) + 1));
+	if (!env)
+		return (failure("lst_env: env not properly malloc'd"), NULL);
+	tmp = lst_env;
+	i = 0;
+	while (tmp)
+	{
+		if (ft_strncmp(tmp->value, "", 1) == 0)
+			env[i] = ft_strdup(tmp->name);
+		else
+		{
+			str = ft_strjoin(tmp->name, "=");
+			env[i] = ft_strjoin(str, tmp->value);
+			free(str);
+		}
+		tmp = tmp->next;
+		i++;
+	}
+	env[i] = NULL;
+	return (env);
+}
+
+char	**get_value(char **elem, char *data, int i)
+{
+	if (data[i] == '=' && data[i + 1])
+	{
+		elem[1] = ft_strdup(data + i + 1);
+		if (!elem[1])
+		{
+			free(elem[0]);
+			free(elem);
+			failure_env("malloc of elem[1] is NULL", elem);
+			return (NULL);
+		}
+	}
+	else
+		elem[1] = ft_strdup("");
+	return (elem);
+}
+
 char	**get_env(char *data)
 {
 	char	**elem;
@@ -35,20 +82,7 @@ char	**get_env(char *data)
 		return (NULL);
 	}
 	ft_strlcpy(elem[0], data, i + 1);
-	if (data[i] == '=' && data[i + 1])
-	{
-		elem[1] = ft_strdup(data + i + 1);
-		if (!elem[1])
-		{
-			free(elem[0]);
-			free(elem);
-			failure_env("malloc of elem[1] is NULL", elem);
-			return (NULL);
-		}
-	}
-	else
-		elem[1] = ft_strdup("");
-	return (elem);
+	return (get_value(elem, data, i));
 }
 
 t_env	*spy_env(char **env)
@@ -72,19 +106,3 @@ t_env	*spy_env(char **env)
 	}
 	return (lst_env);
 }
-
-/*-------------------------------------TESTS-----------------------*/
-
-
-// int main(int ac, char **av, char **env)
-// {
-// 	// print the env
-// 	t_env *lst_env;
-
-// 	(void)ac;
-// 	(void)av;
-// 	lst_env = spy_env(env);
-// 	print_list_env(lst_env);
-// 	free_lst_env(&lst_env);
-// 	return (0);
-// }

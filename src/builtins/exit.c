@@ -1,8 +1,15 @@
 #include "minishell.h"
 
+int	*exit_status(void)
+{
+	static int	exit_s = 0;
+
+	return (&exit_s);
+}
+
 int	is_num(char *str)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (*str == '-')

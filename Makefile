@@ -10,29 +10,31 @@ SOURCES_BUILTINS	=	cd.c		\
 						pwd.c		\
 						unset.c		\
 
-# SOURCES_ENV 		=				\
+SOURCES_EXEC		=	com_path.c	\
+						exec_ast.c	\
+						exec_com.c	\
 
-SOURCES_EXEC		=	execute.c	\
-						path.c		\
-
-SOURCES_PARSING 	=	ast.c		\
+SOURCES_PARSING 	=	build_ast.c	\
 						expansion.c	\
 						here_doc.c	\
-						in_utils.c	\
 						spy_env.c	\
 						tcheck.c	\
+						tok_redir.c	\
+						tok_star.c	\
 						tok_tik.c	\
 						tokenize.c	\
+						transf_tab.c\
 						wildcard.c	\
 
 SOURCES_SHELL 		=	main.c		\
 						#signal.c 	\
 
-SOURCES_UTILS 		=	cmds.c		\
-						env.c		\
-						exec.c		\
-						token.c		\
-						tree.c		\
+SOURCES_UTILS 		=	ast_type.c	\
+						ast_utils.c	\
+						cmds.c		\
+						env_utils.c	\
+						tok_type.c	\
+						tok_utils.c	\
 
 LIBFT		= libft
 

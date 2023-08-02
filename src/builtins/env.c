@@ -1,20 +1,25 @@
 #include "minishell.h"
 
-void	free_tab2(char **tab)
+int	lst_size_env(t_env *lst)
 {
 	int		i;
+	t_env	*tmp;
 
 	i = 0;
-	while (tab[i])
-		free(tab[i++]);
-	free(tab);
+	tmp = lst;
+	while (tmp)
+	{
+		i++;
+		tmp = tmp->next;
+	}
+	return (i);
 }
 
 void	free_tab(char **tab)
 {
 	int	i;
 
-	i  = 0;
+	i = 0;
 	if (!tab)
 		return ;
 	while (tab[i])
@@ -26,22 +31,23 @@ void	free_tab(char **tab)
 	free(tab);
 }
 
-int		exec_env(t_cmd *cmd, int fd_out, t_env *lst_env)
+int	exec_env(t_cmd *cmd, int fd_out, t_env *lst_env)
 {
-	int		i;
-	char	**res;
+	t_env	*tmp;
 
-	i = 0;
 	if (!cmd || !lst_env)
-		return (ft_putstr_fd("bash: env: env not defined\n", fd_out), EXIT_FAILURE);
-	res = env_to_tab(lst_env);
-	if (!res)
-		return (EXIT_FAILURE);
-	while (res[i])
+		return (ft_putstr_fd("bash: env: env not defined\n", fd_out),
+			EXIT_FAILURE);
+	tmp = lst_env;
+	while (tmp)
 	{
-		ft_putendl_fd(res[i], fd_out);
-		i++;
+		if (ft_strncmp(tmp->value, "", 1) != 0)
+		{
+			ft_putstr_fd(tmp->name, fd_out);
+			ft_putstr_fd("=", fd_out);
+			ft_putendl_fd(tmp->value, fd_out);
+		}
+		tmp = tmp->next;
 	}
-	free_tab(res);
 	return (EXIT_SUCCESS);
 }

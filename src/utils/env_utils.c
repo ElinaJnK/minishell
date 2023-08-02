@@ -1,47 +1,5 @@
 #include "minishell.h"
 
-int	lst_size_env(t_env *lst)
-{
-	int		i;
-	t_env	*tmp;
-
-	i = 0;
-	tmp = lst;
-	while (tmp)
-	{
-		i++;
-		tmp = tmp->next;
-	}
-	return (i);
-}
-
-char	**env_to_tab(t_env *lst_env)
-{
-	char	**env;
-	t_env	*tmp;
-	int		i;
-	char	*str;
-
-	if (!lst_env)
-		return (NULL);
-	env = (char **)malloc(sizeof(char *) * (lst_size_env(lst_env) + 1));
-	if (!env)
-		return (failure("lst_env: env not properly malloc'd"), NULL);
-	tmp = lst_env;
-	i = 0;
-	while (tmp)
-	{
-		str = ft_strjoin(tmp->name, "=");
-		env[i] = ft_strjoin(str, tmp->value);
-		if (str)
-			free(str);
-		tmp = tmp->next;
-		i++;
-	}
-	env[i] = NULL;
-	return (env);
-}
-
 void	add_back_env(t_env **lst_env, t_env *new)
 {
 	t_env	*tmp;
@@ -88,6 +46,23 @@ void	free_lst_env(t_env **lst_env)
 	}
 }
 
+void	del_elem(t_env **lst_env, t_env *temp, t_env *prev)
+{
+	if (prev)
+		prev->next = temp->next;
+	else
+		*lst_env = temp->next;
+	if (temp->name)
+		free(temp->name);
+	if (temp->value)
+		free(temp->value);
+	free(temp);
+	if (prev)
+		temp = prev->next;
+	else
+		temp = *lst_env;
+}
+
 void	lst_del_env(t_env **lst_env, char *name)
 {
 	t_env	*temp;
@@ -101,19 +76,7 @@ void	lst_del_env(t_env **lst_env, char *name)
 	{
 		if (ft_strncmp(temp->name, name, ft_strlen(name) + 1) == 0)
 		{
-			if (prev)
-				prev->next = temp->next;
-			else
-				*lst_env = temp->next;
-			if (temp->name)
-				free(temp->name);
-			if (temp->value)
-				free(temp->value);
-			free(temp);
-			if (prev)
-				temp = prev->next;
-			else
-				temp = *lst_env;
+			del_elem(lst_env, temp, prev);
 			break ;
 		}
 		else

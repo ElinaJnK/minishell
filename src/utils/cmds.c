@@ -21,10 +21,47 @@ void	free_cmds(t_cmd *cmds, int count)
 				}
 				free(cmds[i].args);
 			}
+			printf("is being free'd : %s\n\n\n", cmds[i].content);
 			if (cmds[i].content)
 				free(cmds[i].content);
 			i++;
 		}
 		free(cmds);
 	}
+}
+
+int	lst_size_tok(t_token *lst)
+{
+	int		i;
+	t_token	*tmp;
+
+	i = 0;
+	tmp = lst;
+	while (tmp)
+	{
+		i++;
+		tmp = tmp->next;
+	}
+	return (i);
+}
+
+int	init_op(t_cmd *cmd, t_token *t)
+{
+	if (t)
+	{
+		cmd->content = ft_strdup(t->content);
+		if (!cmd->content)
+			return (EXIT_FAILURE);
+		cmd->type = t->type;
+	}
+	else
+	{
+		cmd->content = NULL;
+		cmd->type = -1;
+	}
+	cmd->output = STDOUT_FILENO;
+	cmd->input = STDIN_FILENO;
+	cmd->args = NULL;
+	cmd->nb_args = 0;
+	return (EXIT_SUCCESS);
 }

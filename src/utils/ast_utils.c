@@ -13,28 +13,12 @@ t_ast	*create_node(t_cmd *cmd)
 	return (node);
 }
 
-// void	free_cmd(t_cmd *cmd)
-// {
-// 	int	i;
-
-// 	i = 0;
-// 	if (cmd)
-// 	{
-// 		free(cmd->content);
-// 		while (i <= cmd->nb_args)
-// 			free(cmd->args[i++]);
-// 		free(cmd->args);
-// 		free(cmd);
-// 	}
-// }
-
 void	free_ast(t_ast *node)
 {
 	if (node == NULL)
 		return ;
 	free_ast(node->left);
 	free_ast(node->right);
-	//free_cmd(node->cmd);
 	free(node);
 }
 
@@ -49,3 +33,4 @@ void	free_all(t_all *all)
 	}
 	free(all);
 }
+

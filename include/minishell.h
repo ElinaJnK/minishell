@@ -96,22 +96,23 @@ void	print_list_tok(t_token *lst_tok);
 
 /*----failure-----*/
 void	failure(const char *message);
-void	failure_parse(const char *message, t_token *lst_tok);
+void	failure_parse(const char *message, t_token *lst_tok, char *line);
 void	failure_exec(const char *message);
+void	failure_env(const char *message, char **elem);
 
 /*----parsing functions----*/
 //void	read_stdin(char *limiter);
+void	update_tok(char *line, char **content, int *q_flag, t_token *lst_tok);
 t_token	*tokenize(char *line, t_env *lst_env);
 t_token	*tokenize_bise(t_token *tok);
 t_token	*tokenize_crise(t_token *tok);
 void	check_tok(t_token *lst_tok);
 
 /*----parsing help functions----*/
-t_token	*init_param(t_token **lst_tok, int *q_flag, int *i);
-t_token	*doo(t_token **lst_tok, t_token *tok);
 t_token	*init_tok(t_token *lst_tok);
-char	*ft_addchr(char *s1, char c, t_token *lst_tok);
+char	*ft_addchr(char *s1, char c, t_token *lst_tok, char *line);
 t_all	*build_all(t_cmd *tokens, t_ast *root, t_env *lst_env, int count);
+void	init_param(char **content, t_token **lst_tok, int *q_flag, int *i);
 
 /*----wildcard----*/
 void	process_wild(const char *pattern, const char *path, t_token **tok, int *flag);
@@ -121,8 +122,13 @@ void	free_ast(t_ast *a);
 t_ast	*create_node(t_cmd *cmd);
 t_ast	*build_ast(t_cmd *tokens, t_border *b);
 
+void	ast_redir(t_cmd *tokens, t_ast **root, t_ast **current, int start);
+void	ast_op(t_cmd *tokens, t_ast **root, t_ast **current, int start);
+void	ast_pipe(t_cmd *tokens, t_ast **root, t_ast **current, int start);
+void	ast_cmd(t_cmd *tokens, t_ast **root, t_ast **current, int start);
+
 /*---expansion---*/
-char	*expansion(char *line, int *i, t_env *env);
+char	*expansion(char *line, int *i, t_env *env, t_token *lst_tok);
 
 /*----in-utils-----*/
 t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env);
@@ -153,8 +159,10 @@ t_token	*new_token(char *content, int type);
 void	free_lst_tok(t_token **lst_tok);
 int		is_heredoc(t_token *lst_tok);
 t_token	*last_elem(t_token *lst_tok);
-void	quoted(char *line, t_token **tok);
+void	here_doc_q(char *line, t_token **lst_tok);
 void	free_cmds(t_cmd *cmds, int count);
+int		init_op(t_cmd *cmd, t_token *t);
+int		lst_size_tok(t_token *lst);
 void	free_all(t_all *all);
 
 /*----execution----*/
@@ -162,6 +170,7 @@ char	*get_command_path(char *command, t_env *env);
 void	exec_ast(t_ast *root, int input_fd, int output_fd, t_all *all);
 void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all);
 int		*exit_status(void);
+int		is_paf(char *cmd);
 
 /*---here doc----*/
 int		open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env);

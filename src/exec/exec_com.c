@@ -1,19 +1,5 @@
 #include "minishell.h"
 
-int	is_paf(char *cmd)
-{
-	int	i;
-
-	i = 0;
-	while (cmd[i])
-	{
-		if (cmd[i] == '/')
-			return (1);
-		i++;
-	}
-	return (0);
-}
-
 int	do_builtin(t_cmd *cmd, int output_fd, t_all *all)
 {
 	if (!ft_strncmp(cmd->content, "cd", ft_strlen("cd") + 1))
@@ -46,7 +32,7 @@ int	is_builtin(t_cmd *cmd)
 	return (0);
 }
 
-int	execution(int pid, t_cmd *cmd, t_all *all)
+int	exec(int pid, t_cmd *cmd, t_all *all)
 {
 	char	*path;
 	char	**env;
@@ -68,51 +54,53 @@ int	execution(int pid, t_cmd *cmd, t_all *all)
 	return (free(path), free_tab(env), EXIT_FAILURE);
 }
 
+void	exec_child(t_ast *node, int input_fd, int output_fd, t_all **all)
+{
+	if (input_fd != STDIN_FILENO)
+	{
+		if (dup2(input_fd, STDIN_FILENO) < 0)
+			failure_exec("dup2");
+		close(input_fd);
+	}
+	if (output_fd != STDOUT_FILENO)
+	{
+		if (dup2(output_fd, STDOUT_FILENO) < 0)
+			failure_exec("dup2");
+		close(output_fd);
+	}
+	if (exec(0, node->cmd, *all) == EXIT_FAILURE)
+	{
+		free_all(*all);
+		failure_exec("bash");
+	}
+}
 
 void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 {
 	pid_t	pid;
 	int		status;
+	int		builtin;
 
+	builtin = 0;
 	if (is_builtin(node->cmd))
 	{
-		*exit_status() = do_builtin(node->cmd, output_fd, *all);
+		builtin = do_builtin(node->cmd, output_fd, *all);
+		*exit_status() = builtin;
 		return ;
 	}
 	pid = fork();
 	if (pid < 0)
 		failure_exec("fork error");
 	else if (pid == 0)
-	{
-		if (input_fd != STDIN_FILENO)
-		{
-			if (dup2(input_fd, STDIN_FILENO) < 0)
-				failure_exec("dup2");
-			close(input_fd);
-		}
-		if (output_fd != STDOUT_FILENO)
-		{
-			if (dup2(output_fd, STDOUT_FILENO) < 0)
-				failure_exec("dup2");
-			close(output_fd);
-		}
-		if (execution(pid, node->cmd, *all) == EXIT_FAILURE)
-		{
-			//*exit_status() = EXIT_FAILURE;
-			free_all(*all);
-			failure_exec("bash");
-		}
-		//free_all(*all);
-		//exit(EXIT_SUCCESS);
-	}
+		exec_child(node, input_fd, output_fd, all);
 	else
 	{
 		waitpid(pid, &status, 0);
 		*exit_status() = WEXITSTATUS(status);
 		if (input_fd != STDIN_FILENO)
-            close(input_fd);
-        if (output_fd != STDOUT_FILENO)
-            close(output_fd);
+			close(input_fd);
+		if (output_fd != STDOUT_FILENO)
+			close(output_fd);
 	}
 }
 
