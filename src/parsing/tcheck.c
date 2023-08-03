@@ -1,42 +1,47 @@
 #include "minishell.h"
 
-void	put_error_tok(char *message, t_token *lst_tok)
+void	put_error_tok(char *message, t_token **lst_tok)
 {
 	ft_putstr_fd(message, STDIN_FILENO);
+	*(exit_status()) = EXIT_FAILURE;
 	if (lst_tok)
-		free_lst_tok(&lst_tok);
+		free_lst_tok(lst_tok);
+	lst_tok = NULL;
 }
 
-void	check_first_tok(t_token *tmp, t_token *lst_tok)
+int	check_first_tok(t_token *tmp, t_token **lst_tok)
 {
 	if (!tmp || ((tmp->type >= 1 && tmp->type <= 3) || tmp->type == CLOSE_PAR))
-		put_error_tok("bash: syntax error near unexpected token\n", lst_tok);
+		return (put_error_tok("bash: syntax error near unexpected token\n", lst_tok), EXIT_FAILURE);
+	return (EXIT_SUCCESS);
 }
 
-void	check_last_tok(t_token *tok, int p, t_token *lst_tok)
+int	check_last_tok(t_token *tok, int p, t_token **lst_tok)
 {
 	if (!tok)
-		return ;
+		return (EXIT_FAILURE);
 	if ((tok->type >= 1 && tok->type <= 3) || tok->type == OPEN_PAR
 		|| tok->type == REDIR || tok->type == REDIR2
 		|| tok->type == DREDIR || tok->type == DREDIR2)
-		put_error_tok("bash: syntax error near unexpected token\n", lst_tok);
+		return (put_error_tok("bash: syntax error near unexpected token\n", lst_tok), EXIT_FAILURE);
 	if (tok->type == CLOSE_PAR)
 		p--;
 	if (p != 0)
-		put_error_tok("bash: syntax error near unexpected token\n", lst_tok);
+		return (put_error_tok("bash: syntax error near unexpected token\n", lst_tok), EXIT_FAILURE);
+	return (EXIT_SUCCESS);
 }
 
-void	check_tok(t_token *lst_tok)
+void	check_tok(t_token **lst_tok)
 {
 	t_token	*tmp;
 	int		p;
 
-	tmp = lst_tok;
+	tmp = *lst_tok;
 	p = 0;
 	if (!tmp)
 		return ;
-	check_first_tok(tmp, lst_tok);
+	if (check_first_tok(tmp, lst_tok) == EXIT_FAILURE)
+		return ;
 	while (tmp && tmp->next)
 	{
 		if (tmp->type == OPEN_PAR)
@@ -50,8 +55,12 @@ void	check_tok(t_token *lst_tok)
 			|| (tmp->type != CMD && tmp->type != OPEN_PAR && tmp->type
 				!= CLOSE_PAR && (tmp->next->type == AND
 					|| tmp->next->type == OR)))
+		{
 			put_error_tok("bash: syntax error near unexpected token\n", lst_tok);
+			return ;
+		}
 		tmp = tmp->next;
 	}
-	check_last_tok(tmp, p, lst_tok);
+	if (check_last_tok(tmp, p, lst_tok) == EXIT_FAILURE)
+		return ;
 }

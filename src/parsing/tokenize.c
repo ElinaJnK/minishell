@@ -1,14 +1,16 @@
 #include "minishell.h"
 
-void	add_rest(t_token **lst_tok, char *content, int q_flag, char *line)
+void	add_rest(t_token **lst_tok, char *content, int q_flag)
 {
 	if (q_flag == 0 && content && content[0] != '\0')
 		add_back_tok(lst_tok, new_token(content, 0));
 	else if (q_flag == 1 || q_flag == 2)
 	{
 		free(content);
-		failure_parse("Error: unclosed quote", *lst_tok, line);
+		ft_putstr_fd("bash: unclosed quotes\n", STDIN_FILENO);
+		free_lst_tok(lst_tok);
 	}
+	print_list_tok(*lst_tok);
 }
 
 void	meta_tok(char *line, int *i, t_token **lst_tok)
@@ -36,7 +38,7 @@ void	meta_tok(char *line, int *i, t_token **lst_tok)
 		free(tok);
 }
 
-int	is_true_op(char *line, char *content, t_token **lst_tok)
+int	is_true_op(char *line, char **content, t_token **lst_tok)
 {
 	int	i;
 
@@ -46,19 +48,19 @@ int	is_true_op(char *line, char *content, t_token **lst_tok)
 		if (is_op(line) || is_fb(line) == DREDIR2
 			|| is_fb(line) == DREDIR2)
 		{
-			content = ft_addchr(content, *line, *lst_tok, line);
+			*content = ft_addchr(*content, *line, *lst_tok, line);
 			i++;
-			content = ft_addchr(content, *(line + 1), *lst_tok, line);
+			*content = ft_addchr(*content, *(line + 1), *lst_tok, line);
 			i++;
 		}
 		else
 		{
-			content = ft_addchr(content, *line, *lst_tok, line);
+			*content = ft_addchr(*content, *line, *lst_tok, line);
 			i = 1;
 		}
 	}
 	else
-		content = ft_addchr(content, *line, *lst_tok, line);
+		*content = ft_addchr(*content, *line, *lst_tok, line);
 	return (i);
 }
 
@@ -73,7 +75,7 @@ int	handle_op(int q_flag, char *line, char **content, t_token **lst_tok)
 		*content = NULL;
 	}
 	else if (q_flag == 1 || q_flag == 2)
-		i = is_true_op(line + i, *content, lst_tok);
+		i = is_true_op(line + i, content, lst_tok);
 	return (i);
 }
 
@@ -100,6 +102,6 @@ t_token	*tokenize(char *line, t_env *lst_env)
 		if (line[i] != '\0' && !is_op(line + i) && !is_fb(line + i))
 			i++;
 	}
-	return (add_rest(&tok, content, q_flag, line), check_tok(tok),
+	return (add_rest(&tok, content, q_flag), check_tok(&tok),
 		free(line), tok);
 }

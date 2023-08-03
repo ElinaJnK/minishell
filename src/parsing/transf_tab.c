@@ -100,6 +100,8 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
 	t_token	*tmp;
 	int		i;
 
+	if (!t)
+		return (NULL);
 	cmd = malloc(sizeof(t_cmd) * (lst_size_tok(t) + 1));
 	if (!cmd)
 		return (failure_parse("Malloc allocation failure", t, NULL), NULL);

@@ -30,6 +30,8 @@ void	free_all(t_all *all)
 		free_cmds(all->cmd, all->count);
 		free_lst_env(&all->env);
 		free(all->b);
+		free(all->prompt_good);
+		free(all->prompt_bad);
 	}
 	free(all);
 }

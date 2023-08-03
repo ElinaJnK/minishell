@@ -144,7 +144,11 @@ void	tchitat_stdin(t_all **all)
 	{
 		//add_history(line);
 		signal_prompt();
-		line = readline("(▼・ᴥ・▼)$ ");
+		//line = readline("(▼・ᴥ・▼)$ ");
+		if (*(exit_status()) == 0)
+			line = readline((*all)->prompt_good);
+		else
+			line = readline((*all)->prompt_bad);
 		if (!line)
 			return ;
 		root = NULL;
@@ -194,6 +198,8 @@ int	main(int ac, char **av, char **env)
 		return (failure("Error in malloc allocation"), free_lst_env(&lst_env),
 			*exit_status());
 	all = build_all(NULL, NULL, lst_env, 0);
+	all->prompt_good = ft_strdup("\001\033[35m\002(▼・ᴥ・▼) $ \001\033[0m\002");
+	all->prompt_bad = ft_strdup("\001\033[31m\002ლ(́◉◞౪◟◉‵ლ) $ \001\033[0m\002");
 	all->b = b;
 	tchitat_stdin(&all);
 	free_all(all);

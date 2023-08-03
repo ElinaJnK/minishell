@@ -61,7 +61,7 @@ lib:
 	@make -C $(LIBFT)
 
 $(NAME): $(OBJS)
-	$(CC) $(OBJS) -L $(LIBFT) -lreadline -lft -o $(NAME)
+	$(CC) $(OBJS) -L $(LIBFT) -lreadline -lft -lncurses -o $(NAME)
 
 obj:
 	mkdir -p $(OBJ_DIR) $(OBJ_DIR)/parsing $(OBJ_DIR)/shell $(OBJ_DIR)/utils $(OBJ_DIR)/exec $(OBJ_DIR)/builtins

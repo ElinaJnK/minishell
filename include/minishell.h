@@ -76,6 +76,8 @@ typedef struct s_env
 
 typedef struct s_all
 {
+	char		*prompt_good;
+	char		*prompt_bad;
 	t_env		*env;
 	t_ast		*ast;
 	t_cmd		*cmd;
@@ -106,7 +108,7 @@ void	update_tok(char *line, char **content, int *q_flag, t_token *lst_tok);
 t_token	*tokenize(char *line, t_env *lst_env);
 t_token	*tokenize_bise(t_token *tok);
 t_token	*tokenize_crise(t_token *tok);
-void	check_tok(t_token *lst_tok);
+void	check_tok(t_token **lst_tok);
 
 /*----parsing help functions----*/
 t_token	*init_tok(t_token *lst_tok);
@@ -164,6 +166,7 @@ void	free_cmds(t_cmd *cmds, int count);
 int		init_op(t_cmd *cmd, t_token *t);
 int		lst_size_tok(t_token *lst);
 void	free_all(t_all *all);
+void	put_error_tok(char *message, t_token **lst_tok);
 
 /*----execution----*/
 char	*get_command_path(char *command, t_env *env);
