@@ -35,4 +35,3 @@ void	free_all(t_all *all)
 	}
 	free(all);
 }
-

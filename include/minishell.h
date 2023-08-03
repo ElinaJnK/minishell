@@ -113,7 +113,7 @@ void	check_tok(t_token **lst_tok);
 /*----parsing help functions----*/
 t_token	*init_tok(t_token *lst_tok);
 char	*ft_addchr(char *s1, char c, t_token *lst_tok, char *line);
-t_all	*build_all(t_cmd *tokens, t_ast *root, t_env *lst_env, int count);
+t_all	*build_all(t_env *lst_env);
 void	init_param(char **content, t_token **lst_tok, int *q_flag, int *i);
 
 /*----wildcard----*/
@@ -179,6 +179,8 @@ int		is_paf(char *cmd);
 int		open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env);
 
 /*----builtins----*/
+int		do_builtin(t_cmd *cmd, int output_fd, t_all *all);
+int		is_builtin(t_cmd *cmd);
 int		exec_cd(t_cmd *cmd, int output_fd);
 int		exec_echo(t_cmd *cmd, int fd_out);
 int		exec_env(t_cmd *cmd, int fd_out, t_env *lst_env);

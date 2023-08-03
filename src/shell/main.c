@@ -94,35 +94,25 @@ void	failure(const char *message)
 	exit(EXIT_FAILURE);
 }
 
-t_all	*build_all(t_cmd *tokens, t_ast *root, t_env *lst_env, int count)
+t_all	*build_all(t_env *lst_env)
 {
-	t_all	*all;
+	t_all		*all;
+	t_border	*b;
 
+	b = malloc(sizeof(t_border));
+	if (!b)
+		return (NULL);
 	all = malloc(sizeof(t_all));
 	if (!all)
 		return (NULL);
-	all->ast = root;
-	all->cmd = tokens;
+	all->ast = NULL;
+	all->b = b;
+	all->cmd = NULL;
 	all->env = lst_env;
-	all->count = count;
+	all->count = 0;
+	all->prompt_good = ft_strdup("\001\033[35m\002(▼・ᴥ・▼) $ \001\033[0m\002");
+	all->prompt_bad = ft_strdup("\001\033[31m\002ლ(́◉◞౪◟◉‵ლ) $ \001\033[0m\002");
 	return (all);
-}
-
-t_cmd	*return_command(char *line, t_all **all, int *count)
-{
-	t_cmd		*cmds;
-	t_token		*t;
-
-	if (!line)
-		return (NULL);
-	cmds = NULL;
-	t = NULL;
-	t = tokenize(line, (*all)->env);
-	t = tokenize_bise(t);
-	t = tokenize_crise(t);
-	if (t && (*all)->env)
-		cmds = transform_into_tab(t, count, (*all)->env);
-	return (cmds);
 }
 
 void	init_border(t_all **all, int *count)
@@ -133,25 +123,50 @@ void	init_border(t_all **all, int *count)
 	(*all)->b->start = count;
 }
 
+void	just_do_it(t_all **all, char *line, int count)
+{
+	t_cmd		*cmds;
+	t_ast		*root;
+	t_token		*t;
+
+	cmds = NULL;
+	t = NULL;
+	t = tokenize(line, (*all)->env);
+	t = tokenize_bise(t);
+	t = tokenize_crise(t);
+	if (t && (*all)->env)
+		cmds = transform_into_tab(t, &count, (*all)->env);
+	if (cmds)
+	{
+		init_border(all, &count);
+		root = build_ast(cmds, (*all)->b);
+		if (root && (*all)->env)
+		{
+			(*all)->cmd = cmds;
+			(*all)->ast = root;
+			exec_ast((*all)->ast, STDIN_FILENO, STDOUT_FILENO, *all);
+		}
+		free_cmds(cmds, (*all)->count);
+		if (root)
+			free_ast(root);
+	}
+}
+
 void	tchitat_stdin(t_all **all)
 {
 	char		*line;
-	t_cmd		*cmds;
 	int			count;
-	t_ast		*root;
 
 	while (1)
 	{
 		//add_history(line);
 		signal_prompt();
-		//line = readline("(▼・ᴥ・▼)$ ");
 		if (*(exit_status()) == 0)
 			line = readline((*all)->prompt_good);
 		else
 			line = readline((*all)->prompt_bad);
 		if (!line)
 			return ;
-		root = NULL;
 		count = 0;
 		if (*line == '\n' || *line == '\0')
 		{
@@ -159,21 +174,8 @@ void	tchitat_stdin(t_all **all)
 			line = NULL;
 		}
 		signal_exec();
-		cmds = return_command(line, all, &count);
-		if (cmds)
-		{
-			init_border(all, &count);
-			root = build_ast(cmds, (*all)->b);
-			if (root && (*all)->env)
-			{
-				(*all)->cmd = cmds;
-				(*all)->ast = root;
-				exec_ast((*all)->ast, STDIN_FILENO, STDOUT_FILENO, *all);
-			}
-			free_cmds(cmds, (*all)->count);
-			if (root)
-				free_ast(root);
-		}
+		if (line)
+			just_do_it(all, line, count);
 	}
 }
 
@@ -181,7 +183,6 @@ int	main(int ac, char **av, char **env)
 {
 	t_env		*lst_env;
 	t_all		*all;
-	t_border	*b;
 
 	(void)ac;
 	(void)av;
@@ -193,14 +194,12 @@ int	main(int ac, char **av, char **env)
 	if (!*env)
 		return (failure("No environment"), 1);
 	lst_env = spy_env(env);
-	b = malloc(sizeof(t_border));
-	if (!b)
+	if (!lst_env)
+		return (failure("Error in malloc allocation"), 1);
+	all = build_all(lst_env);
+	if (!all)
 		return (failure("Error in malloc allocation"), free_lst_env(&lst_env),
 			*exit_status());
-	all = build_all(NULL, NULL, lst_env, 0);
-	all->prompt_good = ft_strdup("\001\033[35m\002(▼・ᴥ・▼) $ \001\033[0m\002");
-	all->prompt_bad = ft_strdup("\001\033[31m\002ლ(́◉◞౪◟◉‵ლ) $ \001\033[0m\002");
-	all->b = b;
 	tchitat_stdin(&all);
 	free_all(all);
 	//rl_clear_history();

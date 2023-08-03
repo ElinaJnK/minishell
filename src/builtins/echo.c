@@ -6,6 +6,13 @@ void	failure_exec(const char *message)
 	exit(EXIT_FAILURE);
 }
 
+void	write_echo(t_cmd *cmd, int fd_out, int i)
+{
+	ft_putstr_fd(cmd->args[i], fd_out);
+	if (cmd->args[i + 1])
+		ft_putchar_fd(' ', fd_out);
+}
+
 int	exec_echo(t_cmd *cmd, int fd_out)
 {
 	int	i;
@@ -24,15 +31,10 @@ int	exec_echo(t_cmd *cmd, int fd_out)
 	while (cmd->args[i])
 	{
 		if (ft_strlen(cmd->args[i]))
-		{
-			ft_putstr_fd(cmd->args[i], fd_out);
-			if (cmd->args[i + 1])
-				ft_putchar_fd(' ', fd_out);
-		}
+			write_echo(cmd, fd_out, i);
 		i++;
 	}
 	if (!n_option)
 		ft_putchar_fd('\n', fd_out);
 	return (EXIT_SUCCESS);
 }
-

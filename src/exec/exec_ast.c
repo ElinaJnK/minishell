@@ -41,12 +41,20 @@ void	exec_redir(t_ast *root, int input_fd, int output_fd, t_all *all)
 
 void	exec_ast(t_ast *root, int input_fd, int output_fd, t_all *all)
 {
+	int		builtin;
+
 	if (root == NULL)
 		return ;
 	if (root->left == NULL && root->right == NULL
 		&& !(root->cmd->type >= REDIR && root->cmd->type <= DREDIR2_E))
 	{
-		exec_com(root, input_fd, output_fd, &all);
+		if (is_builtin(root->cmd))
+		{
+			builtin = do_builtin(root->cmd, output_fd, all);
+			*exit_status() = builtin;
+		}
+		else
+			exec_com(root, input_fd, output_fd, &all);
 		return ;
 	}
 	if (root->cmd->type == AND)

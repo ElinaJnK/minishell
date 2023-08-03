@@ -79,15 +79,7 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 {
 	pid_t	pid;
 	int		status;
-	int		builtin;
 
-	builtin = 0;
-	if (is_builtin(node->cmd))
-	{
-		builtin = do_builtin(node->cmd, output_fd, *all);
-		*exit_status() = builtin;
-		return ;
-	}
 	pid = fork();
 	if (pid < 0)
 		failure_exec("fork error");
