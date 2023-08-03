@@ -23,9 +23,12 @@ int	exec_echo(t_cmd *cmd, int fd_out)
 	}
 	while (cmd->args[i])
 	{
-		ft_putstr_fd(cmd->args[i], fd_out);
-		if (cmd->args[i + 1] && ft_strlen(cmd->args[i + 1]))
-			ft_putchar_fd(' ', fd_out);
+		if (ft_strlen(cmd->args[i]))
+		{
+			ft_putstr_fd(cmd->args[i], fd_out);
+			if (cmd->args[i + 1])
+				ft_putchar_fd(' ', fd_out);
+		}
 		i++;
 	}
 	if (!n_option)

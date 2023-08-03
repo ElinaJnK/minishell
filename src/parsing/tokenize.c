@@ -89,6 +89,13 @@ t_token	*tokenize(char *line, t_env *lst_env)
 	init_param(&content, &tok, &q_flag, &i);
 	while ((size_t)i < ft_strlen(line) && line[i])
 	{
+		if ((line[i] == '\'' && line[i + 1] == '\'')
+			|| (line[i] == '"' && line[i + 1] == '"'))
+		{
+			add_back_tok(&tok, new_token(ft_strdup(""), 0));
+			i += 2;
+			continue ;
+		}
 		if (tok && last_elem(tok)->type == DREDIR2)
 			here_doc_q(line + i, &tok);
 		if (*(line + i) == '$' && q_flag != 1 && !is_heredoc(tok))

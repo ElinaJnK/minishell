@@ -17,9 +17,7 @@ char	*ft_addchr(char *s1, char c, t_token *lst_tok, char *line)
 	if (!s1)
 		s1l = 0;
 	else
-	{
 		s1l = ft_strlen(s1);
-	}
 	join = (char *)malloc(sizeof(char) * (s1l + 2));
 	if (!join)
 		failure_parse("Error: malloc", lst_tok, line);
