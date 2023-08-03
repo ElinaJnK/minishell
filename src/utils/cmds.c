@@ -26,6 +26,7 @@ void	free_cmds(t_cmd *cmds, int count)
 			i++;
 		}
 		free(cmds);
+		cmds = NULL;
 	}
 }
 

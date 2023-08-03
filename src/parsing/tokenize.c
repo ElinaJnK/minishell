@@ -45,8 +45,8 @@ int	is_true_op(char *line, char **content, t_token **lst_tok)
 	i = 0;
 	if (is_op(line) || is_fb(line))
 	{
-		if (is_op(line) || is_fb(line) == DREDIR2
-			|| is_fb(line) == DREDIR2)
+		if (is_op(line) || is_fb(line) == DREDIR
+			|| is_fb(line) == DREDIR2 || is_fb(line) == DREDIR2_E)
 		{
 			*content = ft_addchr(*content, *line, *lst_tok, line);
 			i++;
@@ -89,8 +89,9 @@ t_token	*tokenize(char *line, t_env *lst_env)
 	init_param(&content, &tok, &q_flag, &i);
 	while ((size_t)i < ft_strlen(line) && line[i])
 	{
-		if ((line[i] == '\'' && line[i + 1] == '\'')
+		if (((line[i] == '\'' && line[i + 1] == '\'')
 			|| (line[i] == '"' && line[i + 1] == '"'))
+			&& q_flag == 0)
 		{
 			add_back_tok(&tok, new_token(ft_strdup(""), 0));
 			i += 2;

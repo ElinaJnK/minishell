@@ -41,7 +41,7 @@ int	exec(int pid, t_cmd *cmd, t_all *all)
 	if (!env)
 		return (EXIT_FAILURE);
 	if (is_paf(cmd->content))
-		path = cmd->content;
+		path = ft_strdup(cmd->content);
 	else
 		path = get_command_path(cmd->content, all->env);
 	if (!path)

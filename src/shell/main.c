@@ -146,7 +146,8 @@ void	just_do_it(t_all **all, char *line, int count)
 			(*all)->ast = root;
 			exec_ast((*all)->ast, STDIN_FILENO, STDOUT_FILENO, *all);
 		}
-		free_cmds(cmds, (*all)->count);
+		if (cmds)
+			free_cmds(cmds, (*all)->count);
 		if (root)
 			free_ast(root);
 	}
@@ -159,7 +160,6 @@ void	tchitat_stdin(t_all **all)
 
 	while (1)
 	{
-		//add_history(line);
 		signal_prompt();
 		if (*(exit_status()) == 0)
 			line = readline((*all)->prompt_good);
@@ -167,6 +167,7 @@ void	tchitat_stdin(t_all **all)
 			line = readline((*all)->prompt_bad);
 		if (!line)
 			return ;
+		add_history(line);
 		count = 0;
 		if (*line == '\n' || *line == '\0')
 		{
@@ -202,6 +203,6 @@ int	main(int ac, char **av, char **env)
 			*exit_status());
 	tchitat_stdin(&all);
 	free_all(all);
-	//rl_clear_history();
+	rl_clear_history();
 	return (*exit_status());
 }

@@ -14,9 +14,17 @@ int	is_num(char *str)
 	i = 0;
 	if (*str == '-')
 		i++;
+	while (str[i] == ' ')
+		i++;
 	while (str[i])
 	{
 		if (!(str[i] >= '0' && str[i] <= '9'))
+			break ;
+		i++;
+	}
+	while (str[i])
+	{
+		if (str[i] != ' ')
 			return (EXIT_FAILURE);
 		i++;
 	}
@@ -35,10 +43,16 @@ int	exec_exit(t_cmd *cmd, t_all *all, int fd_out)
 		{
 			*exit_status() = (ft_atoi(cmd->args[1]) + 255) % 255;
 		}
-		if (cmd->nb_args >= 2 || is_num(cmd->args[1]) == EXIT_FAILURE)
+		if (cmd->nb_args >= 2)
 		{
 			*exit_status() = EXIT_FAILURE;
 			ft_putstr_fd("bash: exit: too many arguments\n", fd_out);
+			return (EXIT_FAILURE);
+		}
+		if (is_num(cmd->args[1]) == EXIT_FAILURE)
+		{
+			*exit_status() = EXIT_FAILURE;
+			ft_putstr_fd("bash: exit: numeric argument required\n", fd_out);
 			return (EXIT_FAILURE);
 		}
 	}

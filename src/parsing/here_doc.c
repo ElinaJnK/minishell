@@ -39,7 +39,6 @@ int	read_stdin(int fd, char *limiter, int type, t_env *env)
 
 	ft_putstr_fd("> ", 1);
 	line = get_next_line(0);
-	printf("limiter : [%s]\n", limiter);
 	while (line && ft_strncmp(line, limiter, ft_max(ft_strlen(line) - 1,
 				ft_strlen(limiter))) != 0)
 	{
