@@ -31,8 +31,8 @@ char	*search_var(char *var, int size, t_env *env)
 	tmp = env;
 	while (tmp)
 	{
-		if (ft_strncmp(tmp->name, var, size - 1) == 0
-			&& ft_strlen(tmp->name) == ft_strlen(tmp->name))
+		if (ft_strncmp(tmp->name, var, size) == 0
+			&& ft_strlen(tmp->name) == (size_t)size)
 			return (ft_strdup(tmp->value));
 		tmp = tmp->next;
 	}
@@ -60,21 +60,24 @@ char	*expand_env(char *line, int *i, t_env *env)
 			&& line[end] != ' ')
 			end++;
 		end--;
+		printf("line + *i + 1 : %c\n", *(line + *i + 1));
 		var = search_var(line + *i + 1, end - *i, env);
+		printf("var expanded : %s\n", var);
 	}
 	newline = insert_into_line(line, var, *i, end);
+	*i += 1;
+	printf("newline : %s\n", newline);
+	printf("position finale : %d\n", *i);
 	return (newline);
 }
 
 char	*expansion(char *line, int *i, t_env *env, t_token *lst_tok)
 {
 	char	*newline;
-	int		end;
 
-	end = *i;
 	newline = NULL;
-	if (line && line[end])
-		newline = expand_env(line, &end, env);
+	if (line && line[*i])
+		newline = expand_env(line, i, env);
 	if (!newline)
 		return (failure_parse("malloc error", lst_tok, line), NULL);
 	if (line)

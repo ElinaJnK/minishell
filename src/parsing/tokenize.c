@@ -2,6 +2,7 @@
 
 void	add_rest(t_token **lst_tok, char *content, int q_flag)
 {
+	print_list_tok(*lst_tok);
 	if (q_flag == 0 && content && content[0] != '\0')
 		add_back_tok(lst_tok, new_token(content, 0));
 	else if (q_flag == 1 || q_flag == 2)
@@ -100,7 +101,8 @@ t_token	*tokenize(char *line, t_env *lst_env)
 		if (tok && last_elem(tok)->type == DREDIR2)
 			here_doc_q(line + i, &tok);
 		if (*(line + i) == '$' && q_flag != 1 && !is_heredoc(tok))
-			line = expansion(line, &i, lst_env, tok);
+			{line = expansion(line, &i, lst_env, tok);
+			printf("line expanded: %s\n", line);}
 		else if (is_op(line + i) || is_fb(line + i) || line[i] == ' ')
 		{
 			i += handle_op(q_flag, line + i, &content, &tok);

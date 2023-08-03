@@ -55,7 +55,8 @@ void	check_tok(t_token **lst_tok)
 	{
 		parenthesis(tmp, &p);
 		if (tmp->type >= REDIR && tmp->type <= DREDIR2_E
-			&& (tmp->next->type == OPEN_PAR || tmp->next->type == CLOSE_PAR))
+			&& (tmp->next->type == OPEN_PAR || tmp->next->type == CLOSE_PAR
+			|| (tmp->next->type  >= AND && tmp->next->type <= PIPE)))
 		{
 			put_error_tok("bash: syntax error near unexpected token\n", lst_tok);
 			return ;
