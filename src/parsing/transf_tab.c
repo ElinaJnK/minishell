@@ -73,7 +73,7 @@ int	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
 	return (EXIT_SUCCESS);
 }
 
-int	define_types(t_token **t, t_cmd *cmd, t_env *env)
+int	define_types(t_token **t, t_cmd *cmd, t_env *env, t_all **all)
 {
 	if ((*t)->type == CMD)
 	{
@@ -87,6 +87,8 @@ int	define_types(t_token **t, t_cmd *cmd, t_env *env)
 	}
 	else if ((*t)->type != CMD)
 	{
+		if ((*t)->type == PIPE)
+			(*all)->n_pipes++;
 		if (init_op(cmd, *t) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 		*t = (*t)->next;
@@ -94,7 +96,7 @@ int	define_types(t_token **t, t_cmd *cmd, t_env *env)
 	return (EXIT_SUCCESS);
 }
 
-t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
+t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env, t_all **all)
 {
 	t_cmd	*cmd;
 	t_token	*tmp;
@@ -109,7 +111,7 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
 	tmp = t;
 	while (t)
 	{
-		if (define_types(&t, &cmd[i], env) == EXIT_FAILURE)
+		if (define_types(&t, &cmd[i], env, all) == EXIT_FAILURE)
 			return (free_cmds(cmd, *count), free_lst_tok(&tmp), NULL);
 		i++;
 	}

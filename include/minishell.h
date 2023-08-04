@@ -74,8 +74,20 @@ typedef struct s_env
 	struct s_env	*next;
 }	t_env;
 
+typedef struct s_tokyo
+{
+	char	*line;
+	char	*content;
+	int		q_flag;
+	int		i;
+	int		expansion;
+	t_token	*lst_tok;
+	t_env	*lst_env;
+}	t_tokyo;
+
 typedef struct s_all
 {
+	int			n_pipes;
 	char		*prompt_good;
 	char		*prompt_bad;
 	t_env		*env;
@@ -103,18 +115,20 @@ void	failure_exec(const char *message);
 void	failure_env(const char *message, char **elem);
 
 /*----parsing functions----*/
-//void	read_stdin(char *limiter);
-void	update_tok(char *line, char **content, int *q_flag, t_token *lst_tok);
+void	update_tok(t_tokyo **t);
 t_token	*tokenize(char *line, t_env *lst_env);
 t_token	*tokenize_bise(t_token *tok);
 t_token	*tokenize_crise(t_token *tok);
 void	check_tok(t_token **lst_tok);
 
+void	free_tokyo(t_tokyo *t);
+t_tokyo	*init_param(char *line, t_env *lst_env);
+
 /*----parsing help functions----*/
 t_token	*init_tok(t_token *lst_tok);
 char	*ft_addchr(char *s1, char c, t_token *lst_tok, char *line);
 t_all	*build_all(t_env *lst_env);
-void	init_param(char **content, t_token **lst_tok, int *q_flag, int *i);
+t_tokyo	*init_param(char *line, t_env *lst_env);
 
 /*----wildcard----*/
 void	process_wild(const char *pattern, const char *path, t_token **tok, int *flag);
@@ -131,11 +145,9 @@ void	ast_cmd(t_cmd *tokens, t_ast **root, t_ast **current, int start);
 
 /*---expansion---*/
 char	*expansion(char *line, int *i, t_env *env, t_token *lst_tok);
-int		expansion_bis(char *line, char **content, t_env *env, t_token *lst_tok);
-char	*search_var(char *var, int size, t_env *env);
 
 /*----in-utils-----*/
-t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env);
+t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env, t_all **all);
 int		ft_max(int a, int b);
 
 /*----spy-env----*/

@@ -58,6 +58,25 @@ int	env_error(char **env, int output_fd)
 	return (EXIT_FAILURE);
 }
 
+
+int	in_env(char *name, char *new_val, t_env *lst_env)
+{
+	t_env	*tmp;
+
+	tmp = lst_env;
+	while (tmp)
+	{
+		if (ft_strncmp(tmp->name, name, ft_strlen(name) + 1) == 0)
+		{
+			free(tmp->value);
+			tmp->value = ft_strdup(new_val);
+			return (1);
+		}
+		tmp = tmp->next;
+	}
+	return (0);
+}
+
 int	exec_export(t_cmd *cmd, t_env **lst_env, int output_fd)
 {
 	char	**env;
@@ -75,6 +94,12 @@ int	exec_export(t_cmd *cmd, t_env **lst_env, int output_fd)
 		env = get_env(cmd->args[i]);
 		if (check_env(env) == EXIT_FAILURE)
 			return (env_error(env, output_fd));
+		else if (in_env(env[0], env[1], *lst_env))
+		{
+			free_tab(env);
+			i++;
+			continue ;
+		}
 		add_back_env(lst_env, new_env(env[0], env[1]));
 		free_tab(env);
 		i++;

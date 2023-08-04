@@ -57,16 +57,12 @@ char	*expand_env(char *line, int *i, t_env *env)
 	{
 		while (line[end] && !is_op(line + end) && !is_fb(line + end)
 			&& line[end] != '$' && line[end] != '\'' && line[end] != '\"'
-			&& line[end] != ' ')
+			&& line[end] != ' ' && line[end] != '\n')
 			end++;
 		end--;
-		printf("line + *i + 1 : %c\n", *(line + *i + 1));
 		var = search_var(line + *i + 1, end - *i, env);
-		printf("var expanded : %s\n", var);
 	}
 	newline = insert_into_line(line, var, *i, end);
-	printf("newline : %s\n", newline);
-	printf("position finale : %d\n", *i);
 	return (newline);
 }
 

@@ -79,7 +79,6 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 {
 	pid_t	pid;
 	int		status;
-	int		builtin;
 
 	pid = fork();
 	if (pid < 0)
@@ -89,12 +88,9 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 		sig_child();
 		if (is_builtin(node->cmd))
 		{
-			builtin = do_builtin(root->cmd, output_fd, all);
-			*exit_status() = builtin;
-			// if we have more than one command we fork it, execute it and
-			// and then exit from it
+			*exit_status() = do_builtin(node->cmd, output_fd, *all);
 			free_all(*all);
-			exit(builtin);
+			exit(*exit_status());
 		}
 		else
 			exec_child(node, input_fd, output_fd, all);

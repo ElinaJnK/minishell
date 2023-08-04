@@ -30,24 +30,48 @@ char	*ft_addchr(char *s1, char c, t_token *lst_tok, char *line)
 	return (join);
 }
 
-void	update_tok(char *line, char **content, int *q_flag, t_token *lst_tok)
+void	update_tok(t_tokyo **t)
 {
-	if (*line == '"' && *q_flag == 0)
-		*q_flag = 2;
-	else if (*line == '\'' && *q_flag == 0)
-		*q_flag = 1;
-	else if ((*line == '"' && *q_flag == 2)
-		|| (*line == '\'' && *q_flag == 1))
-		*q_flag = 0;
-	else if (*line != ' ' && !is_op(line) && !is_fb(line) && *line != '\0')
-		*content = ft_addchr(*content, *line, lst_tok, line);
+	t_tokyo	*tmp;
+
+	tmp = *t;
+	if (tmp->expansion == 0 && *(tmp->line + tmp->i) == '"' && tmp->q_flag == 0)
+		tmp->q_flag = 2;
+	else if (tmp->expansion == 0 && *(tmp->line + tmp->i) == '\'' && tmp->q_flag == 0)
+		tmp->q_flag = 1;
+	else if (tmp->expansion == 0 && ((*(tmp->line + tmp->i) == '"' && tmp->q_flag == 2)
+		|| (*(tmp->line + tmp->i) == '\'' && tmp->q_flag == 1)))
+		tmp->q_flag = 0;
+	else if ((tmp->expansion == 0 && *(tmp->line + tmp->i) != ' '
+			&& !is_op(tmp->line + tmp->i) && !is_fb(tmp->line + tmp->i)
+			&& *(tmp->line + tmp->i) != '\0')
+			|| tmp->expansion == 1)
+		tmp->content = ft_addchr(tmp->content, *(tmp->line + tmp->i), tmp->lst_tok, tmp->line);
 }
 
-void	init_param(char **content, t_token **lst_tok, int *q_flag, int *i)
+t_tokyo	*init_param(char *line, t_env *lst_env)
 {
-	*content = NULL;
-	*lst_tok = NULL;
-	*q_flag = 0;
-	*i = 0;
+	t_tokyo	*t;
+
+	t = malloc(sizeof(t_tokyo));
+	if (!t)
+		return (NULL);
+	t->content = NULL;
+	t->lst_tok = NULL;
+	t->q_flag = 0;
+	t->i = 0;
+	t->line = line;
+	t->expansion = 0;
+	t->lst_env = lst_env;
+	return (t);
 }
 
+void	free_tokyo(t_tokyo *t)
+{
+	if (t)
+	{
+		if (t->line)
+			free(t->line);
+		free(t);
+	}
+}

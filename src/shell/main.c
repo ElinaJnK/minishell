@@ -110,6 +110,7 @@ t_all	*build_all(t_env *lst_env)
 	all->cmd = NULL;
 	all->env = lst_env;
 	all->count = 0;
+	all->n_pipes = 0;
 	all->prompt_good = ft_strdup("\001\033[35m\002(▼・ᴥ・▼) $ \001\033[0m\002");
 	all->prompt_bad = ft_strdup("\001\033[31m\002ლ(́◉◞౪◟◉‵ლ) $ \001\033[0m\002");
 	return (all);
@@ -131,11 +132,12 @@ void	just_do_it(t_all **all, char *line, int count)
 
 	cmds = NULL;
 	t = NULL;
+	(*all)->n_pipes = 0;
 	t = tokenize(line, (*all)->env);
 	t = tokenize_bise(t);
 	t = tokenize_crise(t);
 	if (t && (*all)->env)
-		cmds = transform_into_tab(t, &count, (*all)->env);
+		cmds = transform_into_tab(t, &count, (*all)->env, all);
 	if (cmds)
 	{
 		init_border(all, &count);
