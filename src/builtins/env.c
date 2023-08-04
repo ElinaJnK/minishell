@@ -31,6 +31,16 @@ void	free_tab(char **tab)
 	free(tab);
 }
 
+int	env_error(char **env, int output_fd)
+{
+	ft_putstr_fd("bash: export: ", output_fd);
+	if (env[0])
+		ft_putstr_fd(env[0], output_fd);
+	ft_putstr_fd(": not a valid identifier\n", output_fd);
+	free_tab(env);
+	return (EXIT_FAILURE);
+}
+
 int	exec_env(t_cmd *cmd, int fd_out, t_env *lst_env)
 {
 	t_env	*tmp;

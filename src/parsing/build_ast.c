@@ -64,4 +64,3 @@ t_ast	*build_ast(t_cmd *tokens, t_border *b)
 	}
 	return (root);
 }
-

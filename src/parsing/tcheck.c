@@ -34,12 +34,25 @@ int	check_last_tok(t_token *tok, int p, t_token **lst_tok)
 	return (EXIT_SUCCESS);
 }
 
-void	parenthesis(t_token *tmp, int *p)
+int	verif(t_token *tmp, int *p)
 {
 	if (tmp->type == OPEN_PAR)
 		*p += 1;
 	else if (tmp->type == CLOSE_PAR)
 		*p -= 1;
+	if ((tmp->next->type == OPEN_PAR && tmp->type == CMD)
+		|| (tmp->type == CLOSE_PAR && tmp->next->type == CMD)
+		|| ((tmp->type == AND || tmp->type == OR) && tmp->next->type != CMD
+			&& tmp->next->type != OPEN_PAR && tmp->next->type != CLOSE_PAR)
+		|| (tmp->type != CMD && tmp->type != OPEN_PAR && tmp->type
+			!= CLOSE_PAR && (tmp->next->type == AND
+				|| tmp->next->type == OR)))
+		return (1);
+	if (tmp->type >= REDIR && tmp->type <= DREDIR2_E
+		&& (tmp->next->type == OPEN_PAR || tmp->next->type == CLOSE_PAR
+			|| (tmp->next->type >= AND && tmp->next->type <= PIPE)))
+		return (1);
+	return (0);
 }
 
 void	check_tok(t_token **lst_tok)
@@ -53,21 +66,7 @@ void	check_tok(t_token **lst_tok)
 		return ;
 	while (tmp && tmp->next)
 	{
-		parenthesis(tmp, &p);
-		if (tmp->type >= REDIR && tmp->type <= DREDIR2_E
-			&& (tmp->next->type == OPEN_PAR || tmp->next->type == CLOSE_PAR
-			|| (tmp->next->type  >= AND && tmp->next->type <= PIPE)))
-		{
-			put_error_tok("bash: syntax error near unexpected token\n", lst_tok);
-			return ;
-		}
-		if ((tmp->next->type == OPEN_PAR && tmp->type == CMD)
-			|| (tmp->type == CLOSE_PAR && tmp->next->type == CMD)
-			|| ((tmp->type == AND || tmp->type == OR) && tmp->next->type != CMD
-				&& tmp->next->type != OPEN_PAR && tmp->next->type != CLOSE_PAR)
-			|| (tmp->type != CMD && tmp->type != OPEN_PAR && tmp->type
-				!= CLOSE_PAR && (tmp->next->type == AND
-					|| tmp->next->type == OR)))
+		if (verif(tmp, &p))
 		{
 			put_error_tok("bash: syntax error near unexpected token\n", lst_tok);
 			return ;

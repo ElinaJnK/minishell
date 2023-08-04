@@ -205,6 +205,6 @@ int	main(int ac, char **av, char **env)
 			*exit_status());
 	tchitat_stdin(&all);
 	free_all(all);
-	rl_clear_history();
+	//rl_clear_history();
 	return (*exit_status());
 }

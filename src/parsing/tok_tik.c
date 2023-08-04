@@ -37,16 +37,19 @@ void	update_tok(t_tokyo **t)
 	tmp = *t;
 	if (tmp->expansion == 0 && *(tmp->line + tmp->i) == '"' && tmp->q_flag == 0)
 		tmp->q_flag = 2;
-	else if (tmp->expansion == 0 && *(tmp->line + tmp->i) == '\'' && tmp->q_flag == 0)
+	else if (tmp->expansion == 0 && *(tmp->line + tmp->i) == '\''
+		&& tmp->q_flag == 0)
 		tmp->q_flag = 1;
-	else if (tmp->expansion == 0 && ((*(tmp->line + tmp->i) == '"' && tmp->q_flag == 2)
-		|| (*(tmp->line + tmp->i) == '\'' && tmp->q_flag == 1)))
+	else if (tmp->expansion == 0 && ((*(tmp->line + tmp->i) == '"'
+				&& tmp->q_flag == 2) || (*(tmp->line + tmp->i) == '\''
+				&& tmp->q_flag == 1)))
 		tmp->q_flag = 0;
 	else if ((tmp->expansion == 0 && *(tmp->line + tmp->i) != ' '
 			&& !is_op(tmp->line + tmp->i) && !is_fb(tmp->line + tmp->i)
 			&& *(tmp->line + tmp->i) != '\0')
-			|| tmp->expansion == 1)
-		tmp->content = ft_addchr(tmp->content, *(tmp->line + tmp->i), tmp->lst_tok, tmp->line);
+		|| tmp->expansion == 1)
+		tmp->content = ft_addchr(tmp->content, *(tmp->line + tmp->i),
+				tmp->lst_tok, tmp->line);
 }
 
 t_tokyo	*init_param(char *line, t_env *lst_env)

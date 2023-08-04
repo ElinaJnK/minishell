@@ -4,7 +4,7 @@ static void	handle_sigint_prompt(int sig)
 {
 	(void)sig;
 	write(2, "\n", 1);
-	rl_replace_line("", 1);
+	//rl_replace_line("", 1);
 	rl_on_new_line();
 	rl_redisplay();
 }

@@ -48,17 +48,6 @@ int	exp_no_arg(int output_fd, t_env *lst_env)
 	return (EXIT_FAILURE);
 }
 
-int	env_error(char **env, int output_fd)
-{
-	ft_putstr_fd("bash: export: ", output_fd);
-	if (env[0])
-		ft_putstr_fd(env[0], output_fd);
-	ft_putstr_fd(": not a valid identifier\n", output_fd);
-	free_tab(env);
-	return (EXIT_FAILURE);
-}
-
-
 int	in_env(char *name, char *new_val, t_env *lst_env)
 {
 	t_env	*tmp;
@@ -82,7 +71,6 @@ int	exec_export(t_cmd *cmd, t_env **lst_env, int output_fd)
 	char	**env;
 	int		i;
 
-	env = NULL;
 	i = 1;
 	if (!cmd)
 		return (ft_putstr_fd("bash: export: problem\n", output_fd),

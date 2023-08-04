@@ -123,6 +123,8 @@ void	check_tok(t_token **lst_tok);
 
 void	free_tokyo(t_tokyo *t);
 t_tokyo	*init_param(char *line, t_env *lst_env);
+int		is_true_op(char *line, char **content, t_token **lst_tok);
+void	meta_tok(t_tokyo **t);
 
 /*----parsing help functions----*/
 t_token	*init_tok(t_token *lst_tok);
@@ -163,6 +165,7 @@ void	update_env(t_env *lst_env, char *name, char *value);
 void	lst_del_env(t_env **lst_env, char *name);
 int		lst_size_env(t_env *lst);
 void	free_tab(char **tab);
+int		env_error(char **env, int output_fd);
 
 /*----utils----*/
 void	generate_pipes(int *pipe_fds, int num_pipes);

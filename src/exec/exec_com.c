@@ -19,19 +19,6 @@ int	do_builtin(t_cmd *cmd, int output_fd, t_all *all)
 	return (EXIT_FAILURE);
 }
 
-int	is_builtin(t_cmd *cmd)
-{
-	if (!ft_strncmp(cmd->content, "cd", ft_strlen("cd") + 1)
-		|| !ft_strncmp(cmd->content, "echo", ft_strlen("echo") + 1)
-		|| !ft_strncmp(cmd->content, "env", ft_strlen("env") + 1)
-		|| !ft_strncmp(cmd->content, "exit", ft_strlen("exit") + 1)
-		|| !ft_strncmp(cmd->content, "export", ft_strlen("export") + 1)
-		|| !ft_strncmp(cmd->content, "pwd", ft_strlen("pwd") + 1)
-		|| !ft_strncmp(cmd->content, "unset", ft_strlen("unset") + 1))
-		return (1);
-	return (0);
-}
-
 int	exec(int pid, t_cmd *cmd, t_all *all)
 {
 	char	*path;
@@ -75,6 +62,22 @@ void	exec_child(t_ast *node, int input_fd, int output_fd, t_all **all)
 	}
 }
 
+void	choose_exec(t_ast *node, int input_fd, int output_fd, t_all **all)
+{
+	int	builtin;
+
+	builtin = 0;
+	if (is_builtin(node->cmd))
+	{
+		builtin = do_builtin(node->cmd, output_fd, *all);
+		*exit_status() = builtin;
+		free_all(*all);
+		exit(*exit_status());
+	}
+	else
+		exec_child(node, input_fd, output_fd, all);
+}
+
 void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 {
 	pid_t	pid;
@@ -86,14 +89,7 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 	else if (pid == 0)
 	{
 		sig_child();
-		if (is_builtin(node->cmd))
-		{
-			*exit_status() = do_builtin(node->cmd, output_fd, *all);
-			free_all(*all);
-			exit(*exit_status());
-		}
-		else
-			exec_child(node, input_fd, output_fd, all);
+		choose_exec(node, input_fd, output_fd, all);
 	}
 	else
 	{
@@ -105,4 +101,3 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 			close(output_fd);
 	}
 }
-
