@@ -131,6 +131,8 @@ void	ast_cmd(t_cmd *tokens, t_ast **root, t_ast **current, int start);
 
 /*---expansion---*/
 char	*expansion(char *line, int *i, t_env *env, t_token *lst_tok);
+int		expansion_bis(char *line, char **content, t_env *env, t_token *lst_tok);
+char	*search_var(char *var, int size, t_env *env);
 
 /*----in-utils-----*/
 t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env);

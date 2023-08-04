@@ -65,7 +65,6 @@ char	*expand_env(char *line, int *i, t_env *env)
 		printf("var expanded : %s\n", var);
 	}
 	newline = insert_into_line(line, var, *i, end);
-	*i += 1;
 	printf("newline : %s\n", newline);
 	printf("position finale : %d\n", *i);
 	return (newline);

@@ -48,7 +48,7 @@ void	exec_ast(t_ast *root, int input_fd, int output_fd, t_all *all)
 	if (root->left == NULL && root->right == NULL
 		&& !(root->cmd->type >= REDIR && root->cmd->type <= DREDIR2_E))
 	{
-		if (is_builtin(root->cmd))
+		if (is_builtin(root->cmd) && all->count == 1)
 		{
 			builtin = do_builtin(root->cmd, output_fd, all);
 			*exit_status() = builtin;

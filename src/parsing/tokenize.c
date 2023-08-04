@@ -101,8 +101,12 @@ t_token	*tokenize(char *line, t_env *lst_env)
 		if (tok && last_elem(tok)->type == DREDIR2)
 			here_doc_q(line + i, &tok);
 		if (*(line + i) == '$' && q_flag != 1 && !is_heredoc(tok))
-			{line = expansion(line, &i, lst_env, tok);
-			printf("line expanded: %s\n", line);}
+		{
+			int ret = expansion_bis(line + i, &content, lst_env, tok);
+			if (ret == -1)
+				return (failure_parse("malloc error", tok, line), NULL);
+			i += ret;
+		}
 		else if (is_op(line + i) || is_fb(line + i) || line[i] == ' ')
 		{
 			i += handle_op(q_flag, line + i, &content, &tok);
