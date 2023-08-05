@@ -137,11 +137,15 @@ void	just_do_it(t_all **all, char *line, int count)
 	t = tokenize_bise(t);
 	t = tokenize_crise(t);
 	if (t && (*all)->env)
-		cmds = transform_into_tab(t, &count, (*all)->env, all);
+	{
+		//cmds = cmd_with_pipeuh(t, &count, (*all)->env);
+		cmds = transform_into_tab(t, &count, (*all)->env);
+	}
 	if (cmds)
 	{
 		init_border(all, &count);
 		root = build_ast(cmds, (*all)->b);
+		printAST(root);
 		if (root && (*all)->env)
 		{
 			(*all)->cmd = cmds;

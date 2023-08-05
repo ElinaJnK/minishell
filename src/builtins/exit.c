@@ -31,9 +31,9 @@ int	is_num(char *str)
 	return (EXIT_SUCCESS);
 }
 
-void	do_end(t_all *all, int fd_out)
+void	do_end(t_cmd *cmd, t_all *all, int fd_out)
 {
-	if (all->n_pipes == 0)
+	if (cmd->n_pipes == 0)
 	{
 		ft_putstr_fd("\001\033[38;5;217m\002Exiting our minishell, ", fd_out);
 		ft_putstr_fd("bye bye !ﾟ･:*｡(ꈍᴗꈍ)ε｀*)~｡*:･ﾟ\n\001\033[0m\002", fd_out);
@@ -67,6 +67,6 @@ int	exec_exit(t_cmd *cmd, t_all *all, int fd_out)
 			return (EXIT_FAILURE);
 		}
 	}
-	do_end(all, fd_out);
+	do_end(cmd, all, fd_out);
 	return (EXIT_SUCCESS);
 }

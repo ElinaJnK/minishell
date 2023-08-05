@@ -35,8 +35,7 @@ int	open_files(t_token **t, t_cmd *cmd, int *pipe_fds, t_env *env)
 		cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_TRUNC,
 				0644);
 	else if ((*t)->type == REDIR2)
-		cmd->input = open((*t)->content, O_RDONLY | O_CREAT,
-				0644);
+		cmd->input = open((*t)->content, O_RDONLY, 0644);
 	else if ((*t)->type == DREDIR)
 		cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_APPEND,
 				0644);
@@ -47,6 +46,10 @@ int	open_files(t_token **t, t_cmd *cmd, int *pipe_fds, t_env *env)
 			return (EXIT_FAILURE);
 		cmd->input = pipe_fds[0];
 	}
+	// if (cmd->output == -1)
+	// 	ft_putstr_fd("bash: exit: too many arguments\n", cmd->output);
+	// if (cmd->input == -1)
+	// 	ft_putstr_fd("bash: exit: too many arguments\n", cmd->output);
 	return (EXIT_SUCCESS);
 }
 
@@ -73,7 +76,7 @@ int	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
 	return (EXIT_SUCCESS);
 }
 
-int	define_types(t_token **t, t_cmd *cmd, t_env *env, t_all **all)
+int	define_types(t_token **t, t_cmd *cmd, t_env *env)
 {
 	if ((*t)->type == CMD)
 	{
@@ -87,8 +90,6 @@ int	define_types(t_token **t, t_cmd *cmd, t_env *env, t_all **all)
 	}
 	else if ((*t)->type != CMD)
 	{
-		if ((*t)->type == PIPE)
-			(*all)->n_pipes++;
 		if (init_op(cmd, *t) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 		*t = (*t)->next;
@@ -96,7 +97,7 @@ int	define_types(t_token **t, t_cmd *cmd, t_env *env, t_all **all)
 	return (EXIT_SUCCESS);
 }
 
-t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env, t_all **all)
+t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
 {
 	t_cmd	*cmd;
 	t_token	*tmp;
@@ -111,7 +112,7 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env, t_all **all)
 	tmp = t;
 	while (t)
 	{
-		if (define_types(&t, &cmd[i], env, all) == EXIT_FAILURE)
+		if (define_types(&t, &cmd[i], env) == EXIT_FAILURE)
 			return (free_cmds(cmd, *count), free_lst_tok(&tmp), NULL);
 		i++;
 	}
@@ -122,3 +123,44 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env, t_all **all)
 	cmd[i].type = -1;
 	return (cmd);
 }
+
+// void	put_pipe(int start, int *i, t_cmd **cmd, int end)
+// {
+// 	t_cmd	*tmp;
+
+// 	tmp = *cmd;
+// 	if (!tmp)
+// 		return ;
+// 	printf("start : %d\n", start);
+// 	while (start < end)
+// 	{
+// 		if (tmp[start].type == AND || tmp[start].type == OR)
+// 			break ;
+// 		tmp[start++].n_pipes = 1;
+// 	}
+// 	*i = start;
+// }
+
+// t_cmd	*cmd_with_pipeuh(t_token *t, int *count, t_env *env)
+// {
+// 	int		i;
+// 	int		j;
+// 	t_cmd	*cmd;
+
+// 	i = 0;
+// 	j = 0;
+// 	cmd = transform_into_tab(t, count, env);
+// 	if (!cmd)
+// 		return (NULL);
+// 	printf("count : %d\n", *count);
+// 	while (i < *count)
+// 	{
+// 		if (cmd[i].type == AND || cmd[i].type == OR)
+// 			j = i++;
+// 		if (cmd[i].type == PIPE)
+// 			put_pipe(j, &i, &cmd, *count);
+// 		if (cmd[i].type != PIPE)
+// 			i++;
+// 	}
+// 	return (cmd);
+// }

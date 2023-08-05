@@ -52,6 +52,7 @@ typedef struct s_cmd
 	int		type;
 	int		input;
 	int		output;
+	int		n_pipes;
 }	t_cmd;
 
 typedef struct s_border
@@ -149,7 +150,8 @@ void	ast_cmd(t_cmd *tokens, t_ast **root, t_ast **current, int start);
 char	*expansion(char *line, int *i, t_env *env, t_token *lst_tok);
 
 /*----in-utils-----*/
-t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env, t_all **all);
+t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env);
+t_cmd	*cmd_with_pipeuh(t_token *t, int *count, t_env *env);
 int		ft_max(int a, int b);
 
 /*----spy-env----*/

@@ -4,8 +4,8 @@ int	do_builtin(t_cmd *cmd, int output_fd, t_all *all)
 {
 	if (!ft_strncmp(cmd->content, "cd", ft_strlen("cd") + 1))
 		return (exec_cd(cmd, output_fd));
-	else if (!ft_strncmp(cmd->content, "echo", ft_strlen("echo") + 1))
-		return (exec_echo(cmd, output_fd));
+	//else if (!ft_strncmp(cmd->content, "echo", ft_strlen("echo") + 1))
+	//	return (exec_echo(cmd, output_fd));
 	else if (!ft_strncmp(cmd->content, "env", ft_strlen("env") + 1))
 		return (exec_env(cmd, output_fd, all->env));
 	else if (!ft_strncmp(cmd->content, "exit", ft_strlen("exit") + 1))
@@ -47,13 +47,14 @@ void	exec_child(t_ast *node, int input_fd, int output_fd, t_all **all)
 	{
 		if (dup2(input_fd, STDIN_FILENO) < 0)
 			failure_exec("dup2");
-		close(input_fd);
+		//close(input_fd);
 	}
 	if (output_fd != STDOUT_FILENO)
 	{
+		printf("output_fd : %d\n\n\n", output_fd);
 		if (dup2(output_fd, STDOUT_FILENO) < 0)
 			failure_exec("dup2");
-		close(output_fd);
+		//close(output_fd);
 	}
 	if (exec(0, node->cmd, *all) == EXIT_FAILURE)
 	{
@@ -95,9 +96,9 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 	{
 		waitpid(pid, &status, 0);
 		*exit_status() = WEXITSTATUS(status);
-		if (input_fd != STDIN_FILENO)
-			close(input_fd);
-		if (output_fd != STDOUT_FILENO)
-			close(output_fd);
+		//if (input_fd != STDIN_FILENO)
+			//close(input_fd);
+		//if (output_fd != STDOUT_FILENO)
+			//close(output_fd);
 	}
 }

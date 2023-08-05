@@ -62,13 +62,14 @@ int	init_op(t_cmd *cmd, t_token *t)
 	cmd->input = STDIN_FILENO;
 	cmd->args = NULL;
 	cmd->nb_args = 0;
+	cmd->n_pipes = 0;
 	return (EXIT_SUCCESS);
 }
 
 int	is_builtin(t_cmd *cmd)
 {
 	if (!ft_strncmp(cmd->content, "cd", ft_strlen("cd") + 1)
-		|| !ft_strncmp(cmd->content, "echo", ft_strlen("echo") + 1)
+		//|| !ft_strncmp(cmd->content, "echo", ft_strlen("echo") + 1)
 		|| !ft_strncmp(cmd->content, "env", ft_strlen("env") + 1)
 		|| !ft_strncmp(cmd->content, "exit", ft_strlen("exit") + 1)
 		|| !ft_strncmp(cmd->content, "export", ft_strlen("export") + 1)
