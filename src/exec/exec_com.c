@@ -45,16 +45,17 @@ void	exec_child(t_ast *node, int input_fd, int output_fd, t_all **all)
 {
 	if (input_fd != STDIN_FILENO)
 	{
+		//printf("file descriptor : %d\n", input_fd);
 		if (dup2(input_fd, STDIN_FILENO) < 0)
-			failure_exec("dup2");
-		//close(input_fd);
+			failure_exec("dup2 clear");
+		close(input_fd);
 	}
 	if (output_fd != STDOUT_FILENO)
 	{
-		printf("output_fd : %d\n\n\n", output_fd);
+		//printf("output_fd : %d\n\n\n", output_fd);
 		if (dup2(output_fd, STDOUT_FILENO) < 0)
-			failure_exec("dup2");
-		//close(output_fd);
+			failure_exec("dup2 here");
+		close(output_fd);
 	}
 	if (exec(0, node->cmd, *all) == EXIT_FAILURE)
 	{
@@ -96,9 +97,9 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 	{
 		waitpid(pid, &status, 0);
 		*exit_status() = WEXITSTATUS(status);
-		//if (input_fd != STDIN_FILENO)
-			//close(input_fd);
-		//if (output_fd != STDOUT_FILENO)
-			//close(output_fd);
+		// if (input_fd != STDIN_FILENO)
+		// 	close(input_fd);
+		// if (output_fd != STDOUT_FILENO)
+		// 	close(output_fd);
 	}
 }
