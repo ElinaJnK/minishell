@@ -33,6 +33,7 @@ int	is_num(char *str)
 
 void	do_end(t_cmd *cmd, t_all *all, int fd_out)
 {
+	(void)cmd;
 	if (cmd->n_pipes == 0)
 	{
 		ft_putstr_fd("\001\033[38;5;217m\002Exiting our minishell, ", fd_out);

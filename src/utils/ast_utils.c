@@ -17,18 +17,33 @@ void	free_ast(t_ast *node)
 {
 	if (node == NULL)
 		return ;
-	free_ast(node->left);
-	free_ast(node->right);
-	free(node);
+	if (node->left)
+		free_ast(node->left);
+	if (node->right)
+		free_ast(node->right);
+	if (node)
+		free(node);
 }
 
 void	free_all(t_all *all)
 {
 	if (all)
 	{
-		free_ast(all->ast);
-		free_cmds(all->cmd, all->count);
-		free_lst_env(&all->env);
+		if (all->ast)
+		{
+			free_ast(all->ast);
+			all->ast = NULL;
+		}
+		if (all->cmd)
+		{
+			free_cmds(all->cmd, all->count);
+			all->cmd = NULL;
+		}
+		if (all->env)
+		{
+			free_lst_env(&all->env);
+			all->env = NULL;
+		}
 		free(all->b);
 		free(all->prompt_good);
 		free(all->prompt_bad);

@@ -132,6 +132,7 @@ void	just_do_it(t_all **all, char *line, int count)
 
 	cmds = NULL;
 	t = NULL;
+	root = NULL;
 	(*all)->n_pipes = 0;
 	t = tokenize(line, (*all)->env);
 	t = tokenize_bise(t);
@@ -149,9 +150,15 @@ void	just_do_it(t_all **all, char *line, int count)
 			exec_ast((*all)->ast, STDIN_FILENO, STDOUT_FILENO, *all);
 		}
 		if (cmds)
+		{
 			free_cmds(cmds, (*all)->count);
+			cmds = NULL;
+		}
 		if (root)
+		{
 			free_ast(root);
+			root = NULL;
+		}
 	}
 }
 
@@ -204,7 +211,16 @@ int	main(int ac, char **av, char **env)
 		return (failure("Error in malloc allocation"), free_lst_env(&lst_env),
 			*exit_status());
 	tchitat_stdin(&all);
-	free_all(all);
+	//free_all(all);
+	if (all->env)
+	{
+		free_lst_env(&all->env);
+		all->env = NULL;
+	}
+	free(all->b);
+	free(all->prompt_good);
+	free(all->prompt_bad);
+	free(all);
 	rl_clear_history();
 	return (*exit_status());
 }
