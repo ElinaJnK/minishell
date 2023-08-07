@@ -4,8 +4,8 @@ int	do_builtin(t_cmd *cmd, int output_fd, t_all *all)
 {
 	if (!ft_strncmp(cmd->content, "cd", ft_strlen("cd") + 1))
 		return (exec_cd(cmd, output_fd));
-	//else if (!ft_strncmp(cmd->content, "echo", ft_strlen("echo") + 1))
-	//	return (exec_echo(cmd, output_fd));
+	else if (!ft_strncmp(cmd->content, "echo", ft_strlen("echo") + 1))
+		return (exec_echo(cmd, output_fd));
 	else if (!ft_strncmp(cmd->content, "env", ft_strlen("env") + 1))
 		return (exec_env(cmd, output_fd, all->env));
 	else if (!ft_strncmp(cmd->content, "exit", ft_strlen("exit") + 1))
@@ -17,6 +17,23 @@ int	do_builtin(t_cmd *cmd, int output_fd, t_all *all)
 	else if (!ft_strncmp(cmd->content, "unset", ft_strlen("unset") + 1))
 		return (exec_unset(cmd, &(all->env)));
 	return (EXIT_FAILURE);
+}
+
+void	command_not_found(char *msg, t_all *all)
+{
+	if (errno == ENOENT)
+	{
+		ft_putstr_fd("bash: ", 2);
+		ft_putstr_fd(msg, 2);
+		ft_putstr_fd(": command not found\n", 2);
+		free_all(all);
+		exit(EXIT_FAILURE);
+	}
+	else
+	{
+		free_all(all);
+		failure_exec("bash");
+	}
 }
 
 int	exec(int pid, t_cmd *cmd, t_all *all)
@@ -45,22 +62,19 @@ void	exec_child(t_ast *node, int input_fd, int output_fd, t_all **all)
 {
 	if (input_fd != STDIN_FILENO)
 	{
-		//printf("file descriptor : %d\n", input_fd);
 		if (dup2(input_fd, STDIN_FILENO) < 0)
 			failure_exec("dup2 clear");
 		close(input_fd);
 	}
 	if (output_fd != STDOUT_FILENO)
 	{
-		//printf("output_fd : %d\n\n\n", output_fd);
 		if (dup2(output_fd, STDOUT_FILENO) < 0)
 			failure_exec("dup2 here");
 		close(output_fd);
 	}
 	if (exec(0, node->cmd, *all) == EXIT_FAILURE)
 	{
-		free_all(*all);
-		failure_exec("bash");
+		command_not_found(node->cmd->content, *all);
 	}
 }
 
@@ -97,9 +111,5 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 	{
 		waitpid(pid, &status, 0);
 		*exit_status() = WEXITSTATUS(status);
-		// if (input_fd != STDIN_FILENO)
-		// 	close(input_fd);
-		// if (output_fd != STDOUT_FILENO)
-		// 	close(output_fd);
 	}
 }

@@ -39,22 +39,17 @@ void	ast_op(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 
 void	ast_pipe(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 {
-	//t_ast	*tmp;
-	// t_ast	*node;
+	t_ast	*node;
 
-	// tmp = NULL;
-	// node = NULL;
-	// if ((*root)->cmd->type == AND || (*root)->cmd->type == OR)
-	// {
-	// 	tmp = (*root)->right;
-	// 	node = create_node(&tokens[start]);
-	// 	(*root)->right = node;
-	// 	node->left = tmp;
-	// 	*current = node;
-	// }
-	// else
-		// ast_op(tokens, root, current, start);
-	ast_redir(tokens, root, current, start);
+	if ((*root)->cmd->type >= REDIR && (*root)->cmd->type <= DREDIR2_E)
+	{
+		node = create_node(&tokens[start]);
+		node->left = *root;
+		*root = node;
+		*current = node;
+	}
+	else
+		ast_redir(tokens, root, current, start);
 }
 
 void	ast_cmd(t_cmd *tokens, t_ast **root, t_ast **current, int start)

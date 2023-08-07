@@ -1,8 +1,9 @@
 #include "minishell.h"
 
-void	add_rest(t_tokyo **t)
+t_token	*add_rest(t_tokyo **t)
 {
 	t_tokyo	*tmp;
+	t_token	*tokens;
 
 	tmp = *t;
 	if (tmp->q_flag == 0 && tmp->content && tmp->content[0] != '\0')
@@ -15,8 +16,11 @@ void	add_rest(t_tokyo **t)
 			tmp->content = NULL;
 		}
 		ft_putstr_fd("bash: unclosed quotes\n", STDIN_FILENO);
-		free_lst_tok(&(tmp->lst_tok));
+		return (free_lst_tok(&(tmp->lst_tok)), free_tokyo(*t), NULL);
 	}
+	check_tok(&((*t)->lst_tok));
+	tokens = (*t)->lst_tok;
+	return (free_tokyo(*t), tokens);
 }
 
 int	handle_op(t_tokyo **tokyo)
@@ -83,9 +87,7 @@ int	japan(t_tokyo **t)
 t_token	*tokenize(char *line, t_env *lst_env)
 {
 	t_tokyo	*t;
-	t_token	*tokens;
 
-	tokens = NULL;
 	t = init_param(line, lst_env);
 	if (!t)
 		return (failure_parse("Error: malloc", NULL, line), NULL);
@@ -103,8 +105,5 @@ t_token	*tokenize(char *line, t_env *lst_env)
 		if (japan(&t) == EXIT_FAILURE)
 			return (free_tokyo(t), NULL);
 	}
-	add_rest(&t);
-	check_tok(&(t->lst_tok));
-	tokens = t->lst_tok;
-	return (free_tokyo(t), tokens);
+	return (add_rest(&t));
 }

@@ -2,6 +2,9 @@
 
 void	failure_exec(const char *message)
 {
+	//perror(strerror(errno));
+	// if (errno == ENOENT)
+	// 	printf("bash: %s: command not found\n", cmd->content);
 	perror(message);
 	exit(EXIT_FAILURE);
 }
