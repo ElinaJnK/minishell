@@ -1,6 +1,7 @@
-# Readme for minishell
+# README - minishell
+## _Avec Karima Sadykova (aka Karimo)_
 Résumé de tous les steps à prendre pour mini shell. Ce readme n'est pas final et il contient parfois des idées que nous avons changé par la suite. Par exemple la partie tokenize a été beaucoup plus longue que prévu initiallement. 
-Allez verifier le code et contactez moi si vous trouvez un leak :)
+Allez verifier le code et contactez nous si vous trouvez un leak :)
 
 Tout d’abord voici les indications que donne le bash:
 
