@@ -1,5 +1,6 @@
 # Readme for minishell
-Résumé de tous les steps à prendre pour mini shell (parce que je n’ai pas envie de le commencer seule):
+Résumé de tous les steps à prendre pour mini shell. Ce readme n'est pas final et il contient parfois des idées que nous avons changé par la suite. Par exemple la partie tokenize a été beaucoup plus longue que prévu initiallement. 
+Allez verifier le code et contactez moi si vous trouvez un leak :)
 
 Tout d’abord voici les indications que donne le bash:
 
@@ -100,14 +101,14 @@ int	is_fb(char *line, int i)
 {
 	else if (ft_strncmp(line + i, "|", 1) == 0)
 		return (3);
+  	else if (ft_strncmp(line + i, ">>", 2) == 0)
+		return (6);
+	else if (ft_strncmp(line + i, "<<", 2) == 0)
+		return (7);
 	else if (ft_strncmp(line + i, ">", 1) == 0)
 		return (4);
 	else if (ft_strncmp(line + i, "<", 1) == 0)
 		return (5);
-	else if (ft_strncmp(line + i, ">>", 2) == 0)
-		return (6);
-	else if (ft_strncmp(line + i, "<<", 2) == 0)
-		return (7);
 	else if (ft_strncmp(line + i, "(", 1) == 0)
 		return (8);
 	else if (ft_strncmp(line + i, ")", 1) == 0)
@@ -118,206 +119,60 @@ int	is_fb(char *line, int i)
 }
 éventuellement on peut changer cette analyse.
 
+P. S. : avant de passer à la partie suivante, pensez à gérer les here_doc ! En effet, c'est plus facile de le faire dans le parsing que dans l'execution. 
+
 Eh mais alors ensuite ?
 
 - Parses the tokens into simple and compound commands (see Shell Commands).
 Ici on guette. Ici on analyse, ici on cherche: les parenthesès !
-En effet on va ici regarder quel sont les compound commands (entre parenthese), on peut aussi s'occuper de bien verifier le nombre de parentheses (on peut le faire avant aussi).
-On regroupe dans une nouvelle liste, les simple commands d'un côté et les compound commands de l'autre.
+Tout d'abord, on pensait simplement refaire une nouvelle liste qui séparerait les compound commands (entre parenthèses) et les simple commands (comme echo a par exemple). Cependant, on c'est vite rendu compte que c'était assez difficilement gérable.
+Alors, on a créé des arbres binaires :D.
+Le fonctionnement de l'algo est assez simple:
+- on regarde quel type de métacharactère on a : <, <<, >, >>, &&, || ou (, )
+- si on a une parenthèse, on va chercher la dernière parenthèse puis lancer un appel récursif sur ce nouveau bout de commande
+- si on a des parenthèses dans des parenthèses on va relancer un appel récursif
+- ces appels récursifs vont créer des "subtree" qui vont ensuite être ajoutés à l'arbre principal.
 
-Ensuite, dans une boucle, quand on entrera dans la partie compound command, BAM on fait un fork.
-On a donc:
-```sh
-> [echo, nana, &&, (, cd, dossier, ||, echo, yum, )]
-# and we do
-> [echo nana, &&, (cd dossier || echo yum)]
-# and then recursively in the fork (later possibly)
-> [cd dossier, ||, echo yum]
-# in the end, this step gives us
-# if we take this structure:
-typedef struct s_cmd
-{
-	t_token			*lst_tok;
-	t_cmd			*lst_com;
-	int				type;
-	struct s_cmd	*next;
-}		t_cmd;
-typedef struct s_cmd
-{
-	t_token			*content;
-	int				type;
-	struct s_cmd	*left;
-	struct s_cmd	*right;
-}		t_cmd;
-> [echo nana, cmd] -> [&&, meta] -> [(cd dossier || echo yum), cmpound_cmd]
-```
-
+Ce bout de code peut être trouvé dans /parsing/build_ast.c et /utils/ast_utils.c
+Finalement pour cette commande :
 ```sh
 > (1 && 2) || ((3 || 4 || 5) && (6 && 7)) && 8
 > [1, &&, 2] -> [||] -> [ [3, ||, 4, ||, 5] -> [&&] -> [6, &&, 7] ] -> [&&] -> [8]
 ```
-			 ||
-		/			\
-	1 && 2				&&
-					/		\
-				&&			8
-			/		\
-	3 || 4 || 5		6 && 7
+On aura un arbre qui ressemble à ça :
+```
+	||
+        /  \
+      &&    &&
+     /  \   / \
+    1    2 ||   &&
+         / | \ / \
+        3  4  5 6  7
+```
 
-On peut eventuellement envisager ça pour les types:
-- 0 : simple command
-- 1 : compound command
-- 2 : metacaracter
-
-control operator
-A token that performs a control function. It is a newline or one of the following: ‘||’, ‘&&’, ‘&’, ‘;’, ‘;;’, ‘;&’, ‘;;&’, ‘|’, ‘|&’, ‘(’, or ‘)’.
-
-Et le tralala que Karimo a déjà fait
-Attention, quand on lancera l'appel pour le subshell dans l'étape du dessus, il faudra faire ça aussi ! (i think)
 - Performs the various shell expansions (see Shell Expansions), breaking the expanded tokens into lists of filenames (see Filename Expansion) and commands and arguments.
 ```
 #chatjpp
 Perform variable expansion:
 The shell performs variable expansion for the environment variables used in the command ($INPUT_FILE, $OUTPUT_FILE, $LOG_FILE), replacing them with their respective values.
 ```
+
+On a ensuite décidé de faire les shell expansions biennnnnn avant au début de la tokenization. Ça allait beaucoup mieux avec notre code jusque là (et puis ce n'est pas très pratique de le faire dans un arbre).
+
 Redirection time, comme ce minishell qui me donne envie de me rediriger en cap patisserie+plomberie:
 - Performs any necessary redirections (see Redirections) and removes the redirection operators and their operands from the argument list.
 
-Ici on fait nos petits dup2 j'imagine, on prend les piti fichier et on remplace les piti files descriptor par les piti fichier <3 trop kawaii trop grr
-
+Ici on fait nos petits dup2 j'imagine, on prend les piti fichier et on remplace les piti files descriptor par les piti fichier <3
 - Executes the command (see Executing Commands).
 Optionally waits for the command to complete and collects its exit status (see Exit Status).
 
-- dans export, verifier que chaque variable qu'on rajoute respecte la specification posix:
+Ça, c'est dans /exec/exec_ast.c comme quand on a construit l'abre, on va maintenant le parcourir et appliquer différentes fonctions selon les noeuds differents. Puis finalement executer les feuilles.
+
+On gère aussi les builtins au niveau des feuilles, avec quelques vérifications :
+- Dans export, verifier que chaque variable qu'on rajoute respecte la specification posix:
 environment variable names must consist solely of uppercase letters, digits, and underscores (_), and they must not start with a digit.
 
-EXECVE OH OUI ENFIN AH OUI OUI OUI OUI OUI
+Finalement on a géré les signaux, le fichier est dans /shell/signal.c
 
-puis on gère les signaux <3
-
-!!! gerer les fichiers vides qq part p-e ?
-ls > "" > e
-
-# Redirections
-
-tree->left = reponse()
-operation
-tree->right = reponse()
-
-if (node == '&&')
-{
-	if (reponse_gauche == 0): //succes
-		regarder reponse_droite
-	else if (reponse_gauche == 1): //failure
-		return ;
-}
-
-if (node == '||')
-{
-	if (reponse_gauche == 0) //success
-		c bon
-	sinon
-		regarder reponse_droite
-}
-
-- >
-if (node == '>')
-{
-	reponse_gauche -> stdout -> enlever tt du fichier et rajouter la sortie de gauche
-}
-- <
-if (node == '<')
-{
-	PROBLEMATIQUE AYAYAYAYA
-}
-- >>
-if (node == '>>')
-{
-	reponse_gauche -> stdout -> append to fichier a droite, si pas de fichier on en cree un nv
-}
-- <<
-
-operation
-tree->left = reponse()
-tree->right = reponse()
-
-int	exec_rec(root, args??):
-	if (!root->left && !root->right):
-		return (execution(root->content))
-	if (root->content == &&):
-		rep_left = exec_rec(root->left)
-		if (rep_left == FAILURE):
-			return exit status FAILURE // on finit l'execution
-		rep_right = exec_rec(root>right)
-
-	if (root->content == ||):
-		rep_left = exec_rec(root->left)
-		if (rep_left == SUCCES):
-			return exit status SUCCES // on finit l'execution
-		rep_right = exec_rec(root>right)
-
-	if (root->content == |):
-		rep_left = exec_rec(root->left) // recuperer la valeur renvoyee par le fils gauche et la donner au fils droite
-		rep_right = exec_rec(root->right, rep_left)
-
-	if (root->content == > || root->content == < || root->content == >>):
-		t_ast *tmp = root
-
-		while (tmp->right):
-			if (tmp->left): // y a un fichier a creer
-				char *f = tmp->content
-				OPEN etc et selon <,> ou >> on fait append ou pas
-			tmp = tmp->right
-		char *fichier = tmp
-		rep_left = exec_rec(root->left, fichier)
-		return rep_left
-
-	// MODIFIER AST ARBRE POUR QUE DELIMITEUR SOIT A DROITE
-	if (root->content == <<): //here_doc
-		char *delim = root->right
-		if (!delim):
-			erreur
-		char *fichier = faire gnl ou comme on a fait dans pipex
-		rep_left = exec_rec(root->left, fichier)
-		return rep_left
-
-(echo a && echo b) && (echo bruh  > 3 && echo rawr) >> f > c d | cat  -> ON NE PEUT PAS AVOIR C D OMGE
-
-
-// dans execute, pour execve faut passer char **env en argument
-
-//aussi qd on cree des arguments pour la commande:
-	si on a echo hello world, jsp si on doit mettre dans args = [echo, hello, world, NULL]
-															ou [echo, hello world, NULL]
-
-// j delete ft_strjoin dans gnl_utils.c psq y a la redefinition
-
-!!!!!!! REVIEW ALL FAILURES
-
-
-
-!!!! EXPANSION FAUT CHERCHER LE DERNIER ARG DU PATH avec /
-echo /mnt/nfs/homes/ksadykov$user
-
-
-
-
-!!!! TESTS a gerer !!!
-test -> bizarre
-cat /dev/urandom 
-cat << $USER > f
--> attention, $USER doit etre interprete EXACTEMENT comme user, PAS D'EXPANSION DASN HERE_DOC
--> MAIS
-
-ls > f2 > f1 > f0
-bash: f1: Permission denied
-f0 N'EST PAS CREE
-
-
-// A GERER
-	command = ft_strdup("echo \"&&\"");
-# WILDCARD *
-- if "" nothing changes
-- if *12 no pattern found, take the star as any character
-- if pattern found, replace with pattern
+A la fin du projet, nous allons aussi inclure certains tests qui semblent un peu contre intuitifs. A bientôt :D
 	
