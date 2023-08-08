@@ -88,6 +88,8 @@ ech"o " yn
 en effet ça ne marche pas car on envoie echo[espace] à bash ce qui n'est pas une commande qui existe.
 
 On a donc maintenant chaque élement dans notre liste avec leur type, on peut par exemple dire que:
+```c
+
 int	is_op(char *line, int i)
 {
 	if (ft_strncmp(line + i, "&&", 2) == 0)
@@ -117,7 +119,7 @@ int	is_fb(char *line, int i)
 		return (10);
 	return (0);
 }
-éventuellement on peut changer cette analyse.
+```
 
 P. S. : avant de passer à la partie suivante, pensez à gérer les here_doc ! En effet, c'est plus facile de le faire dans le parsing que dans l'execution. 
 
