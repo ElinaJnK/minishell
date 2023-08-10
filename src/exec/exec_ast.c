@@ -48,26 +48,25 @@ void	exec_pipe2(t_ast *root, int input_fd, int output_fd, t_all *all)
 void exec_pipe(t_ast *root, int input_fd, int output_fd, t_all *all)
 {
     int pipe_fds[2];
+	pid_t pid;
     
     if (pipe(pipe_fds) < 0)
         failure_exec("pipe error");
-
-    pid_t pid = fork();
+	pid = fork();
     if (pid < 0)
         failure_exec("fork error");
-
     if (pid == 0)
-	{ // Child
-        close(pipe_fds[0]); // Close the unused read end
+	{
+        close(pipe_fds[0]);
         if (root->left)
             root->left->cmd->n_pipes = 1;
         exec_ast(root->left, input_fd, pipe_fds[1], all);
         close(pipe_fds[1]);
-        exit(0);  // Important: Exit after the child process is done
+        exit(0);
     }
 	else
-	{ // Parent
-        close(pipe_fds[1]); // Close the unused write end
+	{
+        close(pipe_fds[1]);
         if (root->right)
             root->right->cmd->n_pipes = 1;
         exec_ast(root->right, pipe_fds[0], output_fd, all);
