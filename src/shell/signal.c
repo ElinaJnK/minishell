@@ -3,6 +3,7 @@
 static void	handle_sigint_prompt(int sig)
 {
 	(void)sig;
+	*exit_status() = 130;
 	write(2, "\n", 1);
 	rl_replace_line("", 1);
 	rl_on_new_line();

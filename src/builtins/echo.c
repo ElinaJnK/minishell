@@ -26,11 +26,10 @@ int	exec_echo(t_cmd *cmd, int fd_out)
 	if (!cmd || !cmd->args)
 		return (ft_putstr_fd("bash: echo: echo not defined\n", fd_out),
 			EXIT_FAILURE);
-	if (cmd->args[1] && !ft_strncmp(cmd->args[1], "-n", 3))
-	{
-		n_option = 1;
+	while (cmd->args[i] && !ft_strncmp(cmd->args[i], "-n", 2))
 		i++;
-	}
+	if (i > 1)
+		n_option = 1;
 	while (cmd->args[i])
 	{
 		if (ft_strlen(cmd->args[i]))

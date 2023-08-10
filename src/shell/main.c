@@ -111,8 +111,11 @@ t_all	*build_all(t_env *lst_env)
 	all->env = lst_env;
 	all->count = 0;
 	all->n_pipes = 0;
-	all->prompt_good = ft_strdup("\001\033[35m\002(▼・ᴥ・▼) $ \001\033[0m\002");
-	all->prompt_bad = ft_strdup("\001\033[31m\002ლ(́◉◞౪◟◉‵ლ) $ \001\033[0m\002");
+	all->prompt_good = ft_strdup("\001\033[35m\002(>.<) $ \001\033[0m\002");
+	all->prompt_bad = ft_strdup("\001\033[31m\002ლ(́o.o) $ \001\033[0m\002");
+	//all->prompt_good = ft_strdup("\001\033[35m\002(▼・ᴥ・▼) $ \001\033[0m\002");
+	//all->prompt_bad = ft_strdup("\001\033[31m\002ლ(́◉◞౪◟◉‵ლ) $ \001\033[0m\002");
+
 	return (all);
 }
 
@@ -170,6 +173,8 @@ void	tchitat_stdin(t_all **all)
 	while (1)
 	{
 		signal_prompt();
+		//rl_redisplay();
+		rl_on_new_line();
 		if (*(exit_status()) == 0)
 			line = readline((*all)->prompt_good);
 		else
