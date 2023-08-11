@@ -31,6 +31,21 @@ int	fill_cmd(t_cmd *cmd, t_token **t)
 
 int	open_files(t_token **t, t_cmd *cmd, int *pipe_fds, t_env *env)
 {
+	if (access((*t)->content, R_OK) != 0)
+	{
+		if (errno == ENOENT)
+		{
+			ft_putstr_fd("bash: ", cmd->output);
+			ft_putstr_fd((*t)->content, cmd->output);
+			ft_putstr_fd(": No such file or directory\n", cmd->output);
+		}
+		else
+		{
+			ft_putstr_fd("bash: ", cmd->output);
+			ft_putstr_fd((*t)->content, cmd->output);
+			ft_putstr_fd(": Permission denied\n", cmd->output);
+		}
+	}
 	if ((*t)->type == REDIR)
 		cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_TRUNC,
 				0644);
@@ -46,10 +61,6 @@ int	open_files(t_token **t, t_cmd *cmd, int *pipe_fds, t_env *env)
 			return (EXIT_FAILURE);
 		cmd->input = pipe_fds[0];
 	}
-	// if (cmd->output == -1)
-	// 	ft_putstr_fd("bash: exit: too many arguments\n", cmd->output);
-	// if (cmd->input == -1)
-	// 	ft_putstr_fd("bash: exit: too many arguments\n", cmd->output);
 	return (EXIT_SUCCESS);
 }
 
@@ -116,6 +127,7 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
 			return (free_cmds(cmd, *count), free_lst_tok(&tmp), NULL);
 		i++;
 	}
+	
 	if (tmp)
 		free_lst_tok(&tmp);
 	*count = i;

@@ -112,7 +112,7 @@ t_all	*build_all(t_env *lst_env)
 	all->count = 0;
 	all->n_pipes = 0;
 	all->prompt_good = ft_strdup("\001\033[35m\002(>.<) $ \001\033[0m\002");
-	all->prompt_bad = ft_strdup("\001\033[31m\002ლ(́o.o) $ \001\033[0m\002");
+	all->prompt_bad = ft_strdup("\001\033[31m\002(́o.o) $ \001\033[0m\002");
 	//all->prompt_good = ft_strdup("\001\033[35m\002(▼・ᴥ・▼) $ \001\033[0m\002");
 	//all->prompt_bad = ft_strdup("\001\033[31m\002ლ(́◉◞౪◟◉‵ლ) $ \001\033[0m\002");
 
@@ -159,7 +159,7 @@ void	just_do_it(t_all **all, char *line, int count)
 			i = 0;
 			while (i < (*all)->count)
 			{
-				printf("ok :))))\n");
+				//printf("ok :))))\n");
 				if ((*all)->cmd[i].pid > 0)
 				{
 					waitpid((*all)->cmd[i].pid,&status, 0);
@@ -171,10 +171,10 @@ void	just_do_it(t_all **all, char *line, int count)
 					else if (WIFSIGNALED(status))
 					{
 						int d;
-						printf("status : %d\n", status);
+						//printf("status : %d\n", status);
 						d = WTERMSIG(status);
 						*exit_status() = 128 + d;
-						printf("d : %d\n", d);
+						//printf("d : %d\n", d);
 
 					}
 				}
@@ -217,10 +217,10 @@ void	tchitat_stdin(t_all **all)
 			free(line);
 			line = NULL;
 		}
-		signal_exec();
+		//signal_exec();
 		if (line)
 			just_do_it(all, line, count);
-		//signal_exec();
+		signal_exec();
 	}
 }
 

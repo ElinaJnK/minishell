@@ -31,7 +31,11 @@ int	exec_cd(t_cmd *cmd, int output_fd, t_env **lst_env)
 	if (lst_size_env(*lst_env) < 5)
 		return (cd_without_env(cmd, output_fd, lst_env));
 	else if (chdir(cmd->args[1]) == -1)
-		return (ft_putstr_fd("bash: cd\n", output_fd),
-			EXIT_FAILURE);
+	{
+		ft_putstr_fd("bash: cd: ", output_fd);
+		ft_putstr_fd(cmd->args[1], output_fd);
+		ft_putstr_fd(": No such file or directory\n", output_fd);
+		return (EXIT_FAILURE);
+	}
 	return (EXIT_SUCCESS);
 }
