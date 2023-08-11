@@ -132,6 +132,8 @@ void	just_do_it(t_all **all, char *line, int count)
 	t_cmd		*cmds;
 	t_ast		*root;
 	t_token		*t;
+	int			i;
+	int			status;
 
 	cmds = NULL;
 	t = NULL;
@@ -139,18 +141,45 @@ void	just_do_it(t_all **all, char *line, int count)
 	(*all)->n_pipes = 0;
 	t = tokenize(line, (*all)->env);
 	t = tokenize_bise(t);
-	t = tokenize_crise(t);
+	t = tokenize_crise(t, (*all)->env);
+	status = 0;
 	if (t && (*all)->env)
 		cmds = transform_into_tab(t, &count, (*all)->env);
 	if (cmds)
 	{
 		init_border(all, &count);
 		root = build_ast(cmds, (*all)->b);
+		printAST(root);
 		if (root && (*all)->env)
 		{
+			//status = 0;
 			(*all)->cmd = cmds;
 			(*all)->ast = root;
 			exec_ast((*all)->ast, STDIN_FILENO, STDOUT_FILENO, *all);
+			i = 0;
+			while (i < (*all)->count)
+			{
+				printf("ok :))))\n");
+				if ((*all)->cmd[i].pid > 0)
+				{
+					waitpid((*all)->cmd[i].pid,&status, 0);
+					//wait(&status);
+					if (WIFEXITED(status))
+					{
+						*exit_status() = WEXITSTATUS(status);
+					}
+					else if (WIFSIGNALED(status))
+					{
+						int d;
+						printf("status : %d\n", status);
+						d = WTERMSIG(status);
+						*exit_status() = 128 + d;
+						printf("d : %d\n", d);
+
+					}
+				}
+				i++;
+			}
 		}
 		if (cmds)
 		{
@@ -174,7 +203,7 @@ void	tchitat_stdin(t_all **all)
 	{
 		signal_prompt();
 		//rl_redisplay();
-		rl_on_new_line();
+		//rl_on_new_line();
 		if (*(exit_status()) == 0)
 			line = readline((*all)->prompt_good);
 		else
@@ -191,7 +220,24 @@ void	tchitat_stdin(t_all **all)
 		signal_exec();
 		if (line)
 			just_do_it(all, line, count);
+		//signal_exec();
 	}
+}
+
+
+t_env	*set_env()
+{
+	t_env	*lst_env;
+	char	*pwd;
+
+	lst_env = NULL;
+	pwd = getcwd(NULL, 0);
+	if (!pwd)
+		return (exit(1), NULL);
+	add_back_env(&lst_env, new_env("PWD", pwd));
+	add_back_env(&lst_env, new_env("SHLVL", "1"));
+	add_back_env(&lst_env, new_env("_", "/usr/bin/env"));
+	return (lst_env);
 }
 
 int	main(int ac, char **av, char **env)
@@ -207,8 +253,10 @@ int	main(int ac, char **av, char **env)
 		exit(0);
 	}
 	if (!*env)
-		return (failure("No environment"), 1);
-	lst_env = spy_env(env);
+		lst_env = set_env();
+		//return (failure("No environment"), 1);
+	else
+		lst_env = spy_env(env);
 	if (!lst_env)
 		return (failure("Error in malloc allocation"), 1);
 	all = build_all(lst_env);

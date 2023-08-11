@@ -3,7 +3,7 @@
 int	do_builtin(t_cmd *cmd, int output_fd, t_all *all)
 {
 	if (!ft_strncmp(cmd->content, "cd", ft_strlen("cd") + 1))
-		return (exec_cd(cmd, output_fd));
+		return (exec_cd(cmd, output_fd, &(all->env)));
 	else if (!ft_strncmp(cmd->content, "echo", ft_strlen("echo") + 1))
 		return (exec_echo(cmd, output_fd));
 	else if (!ft_strncmp(cmd->content, "env", ft_strlen("env") + 1))
@@ -96,20 +96,21 @@ void	choose_exec(t_ast *node, int input_fd, int output_fd, t_all **all)
 
 void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 {
-	pid_t	pid;
+	//pid_t	pid;
 	int		status;
 
-	pid = fork();
-	if (pid < 0)
+	node->cmd->pid = fork();
+	if (node->cmd->pid < 0)
 		failure_exec("fork error");
-	else if (pid == 0)
+	else if (node->cmd->pid == 0)
 	{
 		sig_child();
 		choose_exec(node, input_fd, output_fd, all);
 	}
 	else
 	{
-		waitpid(pid, &status, 0);
-		*exit_status() = WEXITSTATUS(status);
+		waitpid(node->cmd->pid, &status, 0);
+		// if (*exit_status() != 130 && *exit_status() != 131)
+		// 	*exit_status() = WEXITSTATUS(status);
 	}
 }

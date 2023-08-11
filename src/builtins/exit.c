@@ -51,6 +51,7 @@ int	exec_exit(t_cmd *cmd, t_all *all, int fd_out)
 	{
 		if (is_num(cmd->args[1]) == EXIT_SUCCESS)
 		{
+			printf("lolilolololololo\n");
 			*exit_status() = ft_atoi(cmd->args[1]);
 		}
 		if (is_num(cmd->args[1]) == EXIT_FAILURE)
