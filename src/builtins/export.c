@@ -45,7 +45,7 @@ int	exp_no_arg(int output_fd, t_env *lst_env)
 		i++;
 	}
 	free_tab(env);
-	return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
 }
 
 int	in_env(char *name, char *new_val, t_env *lst_env)
@@ -82,13 +82,14 @@ int	exec_export(t_cmd *cmd, t_env **lst_env, int output_fd)
 		env = get_env(cmd->args[i]);
 		if (check_env(env) == EXIT_FAILURE)
 			return (env_error(env, output_fd));
-		else if (in_env(env[0], env[1], *lst_env))
+		else if (ft_strlen(env[1]) && in_env(env[0], env[1], *lst_env))
 		{
 			free_tab(env);
 			i++;
 			continue ;
 		}
-		add_back_env(lst_env, new_env(env[0], env[1]));
+		if (ft_strlen(env[1]))
+			add_back_env(lst_env, new_env(env[0], env[1]));
 		free_tab(env);
 		i++;
 	}

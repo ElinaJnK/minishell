@@ -53,6 +53,7 @@ typedef struct s_cmd
 	int		input;
 	int		output;
 	int		n_pipes;
+	int		pid;
 }	t_cmd;
 
 typedef struct s_border
@@ -119,7 +120,7 @@ void	failure_env(const char *message, char **elem);
 void	update_tok(t_tokyo **t);
 t_token	*tokenize(char *line, t_env *lst_env);
 t_token	*tokenize_bise(t_token *tok);
-t_token	*tokenize_crise(t_token *tok);
+t_token	*tokenize_crise(t_token *tok, t_env *lst_env);
 void	check_tok(t_token **lst_tok);
 
 void	free_tokyo(t_tokyo *t);
@@ -186,6 +187,7 @@ int		init_op(t_cmd *cmd, t_token *t);
 int		lst_size_tok(t_token *lst);
 void	free_all(t_all *all);
 void	put_error_tok(char *message, t_token **lst_tok);
+int		in_env(char *name, char *new_val, t_env *lst_env);
 
 /*----execution----*/
 char	*get_command_path(char *command, t_env *env);
@@ -200,7 +202,7 @@ int		open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env);
 /*----builtins----*/
 int		do_builtin(t_cmd *cmd, int output_fd, t_all *all);
 int		is_builtin(t_cmd *cmd);
-int		exec_cd(t_cmd *cmd, int output_fd);
+int		exec_cd(t_cmd *cmd, int output_fd, t_env **lst_env);
 int		exec_echo(t_cmd *cmd, int fd_out);
 int		exec_env(t_cmd *cmd, int fd_out, t_env *lst_env);
 int		exec_export(t_cmd *cmd, t_env **lst_env, int output_fd);

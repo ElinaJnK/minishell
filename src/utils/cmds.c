@@ -63,6 +63,7 @@ int	init_op(t_cmd *cmd, t_token *t)
 	cmd->args = NULL;
 	cmd->nb_args = 0;
 	cmd->n_pipes = 0;
+	cmd->pid = -42;
 	return (EXIT_SUCCESS);
 }
 

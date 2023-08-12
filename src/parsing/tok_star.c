@@ -24,7 +24,21 @@ void	check_wildcard(t_token **tmp, t_token **res, int *flag, char *pwd)
 	}
 }
 
-t_token	*tokenize_crise(t_token *tok)
+char	*find_pwd(t_env *lst_env)
+{
+	t_env *tmp;
+
+	tmp = lst_env;
+	while (tmp)
+	{
+		if (!ft_strncmp(tmp->name, "PWD", 4))
+			return (tmp->value);
+		tmp = tmp->next;
+	}
+	return (NULL);
+}
+
+t_token	*tokenize_crise(t_token *tok, t_env *lst_env)
 {
 	t_token	*tmp;
 	char	*pwd;
@@ -33,15 +47,14 @@ t_token	*tokenize_crise(t_token *tok)
 
 	if (!tok)
 		return (NULL);
-	pwd = getcwd(NULL, 0);
+	pwd = find_pwd(lst_env);
 	if (!pwd)
-		return (failure("pwd doesn't work"), NULL);
+		return (failure("bash : pwd"), NULL);
 	tmp = tok;
 	flag = 0;
 	res = NULL;
 	while (tmp)
 		check_wildcard(&tmp, &res, &flag, pwd);
-	free(pwd);
 	if (tok)
 		free_lst_tok(&tok);
 	return (res);
