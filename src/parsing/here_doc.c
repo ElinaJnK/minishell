@@ -1,5 +1,12 @@
 #include "minishell.h"
 
+int	*heredoc(void)
+{
+	static int	exit_s = 0;
+
+	return (&exit_s);
+}
+
 char	*here_doc_expand(char *line, t_env *env)
 {
 	int		i;
@@ -37,6 +44,7 @@ int	read_stdin(int fd, char *limiter, int type, t_env *env)
 {
 	char	*line;
 
+	*heredoc() = 1;
 	ft_putstr_fd("> ", 1);
 	line = get_next_line(0);
 	while (line && ft_strncmp(line, limiter, ft_max(ft_strlen(line) - 1,
@@ -56,6 +64,7 @@ int	read_stdin(int fd, char *limiter, int type, t_env *env)
 	}
 	if (line)
 		free(line);
+	*heredoc() = 0;
 	return (close(fd), EXIT_SUCCESS);
 }
 

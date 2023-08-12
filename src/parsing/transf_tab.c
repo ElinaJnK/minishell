@@ -29,56 +29,61 @@ int	fill_cmd(t_cmd *cmd, t_token **t)
 	return (EXIT_SUCCESS);
 }
 
-int	open_files(t_token **t, t_cmd *cmd, int *pipe_fds, t_env *env)
+void	add_error(char *filename, int fd_out, t_token **lst_err)
 {
-	if (access((*t)->content, R_OK) != 0)
+	char	*error;
+
+	if (access(filename, R_OK) != 0)
 	{
 		if (errno == ENOENT)
-		{
-			ft_putstr_fd("bash: ", cmd->output);
-			ft_putstr_fd((*t)->content, cmd->output);
-			ft_putstr_fd(": No such file or directory\n", cmd->output);
-		}
+			error = ft_strjoin(filename, ": No such file or directory\n");
 		else
-		{
-			ft_putstr_fd("bash: ", cmd->output);
-			ft_putstr_fd((*t)->content, cmd->output);
-			ft_putstr_fd(": Permission denied\n", cmd->output);
-		}
+			error = ft_strjoin(filename, ": Permission denied\n");
+		add_back_tok(lst_err, new_token(error, fd_out));
 	}
-	if ((*t)->type == REDIR)
-		cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_TRUNC,
-				0644);
-	else if ((*t)->type == REDIR2)
-		cmd->input = open((*t)->content, O_RDONLY, 0644);
-	else if ((*t)->type == DREDIR)
-		cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_APPEND,
-				0644);
-	else if ((*t)->type == DREDIR2 || (*t)->type == DREDIR2_E)
+}
+
+int	open_files(t_token **t, t_cmd *cmd, t_env *env, t_token **lst_err)
+{
+	int		pipe_fds[2];
+	
+	if ((*t)->type == DREDIR2 || (*t)->type == DREDIR2_E)
 	{
 		if (open_here_doc(pipe_fds, (*t)->content, (*t)->type, env)
 			== EXIT_FAILURE)
 			return (EXIT_FAILURE);
 		cmd->input = pipe_fds[0];
 	}
+	else
+	{
+		if ((*t)->type == REDIR)
+			cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_TRUNC,
+					0644);
+		else if ((*t)->type == REDIR2)
+			cmd->input = open((*t)->content, O_RDONLY, 0644);
+		else if ((*t)->type == DREDIR)
+			cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_APPEND,
+					0644);
+		add_error((*t)->content, cmd->output, lst_err);
+	}
 	return (EXIT_SUCCESS);
 }
 
 int	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
 {
-	int		pipe_fds[2];
 	t_token	*prev;
+	t_token	*lst_err;
 
+	lst_err = NULL;
 	if (init_op(cmd, NULL) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	prev = *t;
 	while (*t && !((*t)->type >= AND && (*t)->type <= PIPE)
 		&& !((*t)->type >= OPEN_PAR && (*t)->type <= CLOSE_PAR))
 	{
-		if (open_files(t, cmd, pipe_fds, env) == EXIT_FAILURE)
+		if (open_files(t, cmd, env, &lst_err) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
-		if (cmd->output < 0 || cmd->input < 0)
-			return (EXIT_FAILURE);
+		cmd->lst_err = lst_err;
 		cmd->type = (*t)->type;
 		prev = *t;
 		*t = (*t)->next;
@@ -124,10 +129,13 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
 	while (t)
 	{
 		if (define_types(&t, &cmd[i], env) == EXIT_FAILURE)
-			return (free_cmds(cmd, *count), free_lst_tok(&tmp), NULL);
+		{
+			if (tmp)
+				free_lst_tok(&tmp);
+			return (free_cmds(cmd, *count), NULL);
+		}
 		i++;
 	}
-	
 	if (tmp)
 		free_lst_tok(&tmp);
 	*count = i;

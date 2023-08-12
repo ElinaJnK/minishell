@@ -9,11 +9,30 @@ void	failure_exec(const char *message)
 	exit(EXIT_FAILURE);
 }
 
-void	write_echo(t_cmd *cmd, int fd_out, int i)
+// void	write_echo(t_cmd *cmd, int fd_out, int i)
+// {
+// 	ft_putstr_fd(cmd->args[i], fd_out);
+// 	if (cmd->args[i + 1])
+// 		ft_putchar_fd(' ', fd_out);
+// }
+void write_echo(t_cmd *cmd, int fd_out, int i)
 {
-	ft_putstr_fd(cmd->args[i], fd_out);
-	if (cmd->args[i + 1])
-		ft_putchar_fd(' ', fd_out);
+    char	*arg;
+	int		bytes_written;
+	
+	arg = cmd->args[i]; // Get the argument to be written
+
+    if (arg)
+    {
+        bytes_written = write(fd_out, arg, ft_strlen(arg));
+        if (bytes_written < 0)
+        {
+            ft_putstr_fd("bash: echo: write error: No space left on device\n", STDERR_FILENO);
+            exit(EXIT_FAILURE);
+        }
+        if (cmd->args[i + 1])
+            ft_putchar_fd(' ', fd_out);
+    }
 }
 
 int	exec_echo(t_cmd *cmd, int fd_out)
@@ -23,6 +42,11 @@ int	exec_echo(t_cmd *cmd, int fd_out)
 
 	n_option = 0;
 	i = 1;
+	if (fd_out < 0)
+	{
+		ft_putstr_fd("bash: echo: write error\n", STDERR_FILENO);
+		return (EXIT_FAILURE);
+	}
 	if (!cmd || !cmd->args)
 		return (ft_putstr_fd("bash: echo: echo not defined\n", fd_out),
 			EXIT_FAILURE);

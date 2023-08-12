@@ -24,6 +24,8 @@ void	free_cmds(t_cmd *cmds, int count)
 				free(cmds[i].content);
 			i++;
 		}
+		if (cmds->lst_err)
+			free_lst_tok(&(cmds->lst_err));
 		free(cmds);
 		cmds = NULL;
 	}
@@ -60,6 +62,7 @@ int	init_op(t_cmd *cmd, t_token *t)
 	}
 	cmd->output = STDOUT_FILENO;
 	cmd->input = STDIN_FILENO;
+	cmd->lst_err = NULL;
 	cmd->args = NULL;
 	cmd->nb_args = 0;
 	cmd->n_pipes = 0;

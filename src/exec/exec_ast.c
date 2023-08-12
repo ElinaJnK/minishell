@@ -82,6 +82,19 @@ void	exec_pipe(t_ast *root, int input_fd, int output_fd, t_all *all)
 	}
 }
 
+void	print_error(t_token *lst_err)
+{
+	t_token *tmp;
+
+	tmp = lst_err;
+	while (tmp)
+	{
+		ft_putstr_fd("bash: ", tmp->type);
+		ft_putstr_fd(tmp->content, tmp->type);
+		tmp = tmp->next;
+	}
+}
+
 void	exec_redir(t_ast *root, int input_fd, int output_fd, t_all *all)
 {
 	if (root->cmd->n_pipes == 1)
@@ -93,6 +106,13 @@ void	exec_redir(t_ast *root, int input_fd, int output_fd, t_all *all)
 	}
 	if (root->left)
 	{
+		if (root->cmd->lst_err)
+			print_error(root->cmd->lst_err);
+		if (root->cmd->input < 0 || root->cmd->output < 0)
+		{
+			*exit_status() = EXIT_FAILURE;
+			return ;
+		}
 		if (root->cmd->input != STDIN_FILENO && root->cmd->output
 			!= STDOUT_FILENO)
 			exec_ast(root->left, root->cmd->input, root->cmd->output, all);
