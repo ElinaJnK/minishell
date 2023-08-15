@@ -38,9 +38,11 @@ int	env_error(char **env, int output_fd)
 	if (env[0])
 	{
 		ft_putstr_fd(env[0], 2);
-		ft_putstr_fd("=", 2);
 		if (env[1])
+		{
+			ft_putstr_fd("=", 2);
 			ft_putstr_fd(env[1], 2);
+		}
 	}
 	ft_putstr_fd("': not a valid identifier\n", 2);
 	free_tab(env);
