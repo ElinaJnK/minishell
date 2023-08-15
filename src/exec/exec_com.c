@@ -100,6 +100,7 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 	int		status;
 
 	node->cmd->pid = fork();
+	//printf("commande:%s pid:%d\n", node->cmd->content, node->cmd->pid);
 	if (node->cmd->pid < 0)
 		failure_exec("fork error");
 	else if (node->cmd->pid == 0)
@@ -110,6 +111,8 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 	else
 	{
 		waitpid(node->cmd->pid, &status, 0);
+		// if (WIFSIGNALED(status))
+		// 	printf("ouiiiii");
 		// if (*exit_status() != 130 && *exit_status() != 131)
 		// 	*exit_status() = WEXITSTATUS(status);
 	}

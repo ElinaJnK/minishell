@@ -136,6 +136,7 @@ void	exec_ast(t_ast *root, int input_fd, int output_fd, t_all *all)
 		{
 			builtin = do_builtin(root->cmd, output_fd, all);
 			*exit_status() = builtin;
+			//ft_putstr_fd("exit\n", 2);
 		}
 		else
 			exec_com(root, input_fd, output_fd, &all);

@@ -28,7 +28,8 @@ void write_echo(t_cmd *cmd, int fd_out, int i)
         if (bytes_written < 0)
         {
             ft_putstr_fd("bash: echo: write error: No space left on device\n", STDERR_FILENO);
-            exit(EXIT_FAILURE);
+            //exit(EXIT_FAILURE);
+			return;
         }
         if (cmd->args[i + 1])
             ft_putchar_fd(' ', fd_out);

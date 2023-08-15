@@ -46,12 +46,12 @@ static void handle_sigint_prompt(int sig)
 		write(2, "\n", 1);
 		rl_replace_line("", 1);
 		rl_on_new_line();
-		if (last_code == 130)
+		//if (last_code == 130)
 			rl_redisplay();
 	}
 	else if (sig == SIGQUIT)
 	{
-		printf("heredoc = %d\n", *heredoc());
+		//printf("heredoc = %d\n", *heredoc());
 		if (*heredoc() == 1)
 			ft_putstr_fd("bash: warning: here-document delimited by end-of-file\n", 2);
 		*exit_status() = 131;

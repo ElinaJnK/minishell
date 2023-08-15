@@ -162,6 +162,7 @@ void	just_do_it(t_all **all, char *line, int count)
 				//printf("ok :))))\n");
 				if ((*all)->cmd[i].pid > 0)
 				{
+					// printf("pid = %d\n", (*all)->cmd[i].pid);
 					waitpid((*all)->cmd[i].pid,&status, 0);
 					//wait(&status);
 					if (WIFEXITED(status))
@@ -217,10 +218,10 @@ void	tchitat_stdin(t_all **all)
 			free(line);
 			line = NULL;
 		}
-		//signal_exec();
+		signal_exec();
 		if (line)
 			just_do_it(all, line, count);
-		signal_exec();
+		//signal_exec();
 	}
 }
 
@@ -247,6 +248,7 @@ int	main(int ac, char **av, char **env)
 
 	(void)ac;
 	(void)av;
+	rl_outstream = stderr;
 	if (ac != 1 || av[1])
 	{
 		printf("This program does not accept arguments\n");
