@@ -15,7 +15,7 @@ t_token	*add_rest(t_tokyo **t)
 			free(tmp->content);
 			tmp->content = NULL;
 		}
-		ft_putstr_fd("bash: unclosed quotes\n", STDIN_FILENO);
+		ft_putstr_fd("bash: unclosed quotes\n", STDERR_FILENO);
 		return (free_lst_tok(&(tmp->lst_tok)), free_tokyo(*t), NULL);
 	}
 	check_tok(&((*t)->lst_tok));
@@ -54,7 +54,7 @@ int	to_expand(t_tokyo **t)
 				tmp->lst_tok);
 		tmp->expansion = 1;
 		if (!tmp->line)
-			return (free_tokyo(tmp), EXIT_FAILURE);
+			return (free_tokyo(tmp), free(tmp->content), free_lst_tok(&tmp->lst_tok), EXIT_FAILURE);
 	}
 	else if (*(tmp->line + tmp->i + 1) != ' ')
 		tmp->i++;

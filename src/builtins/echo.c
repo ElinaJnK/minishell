@@ -49,7 +49,7 @@ int	exec_echo(t_cmd *cmd, int fd_out)
 		return (EXIT_FAILURE);
 	}
 	if (!cmd || !cmd->args)
-		return (ft_putstr_fd("bash: echo: echo not defined\n", fd_out),
+		return (ft_putstr_fd("bash: echo: echo not defined\n", STDERR_FILENO),
 			EXIT_FAILURE);
 	while (cmd->args[i] && !ft_strncmp(cmd->args[i], "-n", 2))
 		i++;

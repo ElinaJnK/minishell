@@ -71,6 +71,7 @@ char	*expansion(char *line, int *i, t_env *env, t_token *lst_tok)
 	char	*newline;
 
 	newline = NULL;
+	(void)lst_tok;
 	if (line && line[*i])
 		newline = expand_env(line, i, env);
 	if (!newline)

@@ -75,6 +75,8 @@ void	free_tokyo(t_tokyo *t)
 	{
 		if (t->line)
 			free(t->line);
+		// if (t->content)
+		// 	free(t->content);
 		free(t);
 	}
 }

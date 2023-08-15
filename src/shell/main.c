@@ -163,7 +163,8 @@ void	just_do_it(t_all **all, char *line, int count)
 				if ((*all)->cmd[i].pid > 0)
 				{
 					// printf("pid = %d\n", (*all)->cmd[i].pid);
-					waitpid((*all)->cmd[i].pid,&status, 0);
+					if (waitpid((*all)->cmd[i].pid, &status, 0) == -1)
+						status = (*all)->cmd[i].status;
 					//wait(&status);
 					if (WIFEXITED(status))
 					{
@@ -224,7 +225,6 @@ void	tchitat_stdin(t_all **all)
 		//signal_exec();
 	}
 }
-
 
 t_env	*set_env()
 {

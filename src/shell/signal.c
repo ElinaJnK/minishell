@@ -36,10 +36,10 @@
 
 static void handle_sigint_prompt(int sig)
 {
-	int last_code;
+	//int last_code;
 
 	(void)sig;	
-	last_code = *exit_status();
+	//last_code = *exit_status();
 	if (sig == SIGINT)
 	{
 		*exit_status() = 130;

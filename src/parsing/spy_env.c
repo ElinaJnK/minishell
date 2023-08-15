@@ -85,6 +85,36 @@ char	**get_env(char *data)
 	return (get_value(elem, data, i));
 }
 
+int	in_env_bis(char *name, t_env *lst_env)
+{
+	t_env	*tmp;
+	int		num;
+
+	tmp = lst_env;
+	num = 0;
+	while (tmp)
+	{
+		if (ft_strncmp(tmp->name, name, ft_strlen(name) + 1) == 0)
+		{
+			if (is_num(tmp->value) == EXIT_SUCCESS)
+			{
+				num = ft_atoi(tmp->value);
+				free(tmp->value);
+				++num;
+				tmp->value = ft_itoa(num);
+			}
+			else
+			{
+				free(tmp->value);
+				tmp->value = ft_strdup("1");
+			}
+			return (1);
+		}
+		tmp = tmp->next;
+	}
+	return (0);
+}
+
 t_env	*spy_env(char **env)
 {
 	t_env	*lst_env;
@@ -104,5 +134,7 @@ t_env	*spy_env(char **env)
 		free_tab(elem);
 		i++;
 	}
+	if (!in_env_bis("SHLVL", lst_env))
+		add_back_env(&lst_env, new_env("SHLVL", "1"));
 	return (lst_env);
 }

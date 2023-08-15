@@ -111,6 +111,7 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 	else
 	{
 		waitpid(node->cmd->pid, &status, 0);
+		node->cmd->status = status;
 		// if (WIFSIGNALED(status))
 		// 	printf("ouiiiii");
 		// if (*exit_status() != 130 && *exit_status() != 131)

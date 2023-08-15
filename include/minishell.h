@@ -54,6 +54,7 @@ typedef struct s_cmd
 	int		output;
 	int		n_pipes;
 	int		pid;
+	int		status;
 	t_token	*lst_err;
 }	t_cmd;
 
@@ -211,6 +212,7 @@ int		exec_export(t_cmd *cmd, t_env **lst_env, int output_fd);
 int		exec_pwd(t_cmd *cmd, int output_fd);
 int		exec_unset(t_cmd *cmd, t_env **lst_env);
 int		exec_exit(t_cmd *cmd, t_all *all, int ft_out);
+int		is_num(char *str);
 
 
 /*----signal----*/
