@@ -38,7 +38,7 @@ static void handle_sigint_prompt(int sig)
 {
 	//int last_code;
 
-	(void)sig;	
+	//(void)sig;	
 	//last_code = *exit_status();
 	if (sig == SIGINT)
 	{

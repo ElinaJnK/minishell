@@ -19,7 +19,7 @@ int	check_name(char *name)
 
 int	check_env(char **env)
 {
-	if (!env || !env[0] || !env[1])
+	if (!env || !env[0])
 		return (EXIT_FAILURE);
 	if (env[2] || check_name(env[0]) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
@@ -28,23 +28,23 @@ int	check_env(char **env)
 
 int	exp_no_arg(int output_fd, t_env *lst_env)
 {
-	int		i;
-	char	*res;
-	char	**env;
+	t_env	*tmp;
 
-	i = 0;
-	env = env_to_tab(lst_env);
-	while (env[i])
+	tmp = lst_env;
+	while (tmp)
 	{
-		res = ft_strjoin("export ", env[i]);
-		if (res)
+		ft_putstr_fd("export ", output_fd);
+		ft_putstr_fd(tmp->name, output_fd);
+		if (ft_strncmp(tmp->value, "", 1) != 0)
 		{
-			ft_putendl_fd(res, output_fd);
-			free(res);
+			ft_putstr_fd("=\"", output_fd);
+			ft_putstr_fd(tmp->value, output_fd);
+			ft_putstr_fd("\"\n", output_fd);
 		}
-		i++;
+		else
+			ft_putstr_fd("\"\n", output_fd);
+		tmp = tmp->next;
 	}
-	free_tab(env);
 	return (EXIT_SUCCESS);
 }
 
@@ -53,6 +53,8 @@ int	in_env(char *name, char *new_val, t_env *lst_env)
 	t_env	*tmp;
 
 	tmp = lst_env;
+	if (new_val == NULL)
+		return (1);
 	while (tmp)
 	{
 		if (ft_strncmp(tmp->name, name, ft_strlen(name) + 1) == 0)
@@ -73,7 +75,7 @@ int	exec_export(t_cmd *cmd, t_env **lst_env, int output_fd)
 
 	i = 1;
 	if (!cmd)
-		return (ft_putstr_fd("bash: export: problem\n", output_fd),
+		return (ft_putstr_fd("bash: export: problem\n", 2),
 			EXIT_FAILURE);
 	if (cmd->nb_args == 0)
 		return (exp_no_arg(output_fd, *lst_env));
@@ -82,13 +84,14 @@ int	exec_export(t_cmd *cmd, t_env **lst_env, int output_fd)
 		env = get_env(cmd->args[i]);
 		if (check_env(env) == EXIT_FAILURE)
 			return (env_error(env, output_fd));
-		else if (ft_strlen(env[1]) && in_env(env[0], env[1], *lst_env))
+		else if (env[1] && in_env(env[0], env[1],
+				*lst_env))
 		{
 			free_tab(env);
 			i++;
 			continue ;
 		}
-		if (ft_strlen(env[1]))
+		if (env[1])
 			add_back_env(lst_env, new_env(env[0], env[1]));
 		free_tab(env);
 		i++;

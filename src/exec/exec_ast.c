@@ -64,22 +64,42 @@ void	exec_pipe(t_ast *root, int input_fd, int output_fd, t_all *all)
 	if (root->cmd->pid == 0)
 	{
 		close(pipe_fds[0]);
+		//close(input_fd);
+		if (output_fd != STDOUT_FILENO)
+			close(output_fd);
 		if (root->left)
 			root->left->cmd->n_pipes = 1;
+		root->left->cmd->output = pipe_fds[1];
 		exec_ast(root->left, input_fd, pipe_fds[1], all);
+		write(2, "LOLO\n", 5);
 		close(pipe_fds[1]);
+		//close(input_fd);
 		free_all(all);
 		exit(0);
 	}
 	else
 	{
 		close(pipe_fds[1]);
+		// if (input_fd != STDIN_FILENO)
+		// 	close(input_fd);
+		//close(output_fd);
+		if (input_fd != STDIN_FILENO)
+			close(input_fd);
 		if (root->right)
 			root->right->cmd->n_pipes = 1;
 		//waitpid(pid, &status, 0);
+		root->right->cmd->input = pipe_fds[0];
 		exec_ast(root->right, pipe_fds[0], output_fd, all);
+		write(2, "LULU\n", 5);
 		close(pipe_fds[0]);
+		
+		
+		// close(input_fd);
+		//close(output_fd);
 	}
+
+	//close(pipe_fds[1]);
+	//close(pipe_fds[0]);
 }
 
 void	print_error(t_token *lst_err)

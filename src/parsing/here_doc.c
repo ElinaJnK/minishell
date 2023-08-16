@@ -17,7 +17,7 @@ char	*here_doc_expand(char *line, t_env *env)
 	{
 		if (line[i] == '$')
 		{
-			line = expansion(line, &i, env, NULL);
+			line = expansion_here(line, &i, env, NULL);
 			if (!line)
 				return (NULL);
 		}

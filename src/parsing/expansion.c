@@ -39,7 +39,7 @@ char	*search_var(char *var, int size, t_env *env)
 	return (NULL);
 }
 
-char	*expand_env(char *line, int *i, t_env *env)
+char	*expand_env(char *line, int *i, t_env *env, int *e)
 {
 	char	*var;
 	char	*newline;
@@ -61,19 +61,36 @@ char	*expand_env(char *line, int *i, t_env *env)
 			end++;
 		end--;
 		var = search_var(line + *i + 1, end - *i, env);
+		if (var && (!ft_strncmp(var, "\"", 2) || !ft_strncmp(var, "\'", 2)))
+			*e = 1;
 	}
 	newline = insert_into_line(line, var, *i, end);
 	return (newline);
 }
 
-char	*expansion(char *line, int *i, t_env *env, t_token *lst_tok)
+char	*expansion(t_tokyo *t)
 {
 	char	*newline;
 
 	newline = NULL;
-	(void)lst_tok;
+	if (t->line && t->line[t->i])
+		newline = expand_env(t->line, &(t->i), t->lst_env, &(t->expansion));
+	if (!newline)
+		return (failure_parse("malloc error", t->lst_tok, t->line), NULL);
+	if (t->line)
+		free(t->line);
+	return (newline);
+}
+
+char	*expansion_here(char *line, int *i, t_env *lst_env, t_token *lst_tok)
+{
+	char	*newline;
+	int		myst;
+
+	myst = 0;
+	newline = NULL;
 	if (line && line[*i])
-		newline = expand_env(line, i, env);
+		newline = expand_env(line, i, lst_env, &myst);
 	if (!newline)
 		return (failure_parse("malloc error", lst_tok, line), NULL);
 	if (line)

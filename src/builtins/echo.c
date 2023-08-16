@@ -17,23 +17,41 @@ void	failure_exec(const char *message)
 // }
 void write_echo(t_cmd *cmd, int fd_out, int i)
 {
-    char	*arg;
+	char	*arg;
 	int		bytes_written;
-	
-	arg = cmd->args[i]; // Get the argument to be written
 
-    if (arg)
-    {
-        bytes_written = write(fd_out, arg, ft_strlen(arg));
-        if (bytes_written < 0)
-        {
-            ft_putstr_fd("bash: echo: write error: No space left on device\n", STDERR_FILENO);
-            //exit(EXIT_FAILURE);
+	arg = cmd->args[i];
+	if (arg)
+	{
+		bytes_written = write(fd_out, arg, ft_strlen(arg));
+		if (bytes_written < 0)
+		{
+			ft_putstr_fd("bash: echo: write error: No space left on device\n", STDERR_FILENO);
+			//exit(EXIT_FAILURE);
 			return;
-        }
-        if (cmd->args[i + 1])
-            ft_putchar_fd(' ', fd_out);
-    }
+		}
+		if (cmd->args[i + 1])
+			ft_putchar_fd(' ', fd_out);
+	}
+}
+
+int	is_n(char *str)
+{
+	int	i;
+
+	i = 0;
+	if (!ft_strncmp(str + i, "-n", 2))
+	{
+		i = 2;
+		while (str[i])
+		{
+			if (str[i] != 'n')
+				return (0);
+			i++;
+		}
+		return (1);
+	}
+	return (0);
 }
 
 int	exec_echo(t_cmd *cmd, int fd_out)
@@ -51,7 +69,7 @@ int	exec_echo(t_cmd *cmd, int fd_out)
 	if (!cmd || !cmd->args)
 		return (ft_putstr_fd("bash: echo: echo not defined\n", STDERR_FILENO),
 			EXIT_FAILURE);
-	while (cmd->args[i] && !ft_strncmp(cmd->args[i], "-n", 2))
+	while (cmd->args[i] && is_n(cmd->args[i]))
 		i++;
 	if (i > 1)
 		n_option = 1;

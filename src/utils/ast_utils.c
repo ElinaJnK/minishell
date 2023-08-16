@@ -27,6 +27,9 @@ void	free_ast(t_ast *node)
 
 void	free_all(t_all *all)
 {
+	int	i;
+
+	i = 0;
 	if (all)
 	{
 		if (all->ast)
@@ -36,6 +39,17 @@ void	free_all(t_all *all)
 		}
 		if (all->cmd)
 		{
+			while (i < all->count)
+			{
+				//write(2, "If I am not here, I am going to kill you\n", 41);
+				ft_putnbr_fd(all->cmd[i].input, 2);
+				ft_putnbr_fd(all->cmd[i].output, 2);
+				if (all->cmd[i].input != STDIN_FILENO)
+					close(all->cmd[i].input);
+				if (all->cmd[i].output != STDOUT_FILENO)
+					close(all->cmd[i].output);
+				i++;
+			}
 			free_cmds(all->cmd, all->count);
 			all->cmd = NULL;
 		}

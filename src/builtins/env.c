@@ -54,12 +54,12 @@ int	exec_env(t_cmd *cmd, int fd_out, t_env *lst_env)
 	t_env	*tmp;
 
 	if (!cmd || !lst_env)
-		return (ft_putstr_fd("bash: env: env not defined\n", fd_out),
+		return (ft_putstr_fd("bash: env: env not defined\n", 2),
 			EXIT_FAILURE);
 	tmp = lst_env;
 	while (tmp)
 	{
-		if (ft_strncmp(tmp->value, "", 1) != 0)
+		if (tmp->value != NULL)
 		{
 			ft_putstr_fd(tmp->name, fd_out);
 			ft_putstr_fd("=", fd_out);

@@ -180,6 +180,10 @@ void	just_do_it(t_all **all, char *line, int count)
 
 					}
 				}
+				if ((*all)->cmd[i].input != STDIN_FILENO)
+					close((*all)->cmd[i].input);
+				if ((*all)->cmd[i].output != STDOUT_FILENO)
+					close((*all)->cmd[i].output);
 				i++;
 			}
 		}

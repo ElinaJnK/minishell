@@ -78,6 +78,12 @@ void	exec_child(t_ast *node, int input_fd, int output_fd, t_all **all)
 	}
 }
 
+#include <fcntl.h>
+int is_fd_open(int fd)
+{
+    return fcntl(fd, F_GETFD) != -1;
+}
+
 void	choose_exec(t_ast *node, int input_fd, int output_fd, t_all **all)
 {
 	int	builtin;
@@ -87,16 +93,20 @@ void	choose_exec(t_ast *node, int input_fd, int output_fd, t_all **all)
 	{
 		builtin = do_builtin(node->cmd, output_fd, *all);
 		*exit_status() = builtin;
+		write(2, "FREE\n", 5);
 		free_all(*all);
+		if ((input_fd != STDIN_FILENO && is_fd_open(input_fd)) || 
+			( output_fd != STDOUT_FILENO && is_fd_open(output_fd)))
+			write(2, "open1\n", 6);
 		exit(*exit_status());
 	}
 	else
 		exec_child(node, input_fd, output_fd, all);
 }
 
+
 void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 {
-	//pid_t	pid;
 	int		status;
 
 	node->cmd->pid = fork();
@@ -112,9 +122,17 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 	{
 		waitpid(node->cmd->pid, &status, 0);
 		node->cmd->status = status;
+		if (input_fd != STDIN_FILENO)
+			close(input_fd);
+		if (output_fd != STDOUT_FILENO)
+			close(output_fd);
+		if ((input_fd != STDIN_FILENO && is_fd_open(input_fd)) || 
+				( output_fd != STDOUT_FILENO && is_fd_open(output_fd)))
+			write(2, "open2\n", 6);
 		// if (WIFSIGNALED(status))
 		// 	printf("ouiiiii");
 		// if (*exit_status() != 130 && *exit_status() != 131)
 		// 	*exit_status() = WEXITSTATUS(status);
 	}
+
 }

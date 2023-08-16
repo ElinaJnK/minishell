@@ -55,8 +55,10 @@ char	**get_value(char **elem, char *data, int i)
 			return (NULL);
 		}
 	}
-	else
+	else if (data[i] == '=' && !data[i + 1])
 		elem[1] = ft_strdup("");
+	else
+		elem[1] = NULL;
 	return (elem);
 }
 

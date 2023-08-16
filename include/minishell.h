@@ -98,7 +98,7 @@ typedef struct s_all
 	t_ast		*ast;
 	t_cmd		*cmd;
 	t_border	*b;
-	int		count;
+	int			count;
 }	t_all;
 
 typedef struct s_sig
@@ -150,7 +150,8 @@ void	ast_pipe(t_cmd *tokens, t_ast **root, t_ast **current, int start);
 void	ast_cmd(t_cmd *tokens, t_ast **root, t_ast **current, int start);
 
 /*---expansion---*/
-char	*expansion(char *line, int *i, t_env *env, t_token *lst_tok);
+char	*expansion(t_tokyo *t);
+char	*expansion_here(char *line, int *i, t_env *lst_env, t_token *lst_tok);
 
 /*----in-utils-----*/
 t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env);

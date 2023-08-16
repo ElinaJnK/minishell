@@ -50,11 +50,9 @@ int	to_expand(t_tokyo **t)
 		&& tmp->line[tmp->i + 1] != '\"' && tmp->line[tmp->i + 1] != '\\'
 		&& !is_op(tmp->line + tmp->i + 1) && !is_fb(tmp->line + tmp->i + 1))
 	{
-		tmp->line = expansion(tmp->line, &(tmp->i), tmp->lst_env,
-				tmp->lst_tok);
-		tmp->expansion = 1;
+		tmp->line = expansion(tmp);
 		if (!tmp->line)
-			return (free_tokyo(tmp), free(tmp->content), free_lst_tok(&tmp->lst_tok), EXIT_FAILURE);
+			return (free_tokyo(tmp), free_lst_tok(&tmp->lst_tok), EXIT_FAILURE);
 	}
 	else if (*(tmp->line + tmp->i + 1) != ' ')
 		tmp->i++;
