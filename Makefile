@@ -15,6 +15,7 @@ SOURCES_EXEC		=	com_path.c	\
 						exec_com.c	\
 
 SOURCES_PARSING 	=	build_ast.c	\
+						expand.c	\
 						expansion.c	\
 						here_doc.c	\
 						spy_env.c	\

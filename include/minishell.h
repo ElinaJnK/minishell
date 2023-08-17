@@ -151,6 +151,9 @@ void	ast_cmd(t_cmd *tokens, t_ast **root, t_ast **current, int start);
 
 /*---expansion---*/
 char	*expansion(t_tokyo *t);
+char	*expansionb(t_tokyo **t);
+char	*search_var(char *var, int size, t_env *env);
+char	*insert_into_line(char *line, char *var, int start, int end);
 char	*expansion_here(char *line, int *i, t_env *lst_env, t_token *lst_tok);
 
 /*----in-utils-----*/

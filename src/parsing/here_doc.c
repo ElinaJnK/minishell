@@ -50,6 +50,8 @@ int	read_stdin(int fd, char *limiter, int type, t_env *env)
 	while (line && ft_strncmp(line, limiter, ft_max(ft_strlen(line) - 1,
 				ft_strlen(limiter))) != 0)
 	{
+		if (*exit_status() == 130)
+			break ;
 		if (type == DREDIR2)
 		{
 			line = here_doc_expand(line, env);
@@ -70,9 +72,24 @@ int	read_stdin(int fd, char *limiter, int type, t_env *env)
 
 int	open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env)
 {
-	if (pipe(pipe_fds) < 0)
-		failure("pipe");
-	return (read_stdin(pipe_fds[1], limiter, type, env));
+	pid_t	pid;
+	int		status;
+
+	pid = fork();
+	status = 0;
+	if (pid == 0)
+	{
+		sig_child();
+		if (pipe(pipe_fds) < 0)
+			failure("pipe");
+		read_stdin(pipe_fds[1], limiter, type, env);
+	}
+	else
+	{
+		waitpid(pid, &status, 0);
+		*exit_status() = status;
+	}
+	return (EXIT_SUCCESS);
 }
 
 void	here_doc_q(char *line, t_token **lst_tok)
