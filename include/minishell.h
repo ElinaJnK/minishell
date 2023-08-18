@@ -204,7 +204,6 @@ int		is_paf(char *cmd);
 
 /*---here doc----*/
 int		open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env);
-int		*heredoc(void);
 
 /*----builtins----*/
 int		do_builtin(t_cmd *cmd, int output_fd, t_all *all);

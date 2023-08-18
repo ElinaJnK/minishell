@@ -1,10 +1,31 @@
 #include "minishell.h"
 
-int	*heredoc(void)
+static void handle_here(int sig)
 {
-	static int	exit_s = 0;
+	if (sig == SIGINT)
+	{
+		printf("\n\nSIGINT\n\n");
+		*exit_status() = 130;
+		exit(*exit_status());
+	}
+	else if (sig == SIGQUIT)
+	{
+		printf("\n\nQUIT\n\n");
+		ft_putstr_fd("bash: warning: here-document delimited by end-of-file\n", 2);
+		*exit_status() = 131;
+		signal(SIGQUIT, SIG_IGN);
+	}
+}
 
-	return (&exit_s);
+void	signal_here(void)
+{
+	struct sigaction	act;
+
+	act.sa_handler = handle_here;
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = 0;
+	sigaction(SIGINT, &act, NULL);
+	sigaction(SIGQUIT, &act, NULL);
 }
 
 char	*here_doc_expand(char *line, t_env *env)
@@ -44,14 +65,14 @@ int	read_stdin(int fd, char *limiter, int type, t_env *env)
 {
 	char	*line;
 
-	*heredoc() = 1;
 	ft_putstr_fd("> ", 1);
 	line = get_next_line(0);
 	while (line && ft_strncmp(line, limiter, ft_max(ft_strlen(line) - 1,
 				ft_strlen(limiter))) != 0)
 	{
-		if (*exit_status() == 130)
-			break ;
+		signal_here();
+		if (*exit_status() == 130 || *exit_status() == 131)
+			{printf("\n\nHERE\n\n"); break ;}
 		if (type == DREDIR2)
 		{
 			line = here_doc_expand(line, env);
@@ -66,7 +87,6 @@ int	read_stdin(int fd, char *limiter, int type, t_env *env)
 	}
 	if (line)
 		free(line);
-	*heredoc() = 0;
 	return (close(fd), EXIT_SUCCESS);
 }
 
@@ -77,12 +97,16 @@ int	open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env)
 
 	pid = fork();
 	status = 0;
+	if (pid == -1)
+	{
+		perror("fork");
+        exit(EXIT_FAILURE);
+	}
 	if (pid == 0)
 	{
 		sig_child();
-		if (pipe(pipe_fds) < 0)
-			failure("pipe");
 		read_stdin(pipe_fds[1], limiter, type, env);
+		exit(*exit_status());
 	}
 	else
 	{

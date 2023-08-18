@@ -47,6 +47,8 @@ int	open_files(t_token **t, t_cmd *cmd, t_env *env, t_token **lst_err)
 {
 	int		pipe_fds[2];
 	
+	if (pipe(pipe_fds) < 0)
+			failure("pipe");
 	if ((*t)->type == DREDIR2 || (*t)->type == DREDIR2_E)
 	{
 		if (open_here_doc(pipe_fds, (*t)->content, (*t)->type, env)
