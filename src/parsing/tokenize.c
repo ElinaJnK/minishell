@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   tokenize.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/20 04:11:41 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/20 04:51:36 by ksadykov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 t_token	*add_rest(t_tokyo **t)
@@ -69,15 +81,14 @@ int	japan(t_tokyo **t)
 	if (*(tmp->line + tmp->i) == '$' && tmp->q_flag != 1
 		&& !is_heredoc(tmp->lst_tok) && to_expand(&tmp) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
-	if (is_op(tmp->line + tmp->i) || is_fb(tmp->line + tmp->i)
-		|| tmp->line[tmp->i] == ' ')
+	if ((is_op(tmp->line + tmp->i) || is_fb(tmp->line + tmp->i)
+			|| tmp->line[tmp->i] == ' ') && tmp->q_flag == 0)
 	{
 		tmp->i += handle_op(&tmp);
 		meta_tok(&tmp);
 	}
 	update_tok(&tmp);
-	if (tmp->line[tmp->i] != '\0' && !is_op(tmp->line + tmp->i)
-		&& !is_fb(tmp->line + tmp->i))
+	if (tmp->line[tmp->i] != '\0')
 		tmp->i++;
 	return (EXIT_SUCCESS);
 }

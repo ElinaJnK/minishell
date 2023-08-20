@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exit.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/20 03:47:12 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/20 03:49:03 by ksadykov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int	*exit_status(void)
@@ -33,20 +45,13 @@ int	is_num(char *str)
 	return (EXIT_SUCCESS);
 }
 
-void	do_end(t_cmd *cmd, t_all *all, int fd_out)
+void	do_end(t_all *all)
 {
-	(void)cmd;
-	(void)fd_out;
-	if (cmd->n_pipes == 0)
-	{
-		//ft_putstr_fd("\001\033[38;5;217m\002Exiting our minishell, ", 2);
-		//ft_putstr_fd("bye bye !ﾟ･:*｡(ꈍᴗꈍ)ε｀*)~｡*:･ﾟ\n\001\033[0m\002", 2);
-	}
 	free_all(all);
 	exit(*exit_status());
 }
 
-int	exec_exit(t_cmd *cmd, t_all *all, int fd_out)
+int	exec_exit(t_cmd *cmd, t_all *all)
 {
 	if (!cmd->args)
 		return (EXIT_FAILURE);
@@ -56,7 +61,6 @@ int	exec_exit(t_cmd *cmd, t_all *all, int fd_out)
 	{
 		if (is_num(cmd->args[1]) == EXIT_SUCCESS)
 		{
-			//printf("lolilolololololo\n");
 			*exit_status() = ft_atoi(cmd->args[1]);
 		}
 		if (is_num(cmd->args[1]) == EXIT_FAILURE)
@@ -73,6 +77,5 @@ int	exec_exit(t_cmd *cmd, t_all *all, int fd_out)
 			return (EXIT_FAILURE);
 		}
 	}
-	do_end(cmd, all, fd_out);
-	return (EXIT_SUCCESS);
+	return (do_end(all), EXIT_SUCCESS);
 }

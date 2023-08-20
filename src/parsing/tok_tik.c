@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   tok_tik.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/20 04:17:53 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/20 05:23:45 by ksadykov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 void	failure_parse(const char *message, t_token *lst_tok, char *line)
@@ -44,8 +56,11 @@ void	update_tok(t_tokyo **t)
 				&& tmp->q_flag == 2) || (*(tmp->line + tmp->i) == '\''
 				&& tmp->q_flag == 1)))
 		tmp->q_flag = 0;
-	else if ((tmp->expansion == 0 && *(tmp->line + tmp->i) != ' '
-			&& !is_op(tmp->line + tmp->i) && !is_fb(tmp->line + tmp->i)
+	else if (*(tmp->line + tmp->i) == ' ' && (tmp->q_flag == 1
+			|| tmp->q_flag == 2))
+		tmp->content = ft_addchr(tmp->content, *(tmp->line + tmp->i),
+				tmp->lst_tok, tmp->line);
+	else if (((tmp->expansion == 0) && *(tmp->line + tmp->i) != ' '
 			&& *(tmp->line + tmp->i) != '\0')
 		|| tmp->expansion == 1)
 		tmp->content = ft_addchr(tmp->content, *(tmp->line + tmp->i),
@@ -75,8 +90,6 @@ void	free_tokyo(t_tokyo *t)
 	{
 		if (t->line)
 			free(t->line);
-		// if (t->content)
-		// 	free(t->content);
 		free(t);
 	}
 }

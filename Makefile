@@ -33,7 +33,10 @@ SOURCES_SHELL 		=	main.c		\
 SOURCES_UTILS 		=	ast_type.c	\
 						ast_utils.c	\
 						cmds.c		\
+						com_utils.c	\
 						env_utils.c	\
+						here_sig.c	\
+						here_utils.c\
 						tok_type.c	\
 						tok_utils.c	\
 

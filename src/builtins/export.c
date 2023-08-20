@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/20 03:50:04 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/20 03:50:05 by ksadykov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int	check_name(char *name)
@@ -75,8 +87,7 @@ int	exec_export(t_cmd *cmd, t_env **lst_env, int output_fd)
 
 	i = 1;
 	if (!cmd)
-		return (ft_putstr_fd("bash: export: problem\n", 2),
-			EXIT_FAILURE);
+		return (ft_putstr_fd("bash: export: problem\n", 2), EXIT_FAILURE);
 	if (cmd->nb_args == 0)
 		return (exp_no_arg(output_fd, *lst_env));
 	while (cmd->args[i])
@@ -84,8 +95,7 @@ int	exec_export(t_cmd *cmd, t_env **lst_env, int output_fd)
 		env = get_env(cmd->args[i]);
 		if (check_env(env) == EXIT_FAILURE)
 			return (env_error(env, output_fd));
-		else if (env[1] && in_env(env[0], env[1],
-				*lst_env))
+		else if (env[1] && in_env(env[0], env[1], *lst_env))
 		{
 			free_tab(env);
 			i++;

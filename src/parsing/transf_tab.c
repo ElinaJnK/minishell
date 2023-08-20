@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   transf_tab.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/20 04:18:51 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/20 05:50:311 by ejankovs         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int	fill_cmd(t_cmd *cmd, t_token **t)
@@ -29,49 +41,53 @@ int	fill_cmd(t_cmd *cmd, t_token **t)
 	return (EXIT_SUCCESS);
 }
 
-void	add_error(char *filename, int fd_out, t_token **lst_err)
+int	open_files(t_token **t, t_cmd *cmd, t_all *all, t_token **lst_err,
+	t_token *tmp)
 {
-	char	*error;
+	int	fd;
 
-	if (access(filename, R_OK) != 0)
-	{
-		if (errno == ENOENT)
-			error = ft_strjoin(filename, ": No such file or directory\n");
-		else
-			error = ft_strjoin(filename, ": Permission denied\n");
-		add_back_tok(lst_err, new_token(error, fd_out));
-	}
-}
-
-int	open_files(t_token **t, t_cmd *cmd, t_env *env, t_token **lst_err)
-{
-	int		pipe_fds[2];
-	
-	if (pipe(pipe_fds) < 0)
-			failure("pipe");
 	if ((*t)->type == DREDIR2 || (*t)->type == DREDIR2_E)
 	{
-		if (open_here_doc(pipe_fds, (*t)->content, (*t)->type, env)
-			== EXIT_FAILURE)
+		if (cmd->input != STDIN_FILENO)
+			close(cmd->input);
+		fd = open("/tmp/minishell", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (fd < 0)
 			return (EXIT_FAILURE);
-		cmd->input = pipe_fds[0];
+		if (open_here_doc(fd, *t, all, tmp)
+			== EXIT_FAILURE || *exit_status() == 130)
+			return (close(fd), EXIT_FAILURE);
+		close(fd);
+		fd = open("/tmp/minishell", O_RDONLY, 0644);
+		cmd->input = fd;
 	}
 	else
 	{
 		if ((*t)->type == REDIR)
+		{
+			if (cmd->output != STDOUT_FILENO)
+				close(cmd->output);
 			cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_TRUNC,
 					0644);
+		}
 		else if ((*t)->type == REDIR2)
+		{
+			if (cmd->input != STDIN_FILENO)
+				close(cmd->input);
 			cmd->input = open((*t)->content, O_RDONLY, 0644);
+		}
 		else if ((*t)->type == DREDIR)
+		{
+			if (cmd->output != STDOUT_FILENO)
+				close(cmd->output);
 			cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_APPEND,
 					0644);
+		}
 		add_error((*t)->content, cmd->output, lst_err);
 	}
 	return (EXIT_SUCCESS);
 }
 
-int	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
+int	fill_redir(t_cmd *cmd, t_token **t, t_all *all, t_token *tmp)
 {
 	t_token	*prev;
 	t_token	*lst_err;
@@ -83,7 +99,7 @@ int	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
 	while (*t && !((*t)->type >= AND && (*t)->type <= PIPE)
 		&& !((*t)->type >= OPEN_PAR && (*t)->type <= CLOSE_PAR))
 	{
-		if (open_files(t, cmd, env, &lst_err) == EXIT_FAILURE)
+		if (open_files(t, cmd, all, &lst_err, tmp) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 		cmd->lst_err = lst_err;
 		cmd->type = (*t)->type;
@@ -94,7 +110,7 @@ int	fill_redir(t_cmd *cmd, t_token **t, t_env *env)
 	return (EXIT_SUCCESS);
 }
 
-int	define_types(t_token **t, t_cmd *cmd, t_env *env)
+int	define_types(t_token **t, t_cmd *cmd, t_all *all, t_token *tmp)
 {
 	if ((*t)->type == CMD)
 	{
@@ -103,7 +119,7 @@ int	define_types(t_token **t, t_cmd *cmd, t_env *env)
 	}
 	else if ((*t)->type >= REDIR && (*t)->type <= DREDIR2_E)
 	{
-		if (fill_redir(cmd, t, env) == EXIT_FAILURE)
+		if (fill_redir(cmd, t, all, tmp) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 	}
 	else if ((*t)->type != CMD)
@@ -115,7 +131,7 @@ int	define_types(t_token **t, t_cmd *cmd, t_env *env)
 	return (EXIT_SUCCESS);
 }
 
-t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
+t_cmd	*transform_into_tab(t_token *t, int *count, t_all **all)
 {
 	t_cmd	*cmd;
 	t_token	*tmp;
@@ -128,9 +144,10 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
 		return (failure_parse("Malloc allocation failure", t, NULL), NULL);
 	i = 0;
 	tmp = t;
+	(*all)->cmd = cmd;
 	while (t)
 	{
-		if (define_types(&t, &cmd[i], env) == EXIT_FAILURE)
+		if (define_types(&t, &cmd[i], *all, tmp) == EXIT_FAILURE)
 		{
 			if (tmp)
 				free_lst_tok(&tmp);
@@ -139,7 +156,10 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env)
 		i++;
 	}
 	if (tmp)
+	{
 		free_lst_tok(&tmp);
+		tmp = NULL;
+	}
 	*count = i;
 	cmd[i].content = NULL;
 	cmd[i].type = -1;

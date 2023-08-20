@@ -34,7 +34,7 @@ void	free_lst_tok(t_token **lst_tok)
 {
 	t_token	*tmp;
 
-	if (!*lst_tok)
+	if (!*lst_tok || !lst_tok)
 		return ;
 	while (*lst_tok)
 	{
@@ -44,6 +44,7 @@ void	free_lst_tok(t_token **lst_tok)
 		free(*lst_tok);
 		*lst_tok = tmp;
 	}
+	*lst_tok = NULL;
 }
 
 int	is_heredoc(t_token *lst_tok)

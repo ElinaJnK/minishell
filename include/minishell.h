@@ -92,6 +92,7 @@ typedef struct s_tokyo
 typedef struct s_all
 {
 	int			n_pipes;
+	int			is_env;
 	char		*prompt_good;
 	char		*prompt_bad;
 	t_env		*env;
@@ -137,7 +138,8 @@ t_all	*build_all(t_env *lst_env);
 t_tokyo	*init_param(char *line, t_env *lst_env);
 
 /*----wildcard----*/
-void	process_wild(const char *pattern, const char *path, t_token **tok, int *flag);
+void	process_wild(const char *pattern, const char *path, t_token **tok,
+			int *flag);
 
 /*----ast tree----*/
 void	free_ast(t_ast *a);
@@ -157,7 +159,7 @@ char	*insert_into_line(char *line, char *var, int start, int end);
 char	*expansion_here(char *line, int *i, t_env *lst_env, t_token *lst_tok);
 
 /*----in-utils-----*/
-t_cmd	*transform_into_tab(t_token *t, int *count, t_env *env);
+t_cmd	*transform_into_tab(t_token *t, int *count, t_all **all);
 t_cmd	*cmd_with_pipeuh(t_token *t, int *count, t_env *env);
 int		ft_max(int a, int b);
 
@@ -167,6 +169,7 @@ t_env	*spy_env(char **env);
 char	**get_env(char *data);
 t_env	*new_env(char *name, char *value);
 char	**env_to_tab(t_env *lst_env);
+void	failure_env(const char *message, char **elem);
 
 
 void	free_lst_env(t_env **lst_env);
@@ -194,6 +197,9 @@ int		lst_size_tok(t_token *lst);
 void	free_all(t_all *all);
 void	put_error_tok(char *message, t_token **lst_tok);
 int		in_env(char *name, char *new_val, t_env *lst_env);
+void	print_error(t_token *lst_err);
+void	pipe_child(t_ast *root, int *pipe_fds, int input_fd, t_all *all);
+void	add_error(char *filename, int fd_out, t_token **lst_err);
 
 /*----execution----*/
 char	*get_command_path(char *command, t_env *env);
@@ -201,22 +207,28 @@ void	exec_ast(t_ast *root, int input_fd, int output_fd, t_all *all);
 void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all);
 int		*exit_status(void);
 int		is_paf(char *cmd);
+void	command_not_found(char *msg, t_all *all);
 
 /*---here doc----*/
-int		open_here_doc(int *pipe_fds, char *limiter, int type, t_env *env);
+int		open_here_doc(int fd, t_token *t, t_all *all, t_token *tmp);
+int		*exit_here(void);
+void	handle_here_c(int sig);
+void	signal_here_c(void);
+int		ft_max(int a, int b);
+void	here_child(int fd, t_token *t, t_all *all, t_token *tmp);
+int		read_stdin(int fd, char *limiter, int type, t_env *env);
 
 /*----builtins----*/
 int		do_builtin(t_cmd *cmd, int output_fd, t_all *all);
 int		is_builtin(t_cmd *cmd);
-int		exec_cd(t_cmd *cmd, int output_fd, t_env **lst_env);
+int		exec_cd(t_cmd *cmd, int output_fd, t_all *all);
 int		exec_echo(t_cmd *cmd, int fd_out);
 int		exec_env(t_cmd *cmd, int fd_out, t_env *lst_env);
 int		exec_export(t_cmd *cmd, t_env **lst_env, int output_fd);
 int		exec_pwd(t_cmd *cmd, int output_fd);
 int		exec_unset(t_cmd *cmd, t_env **lst_env);
-int		exec_exit(t_cmd *cmd, t_all *all, int ft_out);
+int		exec_exit(t_cmd *cmd, t_all *all);
 int		is_num(char *str);
-
 
 /*----signal----*/
 void	signal_prompt(void);

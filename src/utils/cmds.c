@@ -82,3 +82,23 @@ int	is_builtin(t_cmd *cmd)
 		return (1);
 	return (0);
 }
+
+void	add_error(char *filename, int fd_out, t_token **lst_err)
+{
+	char	*error;
+
+	if (access(filename, R_OK) != 0)
+	{
+		if (errno == ENOENT)
+		{
+			error = ft_strjoin(filename, ": No such file or directory\n");
+			*exit_status() = 127;
+		}
+		else
+		{
+			error = ft_strjoin(filename, ": Permission denied\n");
+			*exit_status() = 126;
+		}
+		add_back_tok(lst_err, new_token(error, fd_out));
+	}
+}

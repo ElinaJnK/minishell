@@ -1,4 +1,29 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/20 03:47:03 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/20 05:52:53 by ksadykov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
+
+void	failure_env(const char *message, char **elem)
+{
+	int	i;
+
+	i = 0;
+	while (elem && elem[i])
+		free(elem[i++]);
+	if (elem)
+		free(elem);
+	perror(message);
+	exit(EXIT_FAILURE);
+}
 
 int	lst_size_env(t_env *lst)
 {

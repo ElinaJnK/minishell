@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   tok_star.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/20 04:08:24 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/20 05:23:43 by ksadykov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 void	check_wildcard(t_token **tmp, t_token **res, int *flag, char *pwd)
@@ -26,7 +38,7 @@ void	check_wildcard(t_token **tmp, t_token **res, int *flag, char *pwd)
 
 char	*find_pwd(t_env *lst_env)
 {
-	t_env *tmp;
+	t_env	*tmp;
 
 	tmp = lst_env;
 	while (tmp)

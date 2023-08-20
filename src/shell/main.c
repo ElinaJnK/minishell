@@ -112,10 +112,9 @@ t_all	*build_all(t_env *lst_env)
 	all->count = 0;
 	all->n_pipes = 0;
 	all->prompt_good = ft_strdup("\001\033[35m\002(>.<) $ \001\033[0m\002");
+	//all->prompt_good = ft_strdup("$");
+	//all->prompt_bad = ft_strdup("$");
 	all->prompt_bad = ft_strdup("\001\033[31m\002(́o.o) $ \001\033[0m\002");
-	//all->prompt_good = ft_strdup("\001\033[35m\002(▼・ᴥ・▼) $ \001\033[0m\002");
-	//all->prompt_bad = ft_strdup("\001\033[31m\002ლ(́◉◞౪◟◉‵ლ) $ \001\033[0m\002");
-
 	return (all);
 }
 
@@ -131,70 +130,58 @@ void	just_do_it(t_all **all, char *line, int count)
 {
 	t_cmd		*cmds;
 	t_ast		*root;
-	t_token		*t;
 	int			i;
 	int			status;
+	t_token		*t;
 
 	cmds = NULL;
-	t = NULL;
 	root = NULL;
+	t = NULL;
 	(*all)->n_pipes = 0;
 	t = tokenize(line, (*all)->env);
 	t = tokenize_bise(t);
 	t = tokenize_crise(t, (*all)->env);
 	status = 0;
 	if (t && (*all)->env)
-		cmds = transform_into_tab(t, &count, (*all)->env);
+		cmds = transform_into_tab(t, &count, all);
 	if (cmds)
 	{
 		init_border(all, &count);
 		root = build_ast(cmds, (*all)->b);
-		//printAST(root);
 		if (root && (*all)->env)
 		{
-			//status = 0;
 			(*all)->cmd = cmds;
 			(*all)->ast = root;
 			exec_ast((*all)->ast, STDIN_FILENO, STDOUT_FILENO, *all);
 			i = 0;
 			while (i < (*all)->count)
 			{
-				//printf("ok :))))\n");
 				if ((*all)->cmd[i].pid > 0)
 				{
-					// printf("pid = %d\n", (*all)->cmd[i].pid);
 					if (waitpid((*all)->cmd[i].pid, &status, 0) == -1)
 						status = (*all)->cmd[i].status;
-					//wait(&status);
 					if (WIFEXITED(status))
-					{
 						*exit_status() = WEXITSTATUS(status);
-					}
 					else if (WIFSIGNALED(status))
-					{
-						int d;
-						//printf("status : %d\n", status);
-						d = WTERMSIG(status);
-						*exit_status() = 128 + d;
-						//printf("d : %d\n", d);
-
-					}
+						*exit_status() = 128 + WTERMSIG(status);
 				}
-				// if ((*all)->cmd[i].input != STDIN_FILENO)
-				// 	close((*all)->cmd[i].input);
-				// if ((*all)->cmd[i].output != STDOUT_FILENO)
-				// 	close((*all)->cmd[i].output);
+				if ((*all)->cmd[i].input != STDIN_FILENO)
+					close((*all)->cmd[i].input);
+				if ((*all)->cmd[i].output != STDOUT_FILENO)
+					close((*all)->cmd[i].output);
 				i++;
 			}
 		}
 		if (cmds)
 		{
 			free_cmds(cmds, (*all)->count);
+			(*all)->cmd = NULL;
 			cmds = NULL;
 		}
 		if (root)
 		{
 			free_ast(root);
+			(*all)->ast = NULL;
 			root = NULL;
 		}
 	}
@@ -208,8 +195,6 @@ void	tchitat_stdin(t_all **all)
 	while (1)
 	{
 		signal_prompt();
-		//rl_redisplay();
-		//rl_on_new_line();
 		if (*(exit_status()) == 0)
 			line = readline((*all)->prompt_good);
 		else
@@ -226,7 +211,6 @@ void	tchitat_stdin(t_all **all)
 		signal_exec();
 		if (line)
 			just_do_it(all, line, count);
-		//signal_exec();
 	}
 }
 
@@ -259,13 +243,19 @@ int	main(int ac, char **av, char **env)
 		exit(0);
 	}
 	if (!*env)
+	{
 		lst_env = set_env();
-		//return (failure("No environment"), 1);
+		all = build_all(lst_env);
+		all->is_env = 0;
+	}
 	else
+	{
 		lst_env = spy_env(env);
+		all = build_all(lst_env);
+		all->is_env = 1;
+	}
 	if (!lst_env)
 		return (failure("Error in malloc allocation"), 1);
-	all = build_all(lst_env);
 	if (!all)
 		return (failure("Error in malloc allocation"), free_lst_env(&lst_env),
 			*exit_status());

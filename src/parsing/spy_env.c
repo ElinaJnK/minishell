@@ -1,17 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   spy_env.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/20 04:11:49 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/20 04:17:07 by ksadykov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
-
-void	failure_env(const char *message, char **elem)
-{
-	int	i;
-
-	i = 0;
-	while (elem && elem[i])
-		free(elem[i++]);
-	if (elem)
-		free(elem);
-	perror(message);
-	exit(EXIT_FAILURE);
-}
 
 char	**env_to_tab(t_env *lst_env)
 {
@@ -93,7 +92,6 @@ int	in_env_bis(char *name, t_env *lst_env)
 	int		num;
 
 	tmp = lst_env;
-	num = 0;
 	while (tmp)
 	{
 		if (ft_strncmp(tmp->name, name, ft_strlen(name) + 1) == 0)

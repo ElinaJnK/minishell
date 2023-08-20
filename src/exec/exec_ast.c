@@ -1,9 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_ast.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/20 04:06:17 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/20 04:06:20 by ksadykov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <minishell.h>
 
 void	exec_and(t_ast *root, int input_fd, int output_fd, t_all *all)
 {
-	//int	status;
-	
 	if (root->cmd->n_pipes == 1)
 	{
 		if (root->left)
@@ -12,15 +22,12 @@ void	exec_and(t_ast *root, int input_fd, int output_fd, t_all *all)
 			root->right->cmd->n_pipes = 1;
 	}
 	exec_ast(root->left, input_fd, output_fd, all);
-	//wait(&status);
 	if (*exit_status() == 0)
 		exec_ast(root->right, input_fd, output_fd, all);
 }
 
 void	exec_or(t_ast *root, int input_fd, int output_fd, t_all *all)
 {
-	//int status;
-	
 	if (root->cmd->n_pipes == 1)
 	{
 		if (root->left)
@@ -29,32 +36,13 @@ void	exec_or(t_ast *root, int input_fd, int output_fd, t_all *all)
 			root->right->cmd->n_pipes = 1;
 	}
 	exec_ast(root->left, input_fd, output_fd, all);
-	//wait(&status);
 	if (*exit_status() != 0)
 		exec_ast(root->right, input_fd, output_fd, all);
-}
-
-void	exec_pipe2(t_ast *root, int input_fd, int output_fd, t_all *all)
-{
-	int	pipe_fds[2];
-
-	if (pipe(pipe_fds) < 0)
-		failure_exec("fork error");
-	if (root->left)
-		root->left->cmd->n_pipes = 1;
-	exec_ast(root->left, input_fd, pipe_fds[1], all);
-	if (root->right)
-		root->right->cmd->n_pipes = 1;
-	close(pipe_fds[1]);
-	exec_ast(root->right, pipe_fds[0], output_fd, all);
-	close(pipe_fds[0]);
 }
 
 void	exec_pipe(t_ast *root, int input_fd, int output_fd, t_all *all)
 {
 	int		pipe_fds[2];
-	//pid_t	pid;
-	//int		status;
 
 	if (pipe(pipe_fds) < 0)
 		failure_exec("pipe error");
@@ -64,54 +52,20 @@ void	exec_pipe(t_ast *root, int input_fd, int output_fd, t_all *all)
 	if (root->cmd->pid == 0)
 	{
 		close(pipe_fds[0]);
-		//close(input_fd);
 		if (output_fd != STDOUT_FILENO)
 			close(output_fd);
-		if (root->left)
-			root->left->cmd->n_pipes = 1;
-		root->left->cmd->output = pipe_fds[1];
-		exec_ast(root->left, input_fd, pipe_fds[1], all);
-		write(2, "LOLO\n", 5);
-		close(pipe_fds[1]);
-		//close(input_fd);
-		free_all(all);
-		exit(0);
+		pipe_child(root, pipe_fds, input_fd, all);
 	}
 	else
 	{
 		close(pipe_fds[1]);
-		// if (input_fd != STDIN_FILENO)
-		// 	close(input_fd);
-		//close(output_fd);
 		if (input_fd != STDIN_FILENO)
 			close(input_fd);
 		if (root->right)
 			root->right->cmd->n_pipes = 1;
-		//waitpid(pid, &status, 0);
 		root->right->cmd->input = pipe_fds[0];
 		exec_ast(root->right, pipe_fds[0], output_fd, all);
-		write(2, "LULU\n", 5);
 		close(pipe_fds[0]);
-		
-		
-		// close(input_fd);
-		//close(output_fd);
-	}
-
-	//close(pipe_fds[1]);
-	//close(pipe_fds[0]);
-}
-
-void	print_error(t_token *lst_err)
-{
-	t_token *tmp;
-
-	tmp = lst_err;
-	while (tmp)
-	{
-		ft_putstr_fd("bash: ", tmp->type);
-		ft_putstr_fd(tmp->content, tmp->type);
-		tmp = tmp->next;
 	}
 }
 
@@ -129,10 +83,7 @@ void	exec_redir(t_ast *root, int input_fd, int output_fd, t_all *all)
 		if (root->cmd->lst_err)
 			print_error(root->cmd->lst_err);
 		if (root->cmd->input < 0 || root->cmd->output < 0)
-		{
-			*exit_status() = EXIT_FAILURE;
 			return ;
-		}
 		if (root->cmd->input != STDIN_FILENO && root->cmd->output
 			!= STDOUT_FILENO)
 			exec_ast(root->left, root->cmd->input, root->cmd->output, all);
@@ -156,7 +107,6 @@ void	exec_ast(t_ast *root, int input_fd, int output_fd, t_all *all)
 		{
 			builtin = do_builtin(root->cmd, output_fd, all);
 			*exit_status() = builtin;
-			//ft_putstr_fd("exit\n", 2);
 		}
 		else
 			exec_com(root, input_fd, output_fd, &all);

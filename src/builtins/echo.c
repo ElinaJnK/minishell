@@ -1,21 +1,24 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   echo.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/20 03:46:58 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/20 03:48:49 by ksadykov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 void	failure_exec(const char *message)
 {
-	//perror(strerror(errno));
-	// if (errno == ENOENT)
-	// 	printf("bash: %s: command not found\n", cmd->content);
 	perror(message);
 	exit(EXIT_FAILURE);
 }
 
-// void	write_echo(t_cmd *cmd, int fd_out, int i)
-// {
-// 	ft_putstr_fd(cmd->args[i], fd_out);
-// 	if (cmd->args[i + 1])
-// 		ft_putchar_fd(' ', fd_out);
-// }
-void write_echo(t_cmd *cmd, int fd_out, int i)
+int	write_echo(t_cmd *cmd, int fd_out, int i)
 {
 	char	*arg;
 	int		bytes_written;
@@ -26,13 +29,14 @@ void write_echo(t_cmd *cmd, int fd_out, int i)
 		bytes_written = write(fd_out, arg, ft_strlen(arg));
 		if (bytes_written < 0)
 		{
-			ft_putstr_fd("bash: echo: write error: No space left on device\n", STDERR_FILENO);
-			//exit(EXIT_FAILURE);
-			return;
+			ft_putstr_fd("bash: echo: write error: No space left on device\n",
+				STDERR_FILENO);
+			return (EXIT_FAILURE);
 		}
 		if (cmd->args[i + 1])
 			ft_putchar_fd(' ', fd_out);
 	}
+	return (EXIT_SUCCESS);
 }
 
 int	is_n(char *str)
@@ -62,10 +66,7 @@ int	exec_echo(t_cmd *cmd, int fd_out)
 	n_option = 0;
 	i = 1;
 	if (fd_out < 0)
-	{
-		ft_putstr_fd("bash: echo: write error\n", STDERR_FILENO);
-		return (EXIT_FAILURE);
-	}
+		return (ft_putstr_fd("bash: echo: write error\n", 2), EXIT_FAILURE);
 	if (!cmd || !cmd->args)
 		return (ft_putstr_fd("bash: echo: echo not defined\n", STDERR_FILENO),
 			EXIT_FAILURE);
@@ -76,7 +77,8 @@ int	exec_echo(t_cmd *cmd, int fd_out)
 	while (cmd->args[i])
 	{
 		if (ft_strlen(cmd->args[i]))
-			write_echo(cmd, fd_out, i);
+			if (write_echo(cmd, fd_out, i) == EXIT_FAILURE)
+				return (EXIT_FAILURE);
 		i++;
 	}
 	if (!n_option)

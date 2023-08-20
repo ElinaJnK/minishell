@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   expand.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/20 04:14:08 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/20 04:14:3 by ejankovs         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-int		raccourci(t_tokyo **t, char *var)
+int	raccourci(t_tokyo **t, char *var)
 {
 	int	len;
 	int	i;
@@ -16,6 +28,13 @@ int		raccourci(t_tokyo **t, char *var)
 		i++;
 	}
 	return (i);
+}
+
+int	check_special_carac(char c)
+{
+	if (c != '$' && c != '\'' && c != '\"' && c != ' ' && c != '\n')
+		return (1);
+	return (0);
 }
 
 char	*expand_envb(t_tokyo **t)
@@ -36,18 +55,15 @@ char	*expand_envb(t_tokyo **t)
 	else
 	{
 		while ((*t)->line[end] && !is_op((*t)->line + end)
-			&& !is_fb((*t)->line + end) && (*t)->line[end] != '$'
-			&& (*t)->line[end] != '\'' && (*t)->line[end] != '\"'
-			&& (*t)->line[end] != ' ' && (*t)->line[end] != '\n')
+			&& !is_fb((*t)->line + end) && check_special_carac((*t)->line[end]))
 			end++;
 		end--;
 		var = search_var((*t)->line + (*t)->i + 1, end - (*t)->i,
-			(*t)->lst_env);
+				(*t)->lst_env);
 	}
 	ret = raccourci(t, var);
 	newline = insert_into_line((*t)->line, var, (*t)->i, end);
-	(*t)->i += ret;
-	return (newline);
+	return ((*t)->i += ret, newline);
 }
 
 char	*expansionb(t_tokyo **t)
