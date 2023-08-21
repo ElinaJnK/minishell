@@ -1,48 +1,44 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal.c                                           :+:      :+:    :+:   */
+/*   main_env.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/20 20:18:59 by ksadykov          #+#    #+#             */
+/*   Created: 2023/08/20 20:33:26 by ksadykov          #+#    #+#             */
 /*   Updated: 2023/08/20 21:56:17 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	handle_sigint_prompt(int sig)
+t_env	*set_env(void)
 {
-	if (sig == SIGINT)
+	t_env	*lst_env;
+	char	*pwd;
+
+	lst_env = NULL;
+	pwd = getcwd(NULL, 0);
+	if (!pwd)
+		return (exit(1), NULL);
+	add_back_env(&lst_env, new_env("PWD", pwd));
+	add_back_env(&lst_env, new_env("SHLVL", "1"));
+	add_back_env(&lst_env, new_env("_", "/usr/bin/env"));
+	return (lst_env);
+}
+
+void	init_env(char **env, t_env **lst_env, t_all **all)
+{
+	if (!*env)
 	{
-		*exit_status() = 130;
-		write(2, "\n", 1);
-		rl_replace_line("", 1);
-		rl_on_new_line();
-		rl_redisplay();
+		*lst_env = set_env();
+		*all = build_all(*lst_env);
+		(*all)->is_env = 0;
 	}
-}
-
-void	signal_prompt(void)
-{
-	struct sigaction	act;
-
-	act.sa_handler = handle_sigint_prompt;
-	sigemptyset(&act.sa_mask);
-	act.sa_flags = 0;
-	sigaction(SIGINT, &act, NULL);
-	signal(SIGQUIT, SIG_IGN);
-}
-
-void	signal_exec(void)
-{
-	signal(SIGINT, SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
-}
-
-void	sig_child(void)
-{
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
+	else
+	{
+		*lst_env = spy_env(env);
+		*all = build_all(*lst_env);
+		(*all)->is_env = 1;
+	}
 }

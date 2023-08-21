@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ast_type.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/20 20:05:54 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/21 06:15:32 by ksadykov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 void	ast_redir(t_cmd *tokens, t_ast **root, t_ast **current, int start)
@@ -37,11 +49,39 @@ void	ast_op(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 	*root = NULL;
 }
 
+void	ast_repipe(t_ast **root, t_ast **current, t_ast **node)
+{
+	t_ast	*tmp;
+	t_ast	*prev;
+
+	tmp = NULL;
+	prev = *root;
+	tmp = (*root)->right;
+	while (tmp && tmp->right && !(tmp->cmd->type >= 1 && tmp->cmd->type <= 2))
+	{
+		prev = tmp;
+		tmp = tmp->right;
+	}
+	if (tmp && tmp->cmd->type >= REDIR
+		&& tmp->cmd->type <= DREDIR2_E)
+	{
+		prev->right = *node;
+		(*node)->left = tmp;
+		*current = *node;
+	}
+	else
+	{
+		(*current)->right = *node;
+		(*node)->left = tmp;
+		*current = *node;
+	}
+}
+
 void	ast_pipe(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 {
 	t_ast	*node;
 
-	if ((*root)->cmd->type >= REDIR && (*root)->cmd->type <= DREDIR2_E)
+	if (((*root)->cmd->type >= REDIR && (*root)->cmd->type <= DREDIR2_E))
 	{
 		node = create_node(&tokens[start]);
 		node->left = *root;
@@ -49,7 +89,19 @@ void	ast_pipe(t_cmd *tokens, t_ast **root, t_ast **current, int start)
 		*current = node;
 	}
 	else
-		ast_redir(tokens, root, current, start);
+	{
+		node = create_node(&tokens[start]);
+		if (*current == NULL)
+		{
+			node->left = *root;
+			*current = node;
+			*root = node;
+		}
+		else
+			ast_repipe(root, current, &node);
+		if (*root || *current)
+			return ;
+	}
 }
 
 void	ast_cmd(t_cmd *tokens, t_ast **root, t_ast **current, int start)

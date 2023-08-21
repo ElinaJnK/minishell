@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   transf_tab.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/20 04:18:51 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/20 05:50:311 by ejankovs         ###   ########.fr       */
+/*   Created: 2023/08/21 06:11:33 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/21 06:11:34 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,14 +41,13 @@ int	fill_cmd(t_cmd *cmd, t_token **t)
 	return (EXIT_SUCCESS);
 }
 
-int	open_files(t_token **t, t_cmd *cmd, t_all *all, t_token **lst_err,
-	t_token *tmp)
+int	open_files(t_token **t, t_cmd *cmd, t_all *all, t_token *tmp)
 {
-	int	fd;
+	int		fd;
 
 	if ((*t)->type == DREDIR2 || (*t)->type == DREDIR2_E)
 	{
-		if (cmd->input != STDIN_FILENO)
+		if (cmd->input != STDIN_FILENO && cmd->input > 0)
 			close(cmd->input);
 		fd = open("/tmp/minishell", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd < 0)
@@ -61,29 +60,7 @@ int	open_files(t_token **t, t_cmd *cmd, t_all *all, t_token **lst_err,
 		cmd->input = fd;
 	}
 	else
-	{
-		if ((*t)->type == REDIR)
-		{
-			if (cmd->output != STDOUT_FILENO)
-				close(cmd->output);
-			cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_TRUNC,
-					0644);
-		}
-		else if ((*t)->type == REDIR2)
-		{
-			if (cmd->input != STDIN_FILENO)
-				close(cmd->input);
-			cmd->input = open((*t)->content, O_RDONLY, 0644);
-		}
-		else if ((*t)->type == DREDIR)
-		{
-			if (cmd->output != STDOUT_FILENO)
-				close(cmd->output);
-			cmd->output = open((*t)->content, O_WRONLY | O_CREAT | O_APPEND,
-					0644);
-		}
-		add_error((*t)->content, cmd->output, lst_err);
-	}
+		redirs(t, cmd);
 	return (EXIT_SUCCESS);
 }
 
@@ -99,9 +76,8 @@ int	fill_redir(t_cmd *cmd, t_token **t, t_all *all, t_token *tmp)
 	while (*t && !((*t)->type >= AND && (*t)->type <= PIPE)
 		&& !((*t)->type >= OPEN_PAR && (*t)->type <= CLOSE_PAR))
 	{
-		if (open_files(t, cmd, all, &lst_err, tmp) == EXIT_FAILURE)
+		if (open_files(t, cmd, all, tmp) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
-		cmd->lst_err = lst_err;
 		cmd->type = (*t)->type;
 		prev = *t;
 		*t = (*t)->next;
@@ -154,14 +130,8 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_all **all)
 			return (free_cmds(cmd, *count), NULL);
 		}
 		i++;
+		(*all)->count = i;
 	}
-	if (tmp)
-	{
-		free_lst_tok(&tmp);
-		tmp = NULL;
-	}
-	*count = i;
-	cmd[i].content = NULL;
-	cmd[i].type = -1;
+	finish_trans(cmd, tmp, count, i);
 	return (cmd);
 }

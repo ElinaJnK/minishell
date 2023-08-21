@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ast_utils.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/20 20:10:01 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/21 06:15:32 by ksadykov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 t_ast	*create_node(t_cmd *cmd)
@@ -25,11 +37,25 @@ void	free_ast(t_ast *node)
 		free(node);
 }
 
-void	free_all(t_all *all)
+void	free_and_close(t_all *all)
 {
 	int	i;
 
 	i = 0;
+	while (i < all->count)
+	{
+		if (all->cmd[i].input != STDIN_FILENO && all->cmd[i].input > 0)
+			close(all->cmd[i].input);
+		if (all->cmd[i].output != STDOUT_FILENO && all->cmd[i].output > 0)
+			close(all->cmd[i].output);
+		i++;
+	}
+	free_cmds(all->cmd, all->count);
+	all->cmd = NULL;
+}
+
+void	free_all(t_all *all)
+{
 	if (all)
 	{
 		if (all->ast)
@@ -38,18 +64,7 @@ void	free_all(t_all *all)
 			all->ast = NULL;
 		}
 		if (all->cmd)
-		{
-			while (i < all->count)
-			{
-				if (all->cmd[i].input != STDIN_FILENO)
-					close(all->cmd[i].input);
-				if (all->cmd[i].output != STDOUT_FILENO)
-					close(all->cmd[i].output);
-				i++;
-			}
-			free_cmds(all->cmd, all->count);
-			all->cmd = NULL;
-		}
+			free_and_close(all);
 		if (all->env)
 		{
 			free_lst_env(&all->env);

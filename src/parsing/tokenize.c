@@ -6,7 +6,7 @@
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 04:11:41 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/20 04:51:36 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/21 06:02:31 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ t_token	*add_rest(t_tokyo **t)
 
 	tmp = *t;
 	if (tmp->q_flag == 0 && tmp->content && tmp->content[0] != '\0')
-		add_back_tok(&(tmp->lst_tok), new_token(tmp->content, 0));
+		last_call(t);
 	else if (tmp->q_flag == 1 || tmp->q_flag == 2)
 	{
 		if (tmp->content)
@@ -30,6 +30,7 @@ t_token	*add_rest(t_tokyo **t)
 		ft_putstr_fd("bash: unclosed quotes\n", STDERR_FILENO);
 		return (free_lst_tok(&(tmp->lst_tok)), free_tokyo(*t), NULL);
 	}
+	print_list_tok((*t)->lst_tok);
 	check_tok(&((*t)->lst_tok));
 	tokens = (*t)->lst_tok;
 	return (free_tokyo(*t), tokens);

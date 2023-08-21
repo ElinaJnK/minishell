@@ -6,7 +6,7 @@
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 04:08:10 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/20 05:23:36 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/21 06:08:51 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,16 +51,7 @@ int	verif(t_token *tmp, int *p)
 	else if (tmp->type == CLOSE_PAR)
 		*p -= 1;
 	if ((tmp->next->type == OPEN_PAR && tmp->type == CMD)
-		|| (tmp->type == CLOSE_PAR && tmp->next->type == CMD)
-		|| ((tmp->type == AND || tmp->type == OR) && tmp->next->type != CMD
-			&& tmp->next->type != OPEN_PAR && tmp->next->type != CLOSE_PAR)
-		|| (tmp->type != CMD && tmp->type != OPEN_PAR && tmp->type
-			!= CLOSE_PAR && (tmp->next->type == AND
-				|| tmp->next->type == OR)))
-		return (1);
-	if (tmp->type >= REDIR && tmp->type <= DREDIR2_E
-		&& (tmp->next->type == OPEN_PAR || tmp->next->type == CLOSE_PAR
-			|| (tmp->next->type >= AND && tmp->next->type <= PIPE)))
+		|| (tmp->type == CLOSE_PAR && tmp->next->type == CMD))
 		return (1);
 	return (0);
 }
@@ -80,6 +71,7 @@ void	check_tok(t_token **lst_tok)
 	{
 		if (verif(tmp, &p))
 		{
+			printf("tmp content : %s\n", tmp->content);
 			put_error_tok("bash: syntax error near unexpected token\n", lst_tok);
 			return ;
 		}

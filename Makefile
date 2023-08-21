@@ -28,7 +28,10 @@ SOURCES_PARSING 	=	build_ast.c	\
 						wildcard.c	\
 
 SOURCES_SHELL 		=	main.c		\
+						main_utils.c\
+						main_env.c	\
 						signal.c 	\
+						main_utils_to_delete.c\
 
 SOURCES_UTILS 		=	ast_type.c	\
 						ast_utils.c	\
@@ -39,6 +42,7 @@ SOURCES_UTILS 		=	ast_type.c	\
 						here_utils.c\
 						tok_type.c	\
 						tok_utils.c	\
+						trans_utils.c\
 
 LIBFT		= libft
 

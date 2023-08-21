@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/20 04:08:32 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/20 05:23:39 by ksadykov         ###   ########.fr       */
+/*   Created: 2023/08/21 06:11:12 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/21 06:11:14 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,4 +77,19 @@ t_token	*tokenize_bise(t_token *tok)
 	if (tok)
 		free_lst_tok(&tok);
 	return (res);
+}
+
+void	last_call(t_tokyo **t)
+{
+	t_tokyo	*tmp;
+
+	tmp = *t;
+	if (tmp->i > 0)
+	{
+		if (tmp->line[tmp->i - 1] == '\"' || tmp->line[tmp->i - 1] == '\'')
+			add_back_tok(&(tmp->lst_tok), new_token(tmp->content, 0));
+		else
+			add_back_tok(&(tmp->lst_tok), new_token(tmp->content,
+					get_type(tmp->content)));
+	}
 }

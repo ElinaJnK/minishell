@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cmds.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/20 20:09:50 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/20 20:45:08 by ksadykov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 void	free_cmds(t_cmd *cmds, int count)
@@ -14,18 +26,15 @@ void	free_cmds(t_cmd *cmds, int count)
 			if (cmds[i].args)
 			{
 				while (cmds[i].args[j] && j <= cmds[i].nb_args)
-				{
-					free(cmds[i].args[j]);
-					j++;
-				}
+					free(cmds[i].args[j++]);
 				free(cmds[i].args);
 			}
+			if (cmds[i].lst_err)
+				free_lst_tok(&(cmds[i].lst_err));
 			if (cmds[i].content)
 				free(cmds[i].content);
 			i++;
 		}
-		if (cmds->lst_err)
-			free_lst_tok(&(cmds->lst_err));
 		free(cmds);
 		cmds = NULL;
 	}

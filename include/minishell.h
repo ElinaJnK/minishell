@@ -1,19 +1,31 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/21 06:13:03 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/21 06:14:07 by ksadykov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINISHELL_H
-#define MINISHELL_H
-#include <unistd.h>
-#include <stdlib.h>
-#include <dirent.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-#include "../libft/libft.h"
-#include <signal.h>
-#include <errno.h>
+# define MINISHELL_H
+# include <unistd.h>
+# include <stdlib.h>
+# include <dirent.h>
+# include <fcntl.h>
+# include <sys/types.h>
+# include <sys/wait.h>
+# include <readline/readline.h>
+# include <readline/history.h>
+# include "../libft/libft.h"
+# include <signal.h>
+# include <errno.h>
 /*---to delete after tests----*/
-#include <string.h>
-#include <stdio.h>
+# include <string.h>
+# include <stdio.h>
 
 enum e_token
 {
@@ -32,9 +44,9 @@ enum e_token
 
 typedef struct s_error
 {
-	char 	*error;
-	int		num;
-	struct s_error *next;
+	char			*error;
+	int				num;
+	struct s_error	*next;
 }	t_error;
 
 typedef struct s_token
@@ -43,6 +55,14 @@ typedef struct s_token
 	int				type;
 	struct s_token	*next;
 }	t_token;
+
+typedef struct s_here
+{
+	char	*line;
+	int		ctrl;
+	int		fd;
+	int		i;
+}	t_here;
 
 typedef struct s_cmd
 {
@@ -112,6 +132,7 @@ typedef struct s_sig
 
 /*---to delete after tests----*/
 void	print_list_tok(t_token *lst_tok);
+void	printAST(t_ast *root);
 
 /*----failure-----*/
 void	failure(const char *message);
@@ -128,6 +149,7 @@ void	check_tok(t_token **lst_tok);
 
 void	free_tokyo(t_tokyo *t);
 t_tokyo	*init_param(char *line, t_env *lst_env);
+void	init_border(t_all **all, int *count);
 int		is_true_op(char *line, char **content, t_token **lst_tok);
 void	meta_tok(t_tokyo **t);
 
@@ -136,6 +158,9 @@ t_token	*init_tok(t_token *lst_tok);
 char	*ft_addchr(char *s1, char c, t_token *lst_tok, char *line);
 t_all	*build_all(t_env *lst_env);
 t_tokyo	*init_param(char *line, t_env *lst_env);
+void	get_status(t_all **all);
+void	make_free(t_all **all, t_ast **root, t_cmd **cmds);
+void	last_call(t_tokyo **t);
 
 /*----wildcard----*/
 void	process_wild(const char *pattern, const char *path, t_token **tok,
@@ -162,6 +187,8 @@ char	*expansion_here(char *line, int *i, t_env *lst_env, t_token *lst_tok);
 t_cmd	*transform_into_tab(t_token *t, int *count, t_all **all);
 t_cmd	*cmd_with_pipeuh(t_token *t, int *count, t_env *env);
 int		ft_max(int a, int b);
+void	finish_trans(t_cmd	*cmd, t_token *tmp, int *count, int i);
+void	redirs(t_token **t, t_cmd *cmd);
 
 /*----spy-env----*/
 void	add_back_env(t_env **lst_env, t_env *new);
@@ -170,7 +197,8 @@ char	**get_env(char *data);
 t_env	*new_env(char *name, char *value);
 char	**env_to_tab(t_env *lst_env);
 void	failure_env(const char *message, char **elem);
-
+t_env	*set_env(void);
+void	init_env(char **env, t_env **lst_env, t_all **all);
 
 void	free_lst_env(t_env **lst_env);
 void	update_env(t_env *lst_env, char *name, char *value);
@@ -198,12 +226,12 @@ void	free_all(t_all *all);
 void	put_error_tok(char *message, t_token **lst_tok);
 int		in_env(char *name, char *new_val, t_env *lst_env);
 void	print_error(t_token *lst_err);
-void	pipe_child(t_ast *root, int *pipe_fds, int input_fd, t_all *all);
+void	pipe_child(t_ast **root, int *pipe_fds, int input_fd, t_all *all);
 void	add_error(char *filename, int fd_out, t_token **lst_err);
 
 /*----execution----*/
 char	*get_command_path(char *command, t_env *env);
-void	exec_ast(t_ast *root, int input_fd, int output_fd, t_all *all);
+void	exec_ast(t_ast **root, int input_fd, int output_fd, t_all *all);
 void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all);
 int		*exit_status(void);
 int		is_paf(char *cmd);
@@ -216,7 +244,11 @@ void	handle_here_c(int sig);
 void	signal_here_c(void);
 int		ft_max(int a, int b);
 void	here_child(int fd, t_token *t, t_all *all, t_token *tmp);
-int		read_stdin(int fd, char *limiter, int type, t_env *env);
+int		read_stdin(int fd, t_token *t, t_env *env);
+void	free_here(t_here *here);
+int		init_here(t_here **her, int fd, int *ctrl);
+void	get_line(t_here **h, int *ctrl);
+void	ctrl_d(t_here **here, int *ctrl);
 
 /*----builtins----*/
 int		do_builtin(t_cmd *cmd, int output_fd, t_all *all);
@@ -234,6 +266,4 @@ int		is_num(char *str);
 void	signal_prompt(void);
 void	signal_exec(void);
 void	sig_child(void);
-
-
 #endif

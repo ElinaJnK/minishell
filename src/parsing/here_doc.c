@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_doc.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/20 05:22:24 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/20 05:30:166 by ejankovs         ###   ########.fr       */
+/*   Created: 2023/08/20 18:01:46 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/20 18:05:26 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,89 +38,72 @@ char	*here_doc_expand(char *line, t_env *env)
 	return (line);
 }
 
-int	ctrl_d(char *line, int i, int fd)
+void	ctrl_d(t_here **here, int *ctrl)
 {
-	if (!line && *exit_here() != 130)
+	if (!(*here)->line && *exit_here() != 130)
 	{
 		ft_putstr_fd("bash: warning: here-document at line ", 2);
-		ft_putnbr_fd(i, 2);
+		ft_putnbr_fd((*here)->i, 2);
 		ft_putstr_fd(" delimited by end-of-file\n", 2);
 		*exit_here() = 131;
-		return (close(fd), *exit_here());
+		close((*here)->fd);
+		*ctrl = *exit_here();
+		return ;
 	}
-	return (EXIT_SUCCESS);
+	*ctrl = EXIT_SUCCESS;
 }
 
-int	analyze_exit_here(char *line, int i, int fd)
+int	analyze_exit_here(t_here **here)
 {
+	t_here	*h;
+
+	h = *here;
 	if (*exit_here() == 130)
 	{
-		if (line)
-			free(line);
-		return (close(fd), *exit_here());
+		if (h->line)
+			free(h->line);
+		return (close(h->fd), *exit_here());
 	}
 	if (*exit_here() == 131)
 	{
 		ft_putstr_fd("bash: warning: here-document at line ", 2);
-		ft_putnbr_fd(i, 2);
+		ft_putnbr_fd(h->i, 2);
 		ft_putstr_fd(" delimited by end-of-file\n", 2);
 		*exit_here() = 131;
-		if (line)
-			free(line);
-		return (close(fd), *exit_here());
+		if (h->line)
+			free(h->line);
+		return (close(h->fd), *exit_here());
 	}
 	return (EXIT_SUCCESS);
 }
 
-void	get_line(int fd, char *line, int i)
+int	read_stdin(int fd, t_token *t, t_env *env)
 {
+	t_here	*here;
 	int		ctrl;
 
-	if (write(fd, line, ft_strlen(line)) < 0)
-		failure("write failed");
-	free(line);
-	line = readline("> ");
-}
-
-int	ft_limit(char *line, char *limiter)
-{
-	if (ft_strncmp(line, limiter, ft_max(ft_strlen(line),
-				ft_strlen(limiter))) != 0)
-		return (0);
-	return (1);
-}
-
-int	read_stdin(int fd, char *limiter, int type, t_env *env)
-{
-	char	*line;
-	int		i;
-	int		ctrl;
-
-	i = 1;
-	line = readline("> ");
-	ctrl = ctrl_d(line, i, fd);
-	if (ctrl != EXIT_SUCCESS)
-		return (ctrl);
-	while (line && !ft_limit(line, limiter))
+	ctrl = 0;
+	here = NULL;
+	if (init_here(&here, fd, &ctrl) != EXIT_SUCCESS)
+		return (free_here(here), ctrl);
+	while (here->line && ft_strncmp(here->line, t->content,
+			ft_max(ft_strlen(here->line), ft_strlen(t->content))) != 0)
 	{
-		if (type == DREDIR2)
+		if (t->type == DREDIR2)
 		{
-			line = here_doc_expand(line, env);
-			if (!line)
-				return (close(fd), EXIT_FAILURE);
+			here->line = here_doc_expand(here->line, env);
+			if (!here->line)
+				return (free_here(here), close(fd), EXIT_FAILURE);
 		}
-		get_line(fd, line, i);
-		ctrl = ctrl_d(line, i, fd);
+		get_line(&here, &ctrl);
 		if (ctrl != EXIT_SUCCESS)
-			return (ctrl);
-		i++;
+			return (free_here(here), ctrl);
+		here->i++;
 	}
-	ctrl = analyze_exit_here(line, i, fd);
+	ctrl = analyze_exit_here(&here);
 	if (ctrl != EXIT_SUCCESS)
-		return (ctrl);
-	if (line)
-		free(line);
-	return (close(fd), EXIT_SUCCESS);
+		return (free_here(here), ctrl);
+	return (free_here(here), close(fd), EXIT_SUCCESS);
 }
 
 int	open_here_doc(int fd, t_token *t, t_all *all, t_token *tmp)
