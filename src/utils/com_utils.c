@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   com_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:05:30 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 06:18:24 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/21 18:418:4047 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,9 @@ void	print_error(t_token *lst_err)
 void	pipe_child(t_ast **root, int *pipe_fds, int input_fd, t_all *all)
 {
 	if ((*root)->left)
-		(*root)->left->cmd->n_pipes = 1;
+			(*root)->left->cmd->n_pipes = 1;
+	if ((*root)->left->cmd->output != STDOUT_FILENO)
+		close((*root)->left->cmd->output);
 	(*root)->left->cmd->output = pipe_fds[1];
 	exec_ast(&((*root)->left), input_fd, pipe_fds[1], all);
 	free_all(all);

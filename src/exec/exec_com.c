@@ -6,7 +6,7 @@
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 03:55:37 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 02:46:54 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/21 19:34:47 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,10 @@ int	check_status(char **env, int pid, int status)
 	if (status == -1)
 	{
 		if (errno == EACCES)
-			return (free_tab(env), exit(127), EXIT_FAILURE);
+			return (free_tab(env), 127);
 	}
 	if (status < 0 || pid < 0)
-		return (free_tab(env), exit(status), EXIT_FAILURE);
+		return (free_tab(env), status);
 	return (EXIT_FAILURE);
 }
 
@@ -46,15 +46,17 @@ int	exec(int pid, t_cmd *cmd, t_all *all)
 	if (status == -1)
 	{
 		if (errno == EACCES)
-			return (free_tab(env), exit(127), EXIT_FAILURE);
+			return (free_tab(env), 127);
 	}
 	if (status < 0 || pid < 0)
-		return (free(path), free_tab(env), exit(status), EXIT_FAILURE);
-	return (free(path), free_tab(env), exit(status), EXIT_FAILURE);
+		return (free(path), free_tab(env), status);
+	return (free(path), free_tab(env), status);
 }
 
 void	exec_child(t_ast *node, int input_fd, int output_fd, t_all **all)
 {
+	int	res;
+
 	if (input_fd != STDIN_FILENO)
 	{
 		if (dup2(input_fd, STDIN_FILENO) < 0)
@@ -67,9 +69,11 @@ void	exec_child(t_ast *node, int input_fd, int output_fd, t_all **all)
 			failure_exec("dup2 here");
 		close(output_fd);
 	}
-	if (exec(0, node->cmd, *all) == EXIT_FAILURE)
+	res = exec(0, node->cmd, *all);
+	if (res != EXIT_SUCCESS)
 	{
 		command_not_found(node->cmd->content, *all);
+		exit(res);
 	}
 }
 

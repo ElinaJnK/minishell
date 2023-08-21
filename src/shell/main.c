@@ -6,7 +6,7 @@
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:18:52 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 06:11:44 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/21 20:04:42 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ void	just_do_it(t_all **all, char *line, int count)
 	{
 		init_border(all, &count);
 		root = build_ast(cmds, (*all)->b);
-		printAST(root);
 		if (root && (*all)->env)
 		{
 			(*all)->cmd = cmds;
@@ -94,7 +93,7 @@ int	main(int ac, char **av, char **env)
 	rl_outstream = stderr;
 	if (ac != 1 || av[1])
 	{
-		printf("This program does not accept arguments\n");
+		ft_putstr_fd("This program does not accept arguments\n", 2);
 		exit(0);
 	}
 	init_env(env, &lst_env, &all);

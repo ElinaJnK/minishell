@@ -1,0 +1,76 @@
+cat Makefile
+cat | cat | ls
+mkdir a; mkdir a/b; cd a/b; rm -r ../../a; cd ..
+
+
+echo abcd
+echo a"bc"d
+echo a'bcd'e
+echo $HOME
+echo '$HOME'
+echo "$HOME"
+echo $HO"ME"
+echo $"HOME"
+echo "'$HOME'"
+echo '"$HOME"'
+echo -n lalalal
+echo -n
+echo -nABC
+echo $ a
+echo "$     a"
+echo 
+echo ""
+echo ''
+
+pwd
+pwd lalala
+
+exit
+exit 0
+exit 1
+exit -1
+exit 999999
+exit -999999
+exit -abc
+exit abc
+exit -18abc
+exit 12; ls
+exit 12; exit 123
+exit 12; exit -a123
+exit 1 2 3 a
+exit -
+
+export a=10
+export 111=222
+export 1abc=123
+export
+export _abc=10
+export "111=222"
+export "111"="222"
+export 'a'='b'
+export a=6 b=8 c=9
+export a=5 a=7 a=8
+
+export CDPATH=/; cd /home; ls bin; cd bin
+
+rm -f pouic; >pouic; ls -l pouic
+
+rm -f pouic; echo koala >pouic |
+
+rm -f pouic; rm pouic > pouic; ls -l pouic
+
+rm -f pouic; >|pouic
+
+echo koala > pouic; cat"-e" pouic
+
+e'c'"h"o koala>pouic; cat 'po'"u"ic
+
+export OPT=-n; "echo $OPT" tutu
+
+echo koala|||cat
+
+echo lolilol > pouic; echo tutu > poneyvif; cat < pouic poneyvif
+
+export TUTU=koala FOO=google; echo $TUTU$FOO
+
+export A=1 B=2 C=3 D=4 E=5 F=6 G=7 H=8; echo "$A'$B"'$C"$D'$E'"$F"'"'$G'$H"

@@ -6,7 +6,7 @@
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 06:11:33 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 06:11:34 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/21 20:31:45 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_all **all)
 		{
 			if (tmp)
 				free_lst_tok(&tmp);
-			return (free_cmds(cmd, *count), NULL);
+			return (free_cmds(cmd, i), NULL);
 		}
 		i++;
 		(*all)->count = i;

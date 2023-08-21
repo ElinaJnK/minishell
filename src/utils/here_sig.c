@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_sig.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:04:11 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/20 20:04:11 by ejankovs         ###   ########.fr       */
+/*   Updated: 2023/08/21 20:34:05 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ void	signal_here_c(void)
 	sigemptyset(&act.sa_mask);
 	act.sa_flags = 0;
 	sigaction(SIGINT, &act, NULL);
+	signal(SIGQUIT, SIG_IGN);
 }
 
 void	get_line(t_here **h, int *ctrl)

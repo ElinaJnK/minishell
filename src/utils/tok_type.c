@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tok_type.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:05:47 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/20 20:05:47 by ejankovs         ###   ########.fr       */
+/*   Updated: 2023/08/21 21:23:10 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ int	get_type(char *tok)
 
 int	is_op(char *line)
 {
+	if (!line)
+		return (0);
 	if (ft_strncmp(line, "&&", 2) == 0)
 		return (AND);
 	else if (ft_strncmp(line, "||", 2) == 0)
@@ -39,6 +41,8 @@ int	is_op(char *line)
 
 int	is_fb(char *line)
 {
+	if (!line)
+		return (0);
 	if (ft_strncmp(line, "|", 1) == 0)
 		return (PIPE);
 	else if (ft_strncmp(line, ">>", 2) == 0)

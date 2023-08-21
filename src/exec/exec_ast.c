@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_ast.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 06:05:23 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 06:17:25 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/21 19:04:330 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,8 @@ void	exec_pipe(t_ast **root, int input_fd, int output_fd, t_all *all)
 			close(input_fd);
 		if ((*root)->right)
 			(*root)->right->cmd->n_pipes = 1;
+		if ((*root)->left->cmd->input != STDIN_FILENO)
+			close((*root)->left->cmd->input);
 		(*root)->right->cmd->input = pipe_fds[0];
 		exec_ast(&((*root)->right), pipe_fds[0], output_fd, all);
 		close(pipe_fds[0]);

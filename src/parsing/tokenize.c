@@ -6,7 +6,7 @@
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 04:11:41 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 06:02:31 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/21 22:56:32 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ t_token	*add_rest(t_tokyo **t)
 		ft_putstr_fd("bash: unclosed quotes\n", STDERR_FILENO);
 		return (free_lst_tok(&(tmp->lst_tok)), free_tokyo(*t), NULL);
 	}
-	print_list_tok((*t)->lst_tok);
 	check_tok(&((*t)->lst_tok));
 	tokens = (*t)->lst_tok;
 	return (free_tokyo(*t), tokens);
@@ -45,7 +44,16 @@ int	handle_op(t_tokyo **tokyo)
 	tmp = *tokyo;
 	if (tmp->q_flag == 0 && tmp->content != NULL && tmp->content[0] != '\0')
 	{
-		add_back_tok(&(tmp->lst_tok), new_token(tmp->content, 0));
+		if (tmp->i > 0)
+		{	
+			while (tmp->i > 0 && tmp->line[tmp->i - 1] == ' ')
+				(tmp->i)--;
+			if (tmp->line[tmp->i - 1] == '\"' || tmp->line[tmp->i - 1] == '\'')
+				add_back_tok(&(tmp->lst_tok), new_token(tmp->content, 0));
+			else
+				add_back_tok(&(tmp->lst_tok), new_token(tmp->content,
+						get_type(tmp->content)));
+		}
 		tmp->content = NULL;
 	}
 	else if (tmp->q_flag == 1 || tmp->q_flag == 2)
@@ -64,6 +72,7 @@ int	to_expand(t_tokyo **t)
 		&& !is_op(tmp->line + tmp->i + 1) && !is_fb(tmp->line + tmp->i + 1))
 	{
 		tmp->line = expansionb(&tmp);
+		tmp->expansion = 1;
 		if (!tmp->line)
 			return (free_tokyo(tmp), free_lst_tok(&tmp->lst_tok), EXIT_FAILURE);
 	}
@@ -89,6 +98,8 @@ int	japan(t_tokyo **t)
 		meta_tok(&tmp);
 	}
 	update_tok(&tmp);
+	if (tmp->expansion == 1 && tmp->line[tmp->i] == '$')
+		return (EXIT_SUCCESS);
 	if (tmp->line[tmp->i] != '\0')
 		tmp->i++;
 	return (EXIT_SUCCESS);
@@ -104,14 +115,6 @@ t_token	*tokenize(char *line, t_env *lst_env)
 	while ((size_t)t->i < ft_strlen(t->line) && t->line[t->i])
 	{
 		t->expansion = 0;
-		if (((t->line[t->i] == '\'' && t->line[t->i + 1] == '\'')
-				|| (t->line[t->i] == '"' && t->line[t->i + 1] == '"'))
-			&& t->q_flag == 0)
-		{
-			add_back_tok(&(t->lst_tok), new_token(ft_strdup(""), 0));
-			t->i += 2;
-			continue ;
-		}
 		if (japan(&t) == EXIT_FAILURE)
 			return (free_tokyo(t), NULL);
 	}
