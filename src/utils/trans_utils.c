@@ -24,28 +24,28 @@ void	finish_trans(t_cmd	*cmd, t_token *tmp, int *count, int i)
 	cmd[i].type = -1;
 }
 
-void	redirs(t_token **t, t_cmd *cmd)
+void	redirs(t_token **t, t_cmd **cmd)
 {
 	char	*ct;
 
 	ct = (*t)->content;
 	if ((*t)->type == REDIR)
 	{
-		if (cmd->output != STDOUT_FILENO && cmd->output > 0)
-			close(cmd->output);
-		cmd->output = open(ct, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if ((*cmd)->output != STDOUT_FILENO && (*cmd)->output > 0)
+			close((*cmd)->output);
+		(*cmd)->output = open(ct, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	}
 	else if ((*t)->type == REDIR2)
 	{
-		if (cmd->input != STDIN_FILENO && cmd->input > 0)
-			close(cmd->input);
-		cmd->input = open(ct, O_RDONLY, 0644);
+		if ((*cmd)->input != STDIN_FILENO && (*cmd)->input > 0)
+			close((*cmd)->input);
+		(*cmd)->input = open(ct, O_RDONLY, 0644);
 	}
 	else if ((*t)->type == DREDIR)
 	{
-		if (cmd->output != STDOUT_FILENO && cmd->output > 0)
-			close(cmd->output);
-		cmd->output = open(ct, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if ((*cmd)->output != STDOUT_FILENO && (*cmd)->output > 0)
+			close((*cmd)->output);
+		(*cmd)->output = open(ct, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	}
-	add_error(ct, cmd->output, &(cmd->lst_err));
+	add_error(ct, (*cmd)->output, &((*cmd)->lst_err));
 }

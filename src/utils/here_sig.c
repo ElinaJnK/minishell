@@ -48,12 +48,15 @@ void	get_line(t_here **h, int *ctrl)
 		failure("write failed");
 	free(here->line);
 	here->line = readline("> ");
-	len = (int)ft_strlen(here->line);
-	if (len > 0 && here->line[len - 1] != '\n')
+	if (here->line)
 	{
-		tmp = here->line;
-		here->line = ft_strjoin(tmp, "\n");
-		free(tmp);
+		len = (int)ft_strlen(here->line);
+		if (len > 0 && here->line[len - 1] != '\n')
+		{
+			tmp = here->line;
+			here->line = ft_strjoin(tmp, "\n");
+			free(tmp);
+		}
 	}
 	ctrl_d(&here, ctrl);
 }

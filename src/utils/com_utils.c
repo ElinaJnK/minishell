@@ -61,14 +61,22 @@ void	print_error(t_token *lst_err)
 	}
 }
 
-void	pipe_child(t_ast **root, int *pipe_fds, int input_fd, t_all *all)
+void	pipe_child(t_ast **root, int *pipe_fds, int input_fd, int output_fd, t_all *all)
 {
 	if ((*root)->left)
 			(*root)->left->cmd->n_pipes = 1;
 	if ((*root)->left->cmd->output != STDOUT_FILENO)
-		close((*root)->left->cmd->output);
-	(*root)->left->cmd->output = pipe_fds[1];
-	exec_ast(&((*root)->left), input_fd, pipe_fds[1], all);
+	{
+		close(pipe_fds[1]);
+		exec_ast(&((*root)->left), input_fd, output_fd, all);
+	}
+	else
+	{
+		//close((*root)->left->cmd->output);
+		//printf("here child\n");
+		(*root)->left->cmd->output = pipe_fds[1];
+		exec_ast(&((*root)->left), input_fd, pipe_fds[1], all);
+	}
 	free_all(all);
 	exit(EXIT_SUCCESS);
 }

@@ -29,6 +29,7 @@ void	just_do_it(t_all **all, char *line, int count)
 	{
 		init_border(all, &count);
 		root = build_ast(cmds, (*all)->b);
+		//printAST(root);
 		if (root && (*all)->env)
 		{
 			(*all)->cmd = cmds;

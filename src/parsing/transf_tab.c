@@ -60,7 +60,7 @@ int	open_files(t_token **t, t_cmd *cmd, t_all *all, t_token *tmp)
 		cmd->input = fd;
 	}
 	else
-		redirs(t, cmd);
+		redirs(t, &cmd);
 	return (EXIT_SUCCESS);
 }
 

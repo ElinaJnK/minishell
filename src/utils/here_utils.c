@@ -62,6 +62,8 @@ void	free_here(t_here *here)
 int	init_here(t_here **her, int fd, int *ctrl)
 {
 	t_here	*here;
+	int		len;
+	char	*tmp;
 
 	here = malloc(sizeof(t_here));
 	if (!here)
@@ -70,6 +72,16 @@ int	init_here(t_here **her, int fd, int *ctrl)
 	here->fd = fd;
 	here->i = 1;
 	here->line = readline("> ");
+	if (here->line)
+	{
+		len = (int)ft_strlen(here->line);
+		if (len > 0 && here->line[len - 1] != '\n')
+		{
+			tmp = here->line;
+			here->line = ft_strjoin(tmp, "\n");
+			free(tmp);
+		}
+	}
 	ctrl_d(&here, ctrl);
 	if (*ctrl != EXIT_SUCCESS)
 		return (free_here(here), *ctrl);

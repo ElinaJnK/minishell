@@ -54,7 +54,7 @@ void	exec_pipe(t_ast **root, int input_fd, int output_fd, t_all *all)
 		close(pipe_fds[0]);
 		if (output_fd != STDOUT_FILENO)
 			close(output_fd);
-		pipe_child(root, pipe_fds, input_fd, all);
+		pipe_child(root, pipe_fds, input_fd, output_fd, all);
 	}
 	else
 	{
@@ -63,11 +63,17 @@ void	exec_pipe(t_ast **root, int input_fd, int output_fd, t_all *all)
 			close(input_fd);
 		if ((*root)->right)
 			(*root)->right->cmd->n_pipes = 1;
-		if ((*root)->left->cmd->input != STDIN_FILENO)
-			close((*root)->left->cmd->input);
-		(*root)->right->cmd->input = pipe_fds[0];
-		exec_ast(&((*root)->right), pipe_fds[0], output_fd, all);
-		close(pipe_fds[0]);
+		if ((*root)->right->cmd->input != STDIN_FILENO)
+		{
+			close(pipe_fds[0]);
+			exec_ast(&((*root)->right), input_fd, output_fd, all);
+		}
+		else
+		{
+			(*root)->right->cmd->input = pipe_fds[0];
+			exec_ast(&((*root)->right), pipe_fds[0], output_fd, all);
+			close(pipe_fds[0]);
+		}
 	}
 }
 

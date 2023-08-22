@@ -188,7 +188,7 @@ t_cmd	*transform_into_tab(t_token *t, int *count, t_all **all);
 t_cmd	*cmd_with_pipeuh(t_token *t, int *count, t_env *env);
 int		ft_max(int a, int b);
 void	finish_trans(t_cmd	*cmd, t_token *tmp, int *count, int i);
-void	redirs(t_token **t, t_cmd *cmd);
+void	redirs(t_token **t, t_cmd **cmd);
 
 /*----spy-env----*/
 void	add_back_env(t_env **lst_env, t_env *new);
@@ -226,7 +226,7 @@ void	free_all(t_all *all);
 void	put_error_tok(char *message, t_token **lst_tok);
 int		in_env(char *name, char *new_val, t_env *lst_env);
 void	print_error(t_token *lst_err);
-void	pipe_child(t_ast **root, int *pipe_fds, int input_fd, t_all *all);
+void	pipe_child(t_ast **root, int *pipe_fds, int input_fd, int output_fd, t_all *all);
 void	add_error(char *filename, int fd_out, t_token **lst_err);
 
 /*----execution----*/

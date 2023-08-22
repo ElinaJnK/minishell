@@ -19,14 +19,23 @@ int	raccourci(t_tokyo **t, char *var)
 
 	i = 0;
 	len = 0;
+	if (!var)
+		return (0);
 	if (var)
 		len = ft_strlen(var);
 	while (i < len)
 	{
-		(*t)->content = ft_addchr((*t)->content, var[i],
-				(*t)->lst_tok, (*t)->line);
-		// if (var[i] == ' ')
-		// 	add_back_tok()
+		if (var[i] == ' ' && (*t)->q_flag != 0)
+			(*t)->content = ft_addchr((*t)->content, var[i],
+					(*t)->lst_tok, (*t)->line);
+		else if (var[i] != ' ')
+			(*t)->content = ft_addchr((*t)->content, var[i],
+					(*t)->lst_tok, (*t)->line);
+		if (var[i] == ' ' && (*t)->q_flag == 0 && (*t)->content != NULL && (*t)->content[0] != '\0')
+		{
+			add_back_tok(&((*t)->lst_tok), new_token((*t)->content, 0));
+			(*t)->content = NULL;
+		}
 		i++;
 	}
 	
