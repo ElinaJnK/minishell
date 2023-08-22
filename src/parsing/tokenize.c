@@ -32,6 +32,7 @@ t_token	*add_rest(t_tokyo **t)
 	}
 	check_tok(&((*t)->lst_tok));
 	tokens = (*t)->lst_tok;
+	//print_list_tok(tokens);
 	return (free_tokyo(*t), tokens);
 }
 
@@ -66,31 +67,38 @@ int	to_expand(t_tokyo **t)
 	t_tokyo	*tmp;
 
 	tmp = *t;
-	if (tmp->line[tmp->i + 1] && tmp->line[tmp->i + 1] != ' '
-		&& tmp->line[tmp->i + 1] != '$' && tmp->line[tmp->i + 1] != '\''
+	if (tmp->line[tmp->i] && tmp->line[tmp->i + 1] != ' '
+		/*&& tmp->line[tmp->i + 1] != '$'*/ && tmp->line[tmp->i + 1] != '\''
 		&& tmp->line[tmp->i + 1] != '\"' && tmp->line[tmp->i + 1] != '\\'
 		&& !is_op(tmp->line + tmp->i + 1) && !is_fb(tmp->line + tmp->i + 1))
 	{
 		tmp->line = expansionb(&tmp);
-		tmp->expansion = 1;
 		if (!tmp->line)
 			return (free_tokyo(tmp), free_lst_tok(&tmp->lst_tok), EXIT_FAILURE);
+		return (EXIT_SUCCESS);
 	}
 	else if (*(tmp->line + tmp->i + 1) != ' ')
 		tmp->i++;
-	return (EXIT_SUCCESS);
+	return (42);
 }
 
 int	japan(t_tokyo **t)
 {
 	t_tokyo	*tmp;
+	int		res;
 
 	tmp = *t;
 	if (tmp->lst_tok && last_elem(tmp->lst_tok)->type == DREDIR2)
 		here_doc_q(tmp->line + tmp->i, &(tmp->lst_tok));
 	if (*(tmp->line + tmp->i) == '$' && tmp->q_flag != 1
-		&& !is_heredoc(tmp->lst_tok) && to_expand(&tmp) == EXIT_FAILURE)
-		return (EXIT_FAILURE);
+		&& !is_heredoc(tmp->lst_tok))
+		{
+			res = to_expand(t);
+			if (res == EXIT_FAILURE)
+				return (EXIT_FAILURE);
+			else if (res == EXIT_SUCCESS)
+				return (EXIT_SUCCESS);
+		}
 	if ((is_op(tmp->line + tmp->i) || is_fb(tmp->line + tmp->i)
 			|| tmp->line[tmp->i] == ' ') && tmp->q_flag == 0)
 	{
@@ -98,8 +106,6 @@ int	japan(t_tokyo **t)
 		meta_tok(&tmp);
 	}
 	update_tok(&tmp);
-	if (tmp->expansion == 1 && tmp->line[tmp->i] == '$')
-		return (EXIT_SUCCESS);
 	if (tmp->line[tmp->i] != '\0')
 		tmp->i++;
 	return (EXIT_SUCCESS);

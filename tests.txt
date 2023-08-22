@@ -74,3 +74,31 @@ echo lolilol > pouic; echo tutu > poneyvif; cat < pouic poneyvif
 export TUTU=koala FOO=google; echo $TUTU$FOO
 
 export A=1 B=2 C=3 D=4 E=5 F=6 G=7 H=8; echo "$A'$B"'$C"$D'$E'"$F"'"'$G'$H"
+
+echo " $ " | cat -e
+
+echo $:$= | cat -e
+
+echo foo$"HOME"
+
+echo koala>pouic; <pouic cat
+
+export FOO='"'; echo " $FOO " | cat -e
+
+echo koala > pouic; echo titi > foo; echo tutu > bar; cat pouic foo bar
+
+mkdir dir_test; cd dir_test; touch tutu; echo koala > titi;
+
+export FOO='s -ls'; l$FOO
+
+rm -f out0 out1; echo tutu>out0>out1; ls -l out0 out1
+
+echo koala > pouic; exit | cat -e pouic
+
+echo koala > pouic; cat -e pouic | exit
+
+echo koala>foo; echo pouic>bar; cat foo|cat<bar
+
+echo $
+
+echo $$$$

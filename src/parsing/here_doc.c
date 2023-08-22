@@ -87,7 +87,7 @@ int	read_stdin(int fd, t_token *t, t_env *env)
 	if (init_here(&here, fd, &ctrl) != EXIT_SUCCESS)
 		return (free_here(here), ctrl);
 	while (here->line && ft_strncmp(here->line, t->content,
-			ft_max(ft_strlen(here->line), ft_strlen(t->content))) != 0)
+			ft_max(ft_strlen(here->line) - 1, ft_strlen(t->content))) != 0)
 	{
 		if (t->type == DREDIR2)
 		{
@@ -110,11 +110,11 @@ int	open_here_doc(int fd, t_token *t, t_all *all, t_token *tmp)
 {
 	pid_t	pid;
 	int		status;
-	int		ex;
+	// int		ex;
 
 	pid = fork();
 	status = 0;
-	ex = 0;
+	// ex = 0;
 	if (pid == -1)
 	{
 		perror("fork");

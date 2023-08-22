@@ -67,9 +67,7 @@ int	open_files(t_token **t, t_cmd *cmd, t_all *all, t_token *tmp)
 int	fill_redir(t_cmd *cmd, t_token **t, t_all *all, t_token *tmp)
 {
 	t_token	*prev;
-	t_token	*lst_err;
 
-	lst_err = NULL;
 	if (init_op(cmd, NULL) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	prev = *t;

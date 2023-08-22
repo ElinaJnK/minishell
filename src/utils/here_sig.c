@@ -40,11 +40,20 @@ void	signal_here_c(void)
 void	get_line(t_here **h, int *ctrl)
 {
 	t_here	*here;
+	char	*tmp;
+	int		len;
 
 	here = *h;
 	if (write(here->fd, here->line, ft_strlen(here->line)) < 0)
 		failure("write failed");
 	free(here->line);
 	here->line = readline("> ");
+	len = (int)ft_strlen(here->line);
+	if (len > 0 && here->line[len - 1] != '\n')
+	{
+		tmp = here->line;
+		here->line = ft_strjoin(tmp, "\n");
+		free(tmp);
+	}
 	ctrl_d(&here, ctrl);
 }
