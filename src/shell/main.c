@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:18:52 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 20:04:42 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/22 19:53:10 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void	tchitat_stdin(t_all **all)
 	while (1)
 	{
 		signal_prompt();
-		if (*(exit_status()) == 0)
+		if (*exit_status() == 0)
 			line = readline((*all)->prompt_good);
 		else
 			line = readline((*all)->prompt_bad);
@@ -92,6 +92,7 @@ int	main(int ac, char **av, char **env)
 	(void)ac;
 	(void)av;
 	rl_outstream = stderr;
+	//*exit_status();
 	if (ac != 1 || av[1])
 	{
 		ft_putstr_fd("This program does not accept arguments\n", 2);

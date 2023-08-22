@@ -102,3 +102,14 @@ echo koala>foo; echo pouic>bar; cat foo|cat<bar
 echo $
 
 echo $$$$
+
+(echo a && echo b) || echo skrrpapa | cat -e
+(echo a > c || echo grr) > t | ls | wc -l && echo tru
+
+(echo a > c || echo grr) > t | ls | wc -l && echo tru > vdsger && < ereee
+(echo a > c || echo grr) > t | ls | wc -l && echo tru > vdsger && < ereee && > braaaa
+echo a < juuuu && < kuuuu
+(cat a | cat -e | wc -l | echo toto)&&(echo braaaa ||echo tyty || wejhgiuq)
+echo a < tttttt || echo c < frrr 
+echo a | echo b | echo c < grrrrrr || echo a > braaaa
+cat c | ls | wc -l | echo mon amour cuicui pigeon

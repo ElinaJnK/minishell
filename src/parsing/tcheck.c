@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tcheck.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 04:08:10 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 21:55:34 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/22 17:23:51 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,11 @@ int	verif(t_token *tmp, int *p)
 	if ((tmp->next->type == OPEN_PAR && tmp->type == CMD)
 		|| (tmp->type == CLOSE_PAR && tmp->next->type == CMD))
 		return (1);
-	if (tmp->type >= 1 && tmp->type <= 8
-		&& tmp->next->type >= 1 && tmp->next->type <= 8)
+	if (tmp->type >= 1 && tmp->type <= 3
+		&& tmp->next->type >= 1 && tmp->next->type <= 3)
+		return (1);
+	if (tmp->type == tmp->next->type && tmp->type >= 1 && tmp->type <= 8
+		&& tmp->type >= 1 && tmp->type <= 8)
 		return (1);
 	return (0);
 }

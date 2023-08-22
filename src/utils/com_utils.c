@@ -48,7 +48,7 @@ void	command_not_found(char *msg, t_all *all)
 	}
 }
 
-void	print_error(t_token *lst_err)
+void	print_error(t_token *lst_err, int *status)
 {
 	t_token	*tmp;
 
@@ -57,6 +57,9 @@ void	print_error(t_token *lst_err)
 	{
 		ft_putstr_fd("bash: ", 2);
 		ft_putstr_fd(tmp->content, 2);
+		*exit_status() = tmp->type;
+		*status = tmp->type;
+		//printf("exit_status : %d\n", *exit_status());
 		tmp = tmp->next;
 	}
 }
@@ -72,8 +75,6 @@ void	pipe_child(t_ast **root, int *pipe_fds, int input_fd, int output_fd, t_all 
 	}
 	else
 	{
-		//close((*root)->left->cmd->output);
-		//printf("here child\n");
 		(*root)->left->cmd->output = pipe_fds[1];
 		exec_ast(&((*root)->left), input_fd, pipe_fds[1], all);
 	}

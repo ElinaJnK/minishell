@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   trans_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:05:42 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 19:31:53 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/22 17:36:44 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,5 +47,5 @@ void	redirs(t_token **t, t_cmd **cmd)
 			close((*cmd)->output);
 		(*cmd)->output = open(ct, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	}
-	add_error(ct, (*cmd)->output, &((*cmd)->lst_err));
+	add_error(ct, &((*cmd)->lst_err));
 }

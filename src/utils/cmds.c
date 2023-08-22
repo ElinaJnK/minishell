@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmds.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:09:50 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/20 20:45:08 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/22 20:41:10 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ int	is_builtin(t_cmd *cmd)
 	return (0);
 }
 
-void	add_error(char *filename, int fd_out, t_token **lst_err)
+void	add_error(char *filename, t_token **lst_err)
 {
 	char	*error;
 
@@ -101,13 +101,14 @@ void	add_error(char *filename, int fd_out, t_token **lst_err)
 		if (errno == ENOENT)
 		{
 			error = ft_strjoin(filename, ": No such file or directory\n");
-			*exit_status() = 127;
+			*exit_status() = 1;
 		}
 		else
 		{
 			error = ft_strjoin(filename, ": Permission denied\n");
 			*exit_status() = 126;
 		}
-		add_back_tok(lst_err, new_token(error, fd_out));
+		// printf("exit_status : %d\n", *exit_status());
+		add_back_tok(lst_err, new_token(error, *exit_status()));
 	}
 }

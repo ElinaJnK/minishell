@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 06:13:03 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 06:14:07 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/22 18:04:43 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,9 +225,10 @@ int		lst_size_tok(t_token *lst);
 void	free_all(t_all *all);
 void	put_error_tok(char *message, t_token **lst_tok);
 int		in_env(char *name, char *new_val, t_env *lst_env);
-void	print_error(t_token *lst_err);
-void	pipe_child(t_ast **root, int *pipe_fds, int input_fd, int output_fd, t_all *all);
-void	add_error(char *filename, int fd_out, t_token **lst_err);
+void	print_error(t_token *lst_err, int *status);
+void	pipe_child(t_ast **root, int *pipe_fds, int input_fd,
+		int output_fd, t_all *all);
+void	add_error(char *filename, t_token **lst_err);
 
 /*----execution----*/
 char	*get_command_path(char *command, t_env *env);

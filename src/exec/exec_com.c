@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_com.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 03:55:37 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 19:34:47 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/22 20:26:31 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,11 @@ int	exec(int pid, t_cmd *cmd, t_all *all)
 	if (!path)
 	{
 		status = execve(cmd->content, cmd->args, env);
+		//*exit_status() = status;
 		return (check_status(env, pid, status));
 	}
 	status = execve(path, cmd->args, env);
+	//*exit_status() = status;
 	if (status == -1)
 	{
 		if (errno == EACCES)
@@ -103,11 +105,20 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 	else if (node->cmd->pid == 0)
 	{
 		sig_child();
+		//printf("node : %s\n", node->cmd->content);
 		choose_exec(node, input_fd, output_fd, all);
 	}
 	else
 	{
 		waitpid(node->cmd->pid, &status, 0);
 		node->cmd->status = status;
+		//*exit_status() = status;
+		if (WIFEXITED(status))
+				*exit_status() = WEXITSTATUS(status);
+			else if (WIFSIGNALED(status))
+			{
+				*exit_status() = 128 + WTERMSIG(status);
+				// printf("here : %d\n", *exit_status());
+			}
 	}
 }

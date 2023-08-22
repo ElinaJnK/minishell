@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:31:34 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 01:05:49 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/22 20:51:02 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,19 +58,40 @@ void	get_status(t_all **all)
 	{
 		if ((*all)->cmd[i].pid > 0)
 		{
+			//printf("status cmd: %d\n", (*all)->cmd[i].status);
 			if (waitpid((*all)->cmd[i].pid, &status, 0) == -1)
 				status = (*all)->cmd[i].status;
 			if (WIFEXITED(status))
 				*exit_status() = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
+			{
 				*exit_status() = 128 + WTERMSIG(status);
+				// printf("here : %d\n", *exit_status());
+			}
+			//printf("status exit cmd: %d\n", *exit_status());
 		}
 		if ((*all)->cmd[i].input != STDIN_FILENO && (*all)->cmd[i].input > 0)
 			close((*all)->cmd[i].input);
 		if ((*all)->cmd[i].output != STDOUT_FILENO && (*all)->cmd[i].output > 0)
 			close((*all)->cmd[i].output);
+		// if (i > 2 && (((*all)->cmd[i - 2].type == AND && (*all)->cmd[i - 3].status == 0)
+		// || ((*all)->cmd[i - 2].type == OR  && (*all)->cmd[i - 3].status != 0 && (*all)->cmd[i - 3].status < 256)))
+		// {
+		// 	*exit_status() = (*all)->cmd[i - 1].status;
+		// 	// printf("should not be here\n");
+		// }
 		i++;
 	}
+	// if (i > 0 && (*all)->cmd[i - 1].type >= REDIR
+	// 		&& (*all)->cmd[i - 1].type <= DREDIR2_E
+	// 	)
+	// 	{
+	// 		*exit_status() = (*all)->cmd[i - 1].status;
+	// 		// printf("should not be here\n");
+	// 	}
+
+	//printf("previous : %d\n", (*all)->cmd[i - 1].type);
+	//printf("status : %d\n", *exit_status());
 }
 
 void	make_free(t_all **all, t_ast **root, t_cmd **cmds)

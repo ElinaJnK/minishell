@@ -14,6 +14,11 @@
 
 void	exec_and(t_ast **root, int input_fd, int output_fd, t_all *all)
 {
+	int status;
+	int	i;
+
+	status = 0;
+	i = 0;
 	if ((*root)->cmd->n_pipes == 1)
 	{
 		if ((*root)->left)
@@ -22,8 +27,28 @@ void	exec_and(t_ast **root, int input_fd, int output_fd, t_all *all)
 			(*root)->right->cmd->n_pipes = 1;
 	}
 	exec_ast(&((*root)->left), input_fd, output_fd, all);
+	while (i < all->count && &(all->cmd[i]) != (*root)->cmd)
+	{
+		if (all->cmd[i].pid > 0)
+		{
+			if (waitpid(all->cmd[i].pid, &status, 0) == -1)
+				status = all->cmd[i].status;
+			if (WIFEXITED(status))
+				*exit_status() = WEXITSTATUS(status);
+			else if (WIFSIGNALED(status))
+			{
+				*exit_status() = 128 + WTERMSIG(status);
+			}
+			all->cmd[i].pid = -42;
+		}
+		i++;
+	}
+	(*root)->left->cmd->status = *exit_status();
 	if (*exit_status() == 0)
+	{
 		exec_ast(&((*root)->right), input_fd, output_fd, all);
+		(*root)->right->cmd->status = *exit_status();
+	}
 }
 
 void	exec_or(t_ast **root, int input_fd, int output_fd, t_all *all)
@@ -36,8 +61,12 @@ void	exec_or(t_ast **root, int input_fd, int output_fd, t_all *all)
 			(*root)->right->cmd->n_pipes = 1;
 	}
 	exec_ast(&((*root)->left), input_fd, output_fd, all);
+	(*root)->left->cmd->status = *exit_status();
 	if (*exit_status() != 0)
+	{
 		exec_ast(&((*root)->right), input_fd, output_fd, all);
+		(*root)->right->cmd->status = *exit_status();
+	}
 }
 
 void	exec_pipe(t_ast **root, int input_fd, int output_fd, t_all *all)
@@ -52,15 +81,11 @@ void	exec_pipe(t_ast **root, int input_fd, int output_fd, t_all *all)
 	if ((*root)->cmd->pid == 0)
 	{
 		close(pipe_fds[0]);
-		if (output_fd != STDOUT_FILENO)
-			close(output_fd);
 		pipe_child(root, pipe_fds, input_fd, output_fd, all);
 	}
 	else
 	{
 		close(pipe_fds[1]);
-		if (input_fd != STDIN_FILENO)
-			close(input_fd);
 		if ((*root)->right)
 			(*root)->right->cmd->n_pipes = 1;
 		if ((*root)->right->cmd->input != STDIN_FILENO)
@@ -86,10 +111,10 @@ void	exec_redir(t_ast **r, int input_fd, int output_fd, t_all *all)
 		if ((*r)->right)
 			(*r)->right->cmd->n_pipes = 1;
 	}
-	if (!(*r)->left)
-		return ;
 	if ((*r)->cmd->lst_err)
-		print_error((*r)->cmd->lst_err);
+		print_error((*r)->cmd->lst_err, &((*r)->cmd->status));
+	//printf("status : %d\n", (*r)->cmd->status);
+	// *exit_status() = (*r)->cmd->status;
 	if ((*r)->cmd->input < 0 || (*r)->cmd->output < 0)
 	{
 		if ((*r)->cmd->input < 0)
@@ -98,6 +123,8 @@ void	exec_redir(t_ast **r, int input_fd, int output_fd, t_all *all)
 			(*r)->cmd->output = STDOUT_FILENO;
 		return ;
 	}
+	if (!(*r)->left)
+		return ;
 	if ((*r)->cmd->input != 0 && (*r)->cmd->output != 1)
 		exec_ast(&((*r)->left), (*r)->cmd->input, (*r)->cmd->output, all);
 	else if ((*r)->cmd->input != STDIN_FILENO)
