@@ -6,7 +6,7 @@
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 03:46:58 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/23 12:21:25 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/23 23:10:43 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,7 @@ int	exec_echo(t_cmd *cmd, int fd_out)
 	if (fd_out < 0)
 		return (ft_putstr_fd("bash: echo: write error\n", 2), EXIT_FAILURE);
 	if (!cmd || !cmd->args)
-		return (ft_putstr_fd("bash: echo: echo not defined\n", STDERR_FILENO),
-			EXIT_FAILURE);
+		return (ft_putstr_fd("bash: echo: echo not defined\n", STDERR_FILENO), EXIT_FAILURE);
 	while (cmd->args[i] && is_n(cmd->args[i]))
 		i++;
 	if (i > 1)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_com.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 03:55:37 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/23 12:01:28 by ejankovs         ###   ########.fr       */
+/*   Updated: 2023/08/23 22:02:04 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,8 @@ void	choose_exec(t_ast *node, int input_fd, int output_fd, t_all **all)
 	builtin = 0;
 	if (is_builtin(node->cmd))
 	{
-		builtin = do_builtin(node->cmd, output_fd, *all);
+		ft_putstr_fd("22222I was here\n", 2);
+		builtin = do_builtin(node->cmd, input_fd, output_fd, *all);
 		*exit_status() = builtin;
 		free_all(*all);
 		exit(*exit_status());

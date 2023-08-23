@@ -6,14 +6,16 @@
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 12:54:07 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/23 13:04:52 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/23 21:54:48 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	change_fd(int *in, int *out)
+void	change_fd(int *in, int *out, int input_fd, int output_fd)
 {
+	(void)input_fd;
+	(void)output_fd;
 	if (*in < 0)
 		*in = STDIN_FILENO;
 	if (*out < 0)
@@ -74,6 +76,10 @@ void	wait_op(t_all **a, t_ast *root)
 		}
 		if (all->cmd[i].redir_err != 0)
 			*exit_status() = all->cmd[i].redir_err;
+		if (all->cmd[i].input != STDIN_FILENO && all->cmd[i].input > 0)
+			close(all->cmd[i].input);
+		if (all->cmd[i].output != STDOUT_FILENO && all->cmd[i].output > 0)
+			close(all->cmd[i].output);
 		i++;
 	}
 }

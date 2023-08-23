@@ -6,7 +6,7 @@
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 06:13:03 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/23 12:54:51 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/23 23:07:54 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ typedef struct s_cmd
 	int		pid;
 	int		status;
 	int		redir_err;
+	int		pannacota;
 	t_token	*lst_err;
 }	t_cmd;
 
@@ -236,7 +237,7 @@ void	wait_op(t_all **a, t_ast *root);
 void	pipe_parent2(t_ast **root);
 void	pipe_parent1(int *pipe_fds, t_ast **root);
 void	init_pipe(int *pipe_fds, t_ast **root);
-void	change_fd(int *in, int *out);
+void	change_fd(int *in, int *out, int input_fd, int output_fd);
 void	init_fds(int *fds, int input_fd, int output_fd);
 
 /*---expand_utils---*/
@@ -265,7 +266,7 @@ void	get_line(t_here **h, int *ctrl);
 void	ctrl_d(t_here **here, int *ctrl);
 
 /*----builtins----*/
-int		do_builtin(t_cmd *cmd, int output_fd, t_all *all);
+int		do_builtin(t_cmd *cmd, int input_fd, int output_fd, t_all *all);
 int		is_builtin(t_cmd *cmd);
 int		exec_cd(t_cmd *cmd, int output_fd, t_all *all);
 int		exec_echo(t_cmd *cmd, int fd_out);

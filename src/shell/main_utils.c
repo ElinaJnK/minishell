@@ -6,7 +6,7 @@
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:31:34 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/23 12:50:18 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/23 21:15:49 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,12 @@ void	get_status(t_all **all)
 			if ((*all)->cmd[i].redir_err != 0)
 				*exit_status() = (*all)->cmd[i].redir_err;
 		}
+		// printf("MAIN : cmd : %s in : %d out : %d\n", (*all)->cmd[i].content, (*all)->cmd[i].input,(*all)->cmd[i].output);
 		if ((*all)->cmd[i].input != STDIN_FILENO && (*all)->cmd[i].input > 0)
+		{
+			// printf("should be here\n");
 			close((*all)->cmd[i].input);
+		}
 		if ((*all)->cmd[i].output != STDOUT_FILENO && (*all)->cmd[i].output > 0)
 			close((*all)->cmd[i].output);
 		i++;

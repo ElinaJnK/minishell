@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmds.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:09:50 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/23 11:47:15 by ejankovs         ###   ########.fr       */
+/*   Updated: 2023/08/23 23:08:37 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ int	init_op(t_cmd *cmd, t_token *t)
 	cmd->n_pipes = 0;
 	cmd->pid = -42;
 	cmd->redir_err = 0;
+	cmd->pannacota = -42;
 	return (EXIT_SUCCESS);
 }
 

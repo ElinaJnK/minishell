@@ -6,14 +6,27 @@
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 12:41:14 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/23 12:53:57 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/23 22:55:45 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	do_builtin(t_cmd *cmd, int output_fd, t_all *all)
+int	do_builtin(t_cmd *cmd, int input_fd, int output_fd, t_all *all)
 {
+	if (input_fd != STDIN_FILENO)
+	{
+		// if (dup2(input_fd, STDIN_FILENO) < 0)
+		// 	failure_exec("dup2 clear");
+		close(input_fd);
+	}
+	// if (output_fd != STDOUT_FILENO)
+	// {
+	// 	if (dup2(output_fd, STDOUT_FILENO) < 0)
+	// 		failure_exec("dup2 here");
+	// 	close(output_fd);
+	// }
+	// ft_putstr_fd("I was here\n", 2);
 	if (!ft_strncmp(cmd->content, "cd", ft_strlen("cd") + 1))
 		return (exec_cd(cmd, output_fd, all));
 	else if (!ft_strncmp(cmd->content, "echo", ft_strlen("echo") + 1))
@@ -72,6 +85,8 @@ void	pipe_child(t_ast **root, int *pipe_fds, int *fds, t_all *all)
 	{
 		close(pipe_fds[1]);
 		exec_ast(&((*root)->left), fds[0], fds[1], all);
+		if ((*root)->left->cmd->output != STDOUT_FILENO)
+			close((*root)->left->cmd->output);
 	}
 	else
 	{
