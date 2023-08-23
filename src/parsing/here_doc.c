@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_doc.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 18:01:46 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/20 18:05:26 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/23 11:51:48 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,11 +110,9 @@ int	open_here_doc(int fd, t_token *t, t_all *all, t_token *tmp)
 {
 	pid_t	pid;
 	int		status;
-	// int		ex;
 
 	pid = fork();
 	status = 0;
-	// ex = 0;
 	if (pid == -1)
 	{
 		perror("fork");

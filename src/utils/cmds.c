@@ -6,7 +6,7 @@
 /*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:09:50 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/22 20:41:10 by ejankovs         ###   ########.fr       */
+/*   Updated: 2023/08/23 11:47:15 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,6 @@ void	add_error(char *filename, t_token **lst_err)
 			error = ft_strjoin(filename, ": Permission denied\n");
 			*exit_status() = 126;
 		}
-		// printf("exit_status : %d\n", *exit_status());
 		add_back_tok(lst_err, new_token(error, *exit_status()));
 	}
 }

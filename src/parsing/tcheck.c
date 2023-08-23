@@ -6,7 +6,7 @@
 /*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 04:08:10 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/22 17:23:51 by ejankovs         ###   ########.fr       */
+/*   Updated: 2023/08/23 11:51:32 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	put_error_tok(char *message, t_token **lst_tok)
 {
-	ft_putstr_fd(message, STDIN_FILENO);
+	ft_putstr_fd(message, 2);
 	*(exit_status()) = 2;
 	if (lst_tok)
 		free_lst_tok(lst_tok);
@@ -50,15 +50,21 @@ int	verif(t_token *tmp, int *p)
 		*p += 1;
 	else if (tmp->type == CLOSE_PAR)
 		*p -= 1;
-	if ((tmp->next->type == OPEN_PAR && tmp->type == CMD)
-		|| (tmp->type == CLOSE_PAR && tmp->next->type == CMD))
-		return (1);
-	if (tmp->type >= 1 && tmp->type <= 3
-		&& tmp->next->type >= 1 && tmp->next->type <= 3)
-		return (1);
-	if (tmp->type == tmp->next->type && tmp->type >= 1 && tmp->type <= 8
-		&& tmp->type >= 1 && tmp->type <= 8)
-		return (1);
+	if (tmp->next)
+	{
+		if ((tmp->next->type == OPEN_PAR && tmp->type == CMD)
+			|| (tmp->type == CLOSE_PAR && tmp->next->type == CMD))
+			return (1);
+		if (tmp->type >= 1 && tmp->type <= 3
+			&& tmp->next->type >= 1 && tmp->next->type <= 3)
+			return (1);
+		if (tmp->type == tmp->next->type && tmp->type >= 1 && tmp->type <= 8
+			&& tmp->type >= 1 && tmp->type <= 8)
+			return (1);
+		if (tmp->type >= REDIR && tmp->type <= DREDIR2_E
+			&& (tmp->next->type == OPEN_PAR || tmp->next->type == CLOSE_PAR))
+			return (1);
+	}
 	return (0);
 }
 

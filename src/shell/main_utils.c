@@ -6,7 +6,7 @@
 /*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:31:34 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/22 20:51:02 by ejankovs         ###   ########.fr       */
+/*   Updated: 2023/08/23 11:48:07 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,6 @@ void	get_status(t_all **all)
 	{
 		if ((*all)->cmd[i].pid > 0)
 		{
-			//printf("here %s\n", (*all)->cmd[i].content);
-			//printf("status cmd: %d\n", (*all)->cmd[i].status);
 			if (waitpid((*all)->cmd[i].pid, &status, 0) == -1)
 				status = (*all)->cmd[i].status;
 			if (WIFEXITED(status))

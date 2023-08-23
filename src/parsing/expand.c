@@ -31,14 +31,14 @@ int	raccourci(t_tokyo **t, char *var)
 		else if (var[i] != ' ')
 			(*t)->content = ft_addchr((*t)->content, var[i],
 					(*t)->lst_tok, (*t)->line);
-		if (var[i] == ' ' && (*t)->q_flag == 0 && (*t)->content != NULL && (*t)->content[0] != '\0')
+		if (var[i] == ' ' && (*t)->q_flag == 0 && (*t)->content != NULL
+			&& (*t)->content[0] != '\0')
 		{
 			add_back_tok(&((*t)->lst_tok), new_token((*t)->content, 0));
 			(*t)->content = NULL;
 		}
 		i++;
 	}
-	
 	return (i);
 }
 
@@ -56,8 +56,6 @@ int	check_name_bis(char *name, int end)
 	i = 0;
 	if (!name || (!ft_isalpha(name[0]) && name[0] != '_'))
 		return (EXIT_FAILURE);
-	// if (ft_strlen(name) - end == 0)
-	// 	return (EXIT_FAILURE);
 	while (name[i] && i < end)
 	{
 		if (!ft_isalpha(name[i]) && name[i] != '_'
@@ -87,7 +85,7 @@ char	*expand_envb(t_tokyo **t)
 	char	*var;
 	char	*newline;
 	int		end;
-	int 	res;
+	int		res;
 
 	end = (*t)->i + 1;
 	res = 0;

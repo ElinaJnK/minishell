@@ -6,7 +6,7 @@
 /*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:18:52 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/22 19:53:10 by ejankovs         ###   ########.fr       */
+/*   Updated: 2023/08/23 11:48:02 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,6 @@ int	main(int ac, char **av, char **env)
 	(void)ac;
 	(void)av;
 	rl_outstream = stderr;
-	//*exit_status();
 	if (ac != 1 || av[1])
 	{
 		ft_putstr_fd("This program does not accept arguments\n", 2);

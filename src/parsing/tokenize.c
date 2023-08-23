@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenize.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 04:11:41 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 22:56:32 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/23 11:51:14 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ t_token	*add_rest(t_tokyo **t)
 	}
 	check_tok(&((*t)->lst_tok));
 	tokens = (*t)->lst_tok;
-	//print_list_tok(tokens);
 	return (free_tokyo(*t), tokens);
 }
 
@@ -68,7 +67,7 @@ int	to_expand(t_tokyo **t)
 
 	tmp = *t;
 	if (tmp->line[tmp->i] && tmp->line[tmp->i + 1] != ' '
-		/*&& tmp->line[tmp->i + 1] != '$'*/ && tmp->line[tmp->i + 1] != '\''
+		&& tmp->line[tmp->i + 1] != '\''
 		&& tmp->line[tmp->i + 1] != '\"' && tmp->line[tmp->i + 1] != '\\'
 		&& !is_op(tmp->line + tmp->i + 1) && !is_fb(tmp->line + tmp->i + 1))
 	{
@@ -92,13 +91,13 @@ int	japan(t_tokyo **t)
 		here_doc_q(tmp->line + tmp->i, &(tmp->lst_tok));
 	if (*(tmp->line + tmp->i) == '$' && tmp->q_flag != 1
 		&& !is_heredoc(tmp->lst_tok))
-		{
-			res = to_expand(t);
-			if (res == EXIT_FAILURE)
-				return (EXIT_FAILURE);
-			else if (res == EXIT_SUCCESS)
-				return (EXIT_SUCCESS);
-		}
+	{
+		res = to_expand(t);
+		if (res == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+		else if (res == EXIT_SUCCESS)
+			return (EXIT_SUCCESS);
+	}
 	if ((is_op(tmp->line + tmp->i) || is_fb(tmp->line + tmp->i)
 			|| tmp->line[tmp->i] == ' ') && tmp->q_flag == 0)
 	{

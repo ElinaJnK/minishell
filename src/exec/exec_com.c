@@ -6,7 +6,7 @@
 /*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 03:55:37 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/22 20:26:31 by ejankovs         ###   ########.fr       */
+/*   Updated: 2023/08/23 12:01:28 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,9 @@ int	exec(int pid, t_cmd *cmd, t_all *all)
 	if (!path)
 	{
 		status = execve(cmd->content, cmd->args, env);
-		//*exit_status() = status;
 		return (check_status(env, pid, status));
 	}
 	status = execve(path, cmd->args, env);
-	//*exit_status() = status;
 	if (status == -1)
 	{
 		if (errno == EACCES)
@@ -87,10 +85,6 @@ void	choose_exec(t_ast *node, int input_fd, int output_fd, t_all **all)
 	if (is_builtin(node->cmd))
 	{
 		builtin = do_builtin(node->cmd, output_fd, *all);
-		// if (node->cmd->redir_err != 0)
-		// 	node->cmd->status = node->cmd->redir_err;
-		// else
-		// 	node->cmd->status = builtin;
 		*exit_status() = builtin;
 		free_all(*all);
 		exit(*exit_status());
@@ -114,7 +108,6 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 	else
 	{
 		waitpid(node->cmd->pid, &status, 0);
-		//printf("redir_err : %s %d\n", node->cmd->content, node->cmd->redir_err);
 		if (node->cmd->redir_err != 0)
 			node->cmd->status = node->cmd->redir_err;
 		else
@@ -126,6 +119,5 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 				node->cmd->status = 128 + WTERMSIG(status);
 		}
 		*exit_status() = node->cmd->status;
-		printf("status : %d\n", *exit_status());
 	}
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 03:46:54 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 21:45:47 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/23 11:46:34 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,20 +74,15 @@ int	go_home(t_env **lst_env, t_all *all)
 	if (chdir(res) == -1)
 	{
 		if (all->is_env == 1)
-		{
-			ft_putstr_fd("bash: cd: ", 2);
-			ft_putstr_fd(res, 2);
-			ft_putstr_fd(": No such file or directory\n", 2);
-		}
+			return (ft_putstr_fd("bash: cd: ", 2), ft_putstr_fd(res, 2),
+				ft_putstr_fd(": No such file or directory\n", 2), EXIT_FAILURE);
 		else
-			ft_putstr_fd("bash: cd: HOME not set\n", 2);
-		return (EXIT_FAILURE);
+			return (ft_putstr_fd("bash: cd: HOME not set\n", 2), EXIT_FAILURE);
 	}
 	if (!in_env("PWD", pwd, *lst_env))
 		add_back_env(lst_env, new_env("PWD", pwd));
 	return (EXIT_SUCCESS);
 }
-
 
 int	exec_cd(t_cmd *cmd, int output_fd, t_all *all)
 {

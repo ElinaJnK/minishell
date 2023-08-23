@@ -122,3 +122,17 @@ cat < Makefile | sleep 1 | sleep 1 | sleep 1 < huy
 
 cat < Makefile | echo c | echo b | echo a < hui
 
+cat < (ergher | bjib)
+
+foo
+/bin/ls
+/bin/ls -laF
+/bin/ls -l -a -F
+echo "it works"
+echo it works
+pwd
+/bin/pwd
+env
+
+
+
