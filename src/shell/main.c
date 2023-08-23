@@ -58,7 +58,10 @@ void	tchitat_stdin(t_all **all)
 		add_history(line);
 		count = 0;
 		if (*line == '\n' || *line == '\0')
+		{
 			free(line);
+			line = NULL;
+		}
 		signal_exec();
 		if (line)
 		{

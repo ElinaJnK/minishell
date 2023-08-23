@@ -87,6 +87,10 @@ void	choose_exec(t_ast *node, int input_fd, int output_fd, t_all **all)
 	if (is_builtin(node->cmd))
 	{
 		builtin = do_builtin(node->cmd, output_fd, *all);
+		// if (node->cmd->redir_err != 0)
+		// 	node->cmd->status = node->cmd->redir_err;
+		// else
+		// 	node->cmd->status = builtin;
 		*exit_status() = builtin;
 		free_all(*all);
 		exit(*exit_status());
@@ -105,20 +109,23 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 	else if (node->cmd->pid == 0)
 	{
 		sig_child();
-		//printf("node : %s\n", node->cmd->content);
 		choose_exec(node, input_fd, output_fd, all);
 	}
 	else
 	{
 		waitpid(node->cmd->pid, &status, 0);
-		node->cmd->status = status;
-		//*exit_status() = status;
-		if (WIFEXITED(status))
-				*exit_status() = WEXITSTATUS(status);
+		//printf("redir_err : %s %d\n", node->cmd->content, node->cmd->redir_err);
+		if (node->cmd->redir_err != 0)
+			node->cmd->status = node->cmd->redir_err;
+		else
+		{
+			node->cmd->status = status;
+			if (WIFEXITED(status))
+				node->cmd->status = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
-			{
-				*exit_status() = 128 + WTERMSIG(status);
-				// printf("here : %d\n", *exit_status());
-			}
+				node->cmd->status = 128 + WTERMSIG(status);
+		}
+		*exit_status() = node->cmd->status;
+		printf("status : %d\n", *exit_status());
 	}
 }

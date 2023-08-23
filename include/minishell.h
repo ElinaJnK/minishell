@@ -75,6 +75,7 @@ typedef struct s_cmd
 	int		n_pipes;
 	int		pid;
 	int		status;
+	int		redir_err;
 	t_token	*lst_err;
 }	t_cmd;
 

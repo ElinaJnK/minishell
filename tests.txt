@@ -113,3 +113,12 @@ echo a < juuuu && < kuuuu
 echo a < tttttt || echo c < frrr 
 echo a | echo b | echo c < grrrrrr || echo a > braaaa
 cat c | ls | wc -l | echo mon amour cuicui pigeon
+sleep 1 | sleep 1 < jrekebeb || echo b < try
+(echo a && echo b) > c && cat Makefile | cat -e | wc -l || echo fail
+echo a && echo b
+(echo a && (echo b < hyhuh || echo skrra))
+
+cat < Makefile | sleep 1 | sleep 1 | sleep 1 < huy
+
+cat < Makefile | echo c | echo b | echo a < hui
+

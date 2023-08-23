@@ -67,7 +67,7 @@ void	print_error(t_token *lst_err, int *status)
 void	pipe_child(t_ast **root, int *pipe_fds, int input_fd, int output_fd, t_all *all)
 {
 	if ((*root)->left)
-			(*root)->left->cmd->n_pipes = 1;
+		(*root)->left->cmd->n_pipes = 1;
 	if ((*root)->left->cmd->output != STDOUT_FILENO)
 	{
 		close(pipe_fds[1]);
@@ -79,5 +79,6 @@ void	pipe_child(t_ast **root, int *pipe_fds, int input_fd, int output_fd, t_all 
 		exec_ast(&((*root)->left), input_fd, pipe_fds[1], all);
 	}
 	free_all(all);
-	exit(EXIT_SUCCESS);
+	printf("exit_status : %d\n", *exit_status());
+	exit(*exit_status());
 }

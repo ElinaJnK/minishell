@@ -115,10 +115,12 @@ t_token	*tokenize(char *line, t_env *lst_env)
 {
 	t_tokyo	*t;
 
+	if (!line)
+		return (NULL);
 	t = init_param(line, lst_env);
 	if (!t)
 		return (failure_parse("Error: malloc", NULL, line), NULL);
-	while ((size_t)t->i < ft_strlen(t->line) && t->line[t->i])
+	while (t->line && (size_t)t->i < ft_strlen(t->line) && t->line[t->i])
 	{
 		t->expansion = 0;
 		if (japan(&t) == EXIT_FAILURE)
