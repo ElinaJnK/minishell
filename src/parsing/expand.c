@@ -21,8 +21,7 @@ int	raccourci(t_tokyo **t, char *var)
 	len = 0;
 	if (!var)
 		return (0);
-	if (var)
-		len = ft_strlen(var);
+	len = ft_strlen(var);
 	while (i < len)
 	{
 		if (var[i] == ' ' && (*t)->q_flag != 0)
@@ -42,31 +41,7 @@ int	raccourci(t_tokyo **t, char *var)
 	return (i);
 }
 
-int	check_special_carac(char c)
-{
-	if (c != '$' && c != '\'' && c != '\"' && c != ' ' && c != '\n')
-		return (1);
-	return (0);
-}
-
-int	check_name_bis(char *name, int end)
-{
-	int	i;
-
-	i = 0;
-	if (!name || (!ft_isalpha(name[0]) && name[0] != '_'))
-		return (EXIT_FAILURE);
-	while (name[i] && i < end)
-	{
-		if (!ft_isalpha(name[i]) && name[i] != '_'
-			&& !ft_isdigit(name[i]))
-			return (EXIT_FAILURE);
-		i++;
-	}
-	return (EXIT_SUCCESS);
-}
-
-int		add_var(t_tokyo **t, char *var, int end)
+int	add_var(t_tokyo **t, char *var, int end)
 {
 	int	i;
 
@@ -78,6 +53,22 @@ int		add_var(t_tokyo **t, char *var, int end)
 		i++;
 	}
 	return (i);
+}
+
+char	*expand_while(t_tokyo **t, int end)
+{
+	char	*var;
+
+	if (check_name_bis((*t)->line + (*t)->i + 1,
+			end - (*t)->i) == EXIT_FAILURE)
+	{
+		var = NULL;
+		(*t)->i += add_var(t, (*t)->line + (*t)->i, end - (*t)->i + 1);
+	}
+	else
+		var = search_var((*t)->line + (*t)->i + 1, end - (*t)->i,
+				(*t)->lst_env);
+	return (var);
 }
 
 char	*expand_envb(t_tokyo **t)
@@ -102,14 +93,7 @@ char	*expand_envb(t_tokyo **t)
 			&& !is_fb((*t)->line + end) && check_special_carac((*t)->line[end]))
 			end++;
 		end--;
-		if (check_name_bis((*t)->line + (*t)->i + 1, end - (*t)->i) == EXIT_FAILURE)
-		{
-			var = NULL;
-			(*t)->i += add_var(t, (*t)->line + (*t)->i, end - (*t)->i + 1);
-		}
-		else
-			var = search_var((*t)->line + (*t)->i + 1, end - (*t)->i,
-					(*t)->lst_env);
+		var = expand_while(t, end);
 	}
 	res += raccourci(t, var);
 	newline = insert_into_line((*t)->line, var, (*t)->i, end);

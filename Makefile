@@ -43,6 +43,8 @@ SOURCES_UTILS 		=	ast_type.c	\
 						tok_type.c	\
 						tok_utils.c	\
 						trans_utils.c\
+						exec_ast_utils.c\
+						expand_utils.c\
 
 LIBFT		= libft
 

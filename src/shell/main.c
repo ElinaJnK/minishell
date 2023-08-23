@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:18:52 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/23 11:48:02 by ejankovs         ###   ########.fr       */
+/*   Updated: 2023/08/23 12:45:22 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ void	just_do_it(t_all **all, char *line, int count)
 	{
 		init_border(all, &count);
 		root = build_ast(cmds, (*all)->b);
-		//printAST(root);
 		if (root && (*all)->env)
 		{
 			(*all)->cmd = cmds;
@@ -41,6 +40,17 @@ void	just_do_it(t_all **all, char *line, int count)
 	}
 }
 
+char	*do_readline(t_all *all)
+{
+	char	*line;
+
+	if (*exit_status() == 0)
+		line = readline(all->prompt_good);
+	else
+		line = readline(all->prompt_bad);
+	return (line);
+}
+
 void	tchitat_stdin(t_all **all)
 {
 	char		*line;
@@ -49,10 +59,7 @@ void	tchitat_stdin(t_all **all)
 	while (1)
 	{
 		signal_prompt();
-		if (*exit_status() == 0)
-			line = readline((*all)->prompt_good);
-		else
-			line = readline((*all)->prompt_bad);
+		line = do_readline(*all);
 		if (!line)
 			return ;
 		add_history(line);

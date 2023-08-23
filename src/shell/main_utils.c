@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:31:34 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/23 11:48:07 by ejankovs         ###   ########.fr       */
+/*   Updated: 2023/08/23 12:50:18 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	get_status(t_all **all)
 			else if (WIFSIGNALED(status))
 				*exit_status() = 128 + WTERMSIG(status);
 			if ((*all)->cmd[i].redir_err != 0)
-		 		*exit_status() = (*all)->cmd[i].redir_err;
+				*exit_status() = (*all)->cmd[i].redir_err;
 		}
 		if ((*all)->cmd[i].input != STDIN_FILENO && (*all)->cmd[i].input > 0)
 			close((*all)->cmd[i].input);

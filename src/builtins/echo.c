@@ -6,7 +6,7 @@
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 03:46:58 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/20 03:48:49 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/23 12:21:25 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ int	write_echo(t_cmd *cmd, int fd_out, int i)
 	int		bytes_written;
 
 	arg = cmd->args[i];
+	if (fd_out < 0)
+		return (EXIT_FAILURE);
 	if (arg)
 	{
 		bytes_written = write(fd_out, arg, ft_strlen(arg));

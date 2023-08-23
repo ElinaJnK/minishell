@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   com_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/20 20:05:30 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 18:418:4047 by ejankovs         ###   ########.fr       */
+/*   Created: 2023/08/23 12:41:14 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/23 12:53:57 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,20 +63,27 @@ void	print_error(t_token *lst_err, int *status)
 	}
 }
 
-void	pipe_child(t_ast **root, int *pipe_fds, int input_fd, int output_fd, t_all *all)
+void	pipe_child(t_ast **root, int *pipe_fds, int *fds, t_all *all)
 {
+	close(pipe_fds[0]);
 	if ((*root)->left)
 		(*root)->left->cmd->n_pipes = 1;
 	if ((*root)->left->cmd->output != STDOUT_FILENO)
 	{
 		close(pipe_fds[1]);
-		exec_ast(&((*root)->left), input_fd, output_fd, all);
+		exec_ast(&((*root)->left), fds[0], fds[1], all);
 	}
 	else
 	{
 		(*root)->left->cmd->output = pipe_fds[1];
-		exec_ast(&((*root)->left), input_fd, pipe_fds[1], all);
+		exec_ast(&((*root)->left), fds[0], pipe_fds[1], all);
 	}
 	free_all(all);
 	exit(EXIT_SUCCESS);
+}
+
+void	init_fds(int *fds, int input_fd, int output_fd)
+{
+	fds[0] = input_fd;
+	fds[1] = output_fd;
 }

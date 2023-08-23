@@ -3,43 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   exec_ast.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/21 06:05:23 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 19:04:330 by ejankovs         ###   ########.fr       */
+/*   Created: 2023/08/23 12:28:19 by ksadykov          #+#    #+#             */
+/*   Updated: 2023/08/23 13:04:55 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void	wait_op(t_all **a, t_ast *root)
-{
-	t_all	*all;
-	int		i;
-	int		status;
-
-	all = *a;
-	status = 0;
-	i = 0;
-	while (i < all->count && &(all->cmd[i]) != root->cmd)
-	{
-		if (all->cmd[i].pid > 0)
-		{
-			if (waitpid(all->cmd[i].pid, &status, 0) == -1)
-				status = all->cmd[i].status;
-			if (WIFEXITED(status))
-				*exit_status() = WEXITSTATUS(status);
-			else if (WIFSIGNALED(status))
-			{
-				*exit_status() = 128 + WTERMSIG(status);
-			}
-			all->cmd[i].pid = -42;
-		}
-		if (all->cmd[i].redir_err != 0)
-			*exit_status() = all->cmd[i].redir_err;
-		i++;
-	}
-}
 
 void	exec_and(t_ast **root, int input_fd, int output_fd, t_all *all)
 {
@@ -85,22 +56,15 @@ void	exec_or(t_ast **root, int input_fd, int output_fd, t_all *all)
 void	exec_pipe(t_ast **root, int input_fd, int output_fd, t_all *all)
 {
 	int		pipe_fds[2];
+	int		fds[2];
 
-	if (pipe(pipe_fds) < 0)
-		failure_exec("pipe error");
-	(*root)->cmd->pid = fork();
-	if ((*root)->cmd->pid < 0)
-		failure_exec("fork error");
+	init_fds(fds, input_fd, output_fd);
+	init_pipe(pipe_fds, root);
 	if ((*root)->cmd->pid == 0)
-	{
-		close(pipe_fds[0]);
-		pipe_child(root, pipe_fds, input_fd, output_fd, all);
-	}
+		pipe_child(root, pipe_fds, fds, all);
 	else
 	{
-		close(pipe_fds[1]);
-		if ((*root)->right)
-			(*root)->right->cmd->n_pipes = 1;
+		pipe_parent1(pipe_fds, root);
 		if ((*root)->right->cmd->input != STDIN_FILENO)
 		{
 			close(pipe_fds[0]);
@@ -112,15 +76,7 @@ void	exec_pipe(t_ast **root, int input_fd, int output_fd, t_all *all)
 			exec_ast(&((*root)->right), pipe_fds[0], output_fd, all);
 			close(pipe_fds[0]);
 		}
-		if ((*root)->right)
-		{
-			(*root)->right->cmd->status = *exit_status();
-			if ((*root)->right->cmd->redir_err != 0)
-			{
-				(*root)->cmd->redir_err = (*root)->right->cmd->redir_err;
-				*exit_status() = (*root)->right->cmd->redir_err;
-			}
-		}
+		pipe_parent2(root);
 	}
 }
 
@@ -142,13 +98,7 @@ void	exec_redir(t_ast **r, int input_fd, int output_fd, t_all *all)
 			(*r)->left->cmd->redir_err = (*r)->cmd->redir_err;
 	}
 	if ((*r)->cmd->input < 0 || (*r)->cmd->output < 0)
-	{
-		if ((*r)->cmd->input < 0)
-			(*r)->cmd->input = STDIN_FILENO;
-		if ((*r)->cmd->output < 0)
-			(*r)->cmd->output = STDOUT_FILENO;
-		return ;
-	}
+		return (change_fd(&((*r)->cmd->input), &((*r)->cmd->output)));
 	if (!(*r)->left)
 		return ;
 	if ((*r)->cmd->input != 0 && (*r)->cmd->output != 1)

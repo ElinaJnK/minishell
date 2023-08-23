@@ -10,3 +10,27 @@
 	...
 	fun:add_history
 }
+{
+	ignore_readline_leaks
+	Memcheck:Leak
+	...
+	fun:rl_redisplay
+}
+{
+	ignore_readline_leaks
+	Memcheck:Leak
+	...
+	fun:rl_clear_history
+}
+{
+	ignore_readline_leaks
+	Memcheck:Leak
+	...
+	fun:rl_on_new_line
+}
+{
+	ignore_readline_leaks
+	Memcheck:Leak
+	...
+	fun:rl_replace_line
+}

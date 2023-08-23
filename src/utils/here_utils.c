@@ -6,7 +6,7 @@
 /*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:06:17 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/20 21:08:09 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/23 12:51:48 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,5 @@ int	init_here(t_here **her, int fd, int *ctrl)
 	ctrl_d(&here, ctrl);
 	if (*ctrl != EXIT_SUCCESS)
 		return (free_here(here), *ctrl);
-	(*her) = here;
-	return (EXIT_SUCCESS);
+	return ((*her) = here, EXIT_SUCCESS);
 }

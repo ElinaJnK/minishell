@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 06:13:03 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/22 18:04:43 by ejankovs         ###   ########.fr       */
+/*   Updated: 2023/08/23 12:54:51 by ksadykov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,7 @@ t_token	*tokenize(char *line, t_env *lst_env);
 t_token	*tokenize_bise(t_token *tok);
 t_token	*tokenize_crise(t_token *tok, t_env *lst_env);
 void	check_tok(t_token **lst_tok);
+char	*do_readline(t_all *all);
 
 void	free_tokyo(t_tokyo *t);
 t_tokyo	*init_param(char *line, t_env *lst_env);
@@ -227,9 +228,20 @@ void	free_all(t_all *all);
 void	put_error_tok(char *message, t_token **lst_tok);
 int		in_env(char *name, char *new_val, t_env *lst_env);
 void	print_error(t_token *lst_err, int *status);
-void	pipe_child(t_ast **root, int *pipe_fds, int input_fd,
-		int output_fd, t_all *all);
+void	pipe_child(t_ast **root, int *pipe_fds, int *fds, t_all *all);
 void	add_error(char *filename, t_token **lst_err);
+
+/*--exec_ast_utils---*/
+void	wait_op(t_all **a, t_ast *root);
+void	pipe_parent2(t_ast **root);
+void	pipe_parent1(int *pipe_fds, t_ast **root);
+void	init_pipe(int *pipe_fds, t_ast **root);
+void	change_fd(int *in, int *out);
+void	init_fds(int *fds, int input_fd, int output_fd);
+
+/*---expand_utils---*/
+int		check_name_bis(char *name, int end);
+int		check_special_carac(char c);
 
 /*----execution----*/
 char	*get_command_path(char *command, t_env *env);
