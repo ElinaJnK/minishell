@@ -6,7 +6,7 @@
 /*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 03:46:54 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/23 11:46:34 by ejankovs         ###   ########.fr       */
+/*   Updated: 2023/08/24 19:07:50 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ int	go_home(t_env **lst_env, t_all *all)
 			EXIT_FAILURE);
 	if (!in_env("OLDPWD", pwd, *lst_env))
 		add_back_env(lst_env, new_env("OLDPWD", pwd));
+	free(pwd);
 	res = in_envi("HOME", *lst_env);
 	if (!res)
 		ft_putstr_fd("bash: cd: HOME not set\n", 2);
@@ -79,9 +80,10 @@ int	go_home(t_env **lst_env, t_all *all)
 		else
 			return (ft_putstr_fd("bash: cd: HOME not set\n", 2), EXIT_FAILURE);
 	}
+	pwd = getcwd(NULL, 0);
 	if (!in_env("PWD", pwd, *lst_env))
 		add_back_env(lst_env, new_env("PWD", pwd));
-	return (EXIT_SUCCESS);
+	return (free(pwd), EXIT_SUCCESS);
 }
 
 int	exec_cd(t_cmd *cmd, int output_fd, t_all *all)

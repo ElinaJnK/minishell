@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_com.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 03:55:37 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/23 22:02:04 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/24 19:31:12 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,15 +38,12 @@ int	exec(int pid, t_cmd *cmd, t_all *all)
 	else
 		path = get_command_path(cmd->content, all->env);
 	if (!path)
-	{
-		status = execve(cmd->content, cmd->args, env);
-		return (check_status(env, pid, status));
-	}
+		return (free_tab(env), 127);
 	status = execve(path, cmd->args, env);
 	if (status == -1)
 	{
 		if (errno == EACCES)
-			return (free_tab(env), 127);
+			return (free(path), free_tab(env), 126);
 	}
 	if (status < 0 || pid < 0)
 		return (free(path), free_tab(env), status);
@@ -84,7 +81,6 @@ void	choose_exec(t_ast *node, int input_fd, int output_fd, t_all **all)
 	builtin = 0;
 	if (is_builtin(node->cmd))
 	{
-		ft_putstr_fd("22222I was here\n", 2);
 		builtin = do_builtin(node->cmd, input_fd, output_fd, *all);
 		*exit_status() = builtin;
 		free_all(*all);
@@ -112,13 +108,7 @@ void	exec_com(t_ast *node, int input_fd, int output_fd, t_all **all)
 		if (node->cmd->redir_err != 0)
 			node->cmd->status = node->cmd->redir_err;
 		else
-		{
 			node->cmd->status = status;
-			if (WIFEXITED(status))
-				node->cmd->status = WEXITSTATUS(status);
-			else if (WIFSIGNALED(status))
-				node->cmd->status = 128 + WTERMSIG(status);
-		}
 		*exit_status() = node->cmd->status;
 	}
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tok_redir.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 06:11:12 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 21:14:59 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/24 18:33:28 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void	last_call(t_tokyo **t)
 	tmp = *t;
 	if (tmp->i > 0)
 	{
-		while (tmp->i > 0 && tmp->line[tmp->i - 1] == ' ')
+		while (tmp->i > 0 && is_whitespace(tmp->line[tmp->i - 1]))
 			(tmp->i)--;
 		if (tmp->line[tmp->i - 1] == '\"' || tmp->line[tmp->i - 1] == '\'')
 			add_back_tok(&(tmp->lst_tok), new_token(tmp->content, 0));

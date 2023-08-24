@@ -24,13 +24,13 @@ int	raccourci(t_tokyo **t, char *var)
 	len = ft_strlen(var);
 	while (i < len)
 	{
-		if (var[i] == ' ' && (*t)->q_flag != 0)
+		if (is_whitespace(var[i]) && (*t)->q_flag != 0)
 			(*t)->content = ft_addchr((*t)->content, var[i],
 					(*t)->lst_tok, (*t)->line);
-		else if (var[i] != ' ')
+		else if (!is_whitespace(var[i]))
 			(*t)->content = ft_addchr((*t)->content, var[i],
 					(*t)->lst_tok, (*t)->line);
-		if (var[i] == ' ' && (*t)->q_flag == 0 && (*t)->content != NULL
+		if (is_whitespace(var[i]) && (*t)->q_flag == 0 && (*t)->content != NULL
 			&& (*t)->content[0] != '\0')
 		{
 			add_back_tok(&((*t)->lst_tok), new_token((*t)->content, 0));

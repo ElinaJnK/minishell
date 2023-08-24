@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 06:13:03 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/23 23:07:54 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/24 19:25:20 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,6 @@
 # include "../libft/libft.h"
 # include <signal.h>
 # include <errno.h>
-/*---to delete after tests----*/
-# include <string.h>
-# include <stdio.h>
 
 enum e_token
 {
@@ -132,10 +129,6 @@ typedef struct s_sig
 	pid_t	pid;
 }	t_sig;
 
-/*---to delete after tests----*/
-void	print_list_tok(t_token *lst_tok);
-void	printAST(t_ast *root);
-
 /*----failure-----*/
 void	failure(const char *message);
 void	failure_parse(const char *message, t_token *lst_tok, char *line);
@@ -236,8 +229,9 @@ void	add_error(char *filename, t_token **lst_err);
 void	wait_op(t_all **a, t_ast *root);
 void	pipe_parent2(t_ast **root);
 void	pipe_parent1(int *pipe_fds, t_ast **root);
+void	pipe_parent(t_ast **root, int *pipe_fds, int *fds, t_all *all);
 void	init_pipe(int *pipe_fds, t_ast **root);
-void	change_fd(int *in, int *out, int input_fd, int output_fd);
+void	change_fd(int *in, int *out);
 void	init_fds(int *fds, int input_fd, int output_fd);
 
 /*---expand_utils---*/
@@ -276,6 +270,9 @@ int		exec_pwd(t_cmd *cmd, int output_fd);
 int		exec_unset(t_cmd *cmd, t_env **lst_env);
 int		exec_exit(t_cmd *cmd, t_all *all);
 int		is_num(char *str);
+
+/*--white---*/
+int		is_whitespace(char c);
 
 /*----signal----*/
 void	signal_prompt(void);

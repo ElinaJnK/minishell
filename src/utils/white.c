@@ -1,18 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_isalpha.c                                       :+:      :+:    :+:   */
+/*   white.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/19 18:38:05 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/24 15:28:25 by ksadykov         ###   ########.fr       */
+/*   Created: 2023/08/24 18:27:58 by ejankovs          #+#    #+#             */
+/*   Updated: 2023/08/24 19:00:26 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "minishell.h"
 
-int	ft_isalpha(int c)
+int	is_whitespace(char c)
 {
-	return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'));
+	if (c == ' ' || c == '\t')
+		return (1);
+	return (0);
 }

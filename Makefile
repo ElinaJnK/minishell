@@ -31,7 +31,6 @@ SOURCES_SHELL 		=	main.c		\
 						main_utils.c\
 						main_env.c	\
 						signal.c 	\
-						main_utils_to_delete.c\
 
 SOURCES_UTILS 		=	ast_type.c	\
 						ast_utils.c	\
@@ -45,6 +44,7 @@ SOURCES_UTILS 		=	ast_type.c	\
 						trans_utils.c\
 						exec_ast_utils.c\
 						expand_utils.c\
+						white.c 	\
 
 LIBFT		= libft
 

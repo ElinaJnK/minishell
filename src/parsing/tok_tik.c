@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tok_tik.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 04:17:53 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 22:50:32 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/24 18:54:42 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,11 +56,11 @@ void	update_tok(t_tokyo **t)
 				&& tmp->q_flag == 2) || (*(tmp->line + tmp->i) == '\''
 				&& tmp->q_flag == 1)))
 		tmp->q_flag = 0;
-	else if (*(tmp->line + tmp->i) == ' ' && (tmp->q_flag == 1
+	else if (is_whitespace(*(tmp->line + tmp->i)) && (tmp->q_flag == 1
 			|| tmp->q_flag == 2))
 		tmp->content = ft_addchr(tmp->content, *(tmp->line + tmp->i),
 				tmp->lst_tok, tmp->line);
-	else if (((tmp->expansion == 0) && *(tmp->line + tmp->i) != ' '
+	else if (((tmp->expansion == 0) && !is_whitespace(*(tmp->line + tmp->i))
 			&& *(tmp->line + tmp->i) != '\0')
 		|| tmp->expansion == 1)
 		tmp->content = ft_addchr(tmp->content, *(tmp->line + tmp->i),

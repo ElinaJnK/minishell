@@ -6,9 +6,11 @@
 /*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 04:11:41 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/23 11:51:14 by ejankovs         ###   ########.fr       */
+/*   Updated: 2023/08/24 18:56:51 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "minishell.h"
 
 #include "minishell.h"
 
@@ -46,7 +48,7 @@ int	handle_op(t_tokyo **tokyo)
 	{
 		if (tmp->i > 0)
 		{	
-			while (tmp->i > 0 && tmp->line[tmp->i - 1] == ' ')
+			while (tmp->i > 0 && is_whitespace(tmp->line[tmp->i - 1]))
 				(tmp->i)--;
 			if (tmp->line[tmp->i - 1] == '\"' || tmp->line[tmp->i - 1] == '\'')
 				add_back_tok(&(tmp->lst_tok), new_token(tmp->content, 0));
@@ -66,7 +68,7 @@ int	to_expand(t_tokyo **t)
 	t_tokyo	*tmp;
 
 	tmp = *t;
-	if (tmp->line[tmp->i] && tmp->line[tmp->i + 1] != ' '
+	if (tmp->line[tmp->i] && !is_whitespace(tmp->line[tmp->i + 1])
 		&& tmp->line[tmp->i + 1] != '\''
 		&& tmp->line[tmp->i + 1] != '\"' && tmp->line[tmp->i + 1] != '\\'
 		&& !is_op(tmp->line + tmp->i + 1) && !is_fb(tmp->line + tmp->i + 1))
@@ -76,7 +78,7 @@ int	to_expand(t_tokyo **t)
 			return (free_tokyo(tmp), free_lst_tok(&tmp->lst_tok), EXIT_FAILURE);
 		return (EXIT_SUCCESS);
 	}
-	else if (*(tmp->line + tmp->i + 1) != ' ')
+	else if (!is_whitespace(*(tmp->line + tmp->i + 1)))
 		tmp->i++;
 	return (42);
 }
@@ -99,7 +101,7 @@ int	japan(t_tokyo **t)
 			return (EXIT_SUCCESS);
 	}
 	if ((is_op(tmp->line + tmp->i) || is_fb(tmp->line + tmp->i)
-			|| tmp->line[tmp->i] == ' ') && tmp->q_flag == 0)
+			|| is_whitespace(tmp->line[tmp->i])) && tmp->q_flag == 0)
 	{
 		tmp->i += handle_op(&tmp);
 		meta_tok(&tmp);

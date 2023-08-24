@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 04:08:40 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/21 22:42:32 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/24 18:59:41 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ char	*expand_env(char *line, int *i, t_env *env, int *e)
 	{
 		while (line[end] && !is_op(line + end) && !is_fb(line + end)
 			&& line[end] != '$' && line[end] != '\'' && line[end] != '\"'
-			&& line[end] != ' ' && line[end] != '\n')
+			&& !is_whitespace(line[end]) && line[end] != '\n')
 			end++;
 		end--;
 		var = search_var(line + *i + 1, end - *i, env);

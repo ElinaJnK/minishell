@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ast_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksadykov <ksadykov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ejankovs <ejankovs@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 20:10:01 by ksadykov          #+#    #+#             */
-/*   Updated: 2023/08/23 23:09:19 by ksadykov         ###   ########.fr       */
+/*   Updated: 2023/08/24 18:22:40 by ejankovs         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,20 +44,15 @@ void	free_and_close(t_all *all)
 	i = 0;
 	while (i < all->count)
 	{
-		// printf("in while : %d\n", all->cmd[i].input);
 		if (all->cmd[i].input != STDIN_FILENO && all->cmd[i].input > 0)
-		{
-			// printf("pipe[1] should be make: %d %s\n", all->cmd[i].output , all->cmd[i].content);
 			close(all->cmd[i].input);
-		}
 		if (all->cmd[i].output != STDOUT_FILENO && all->cmd[i].output > 0)
-		{
-			// printf("pipe[1]trueeee: %d %s\n", all->cmd[i].output , all->cmd[i].content);
-			// printf("in free_all : %d\n", close(all->cmd[i].output));
 			close(all->cmd[i].output);
-		}
 		if (all->cmd[i].pannacota != -42)
+		{
 			close(all->cmd[i].pannacota);
+			all->cmd[i].pannacota = -42;
+		}
 		i++;
 	}
 	free_cmds(all->cmd, all->count);
@@ -85,4 +80,15 @@ void	free_all(t_all *all)
 		free(all->prompt_bad);
 	}
 	free(all);
+}
+
+void	pipe_parent(t_ast **root, int *pipe_fds, int *fds, t_all *all)
+{
+	close(pipe_fds[0]);
+	close(pipe_fds[1]);
+	exec_ast(&((*root)->right), fds[0], fds[1], all);
+	if (fds[0] != STDIN_FILENO)
+		close(fds[0]);
+	if (fds[1] != STDOUT_FILENO)
+		close(fds[1]);
 }
