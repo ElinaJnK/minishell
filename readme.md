@@ -1,183 +1,188 @@
 # README - minishell
-## _Avec Karima Sadykova (aka Karimo)_
-_Merci à Samy Naji pour les nombreux tests (dont test_commands.py) et à Akadil Kalimoldayev pour le pipe_
+## _With Karima Sadykova (aka Karimo)_
 
-Résumé de tous les steps à prendre pour mini shell. Ce readme n'est pas final et il contient parfois des idées que nous avons changé par la suite. Par exemple la partie tokenize a été beaucoup plus longue que prévu initiallement. 
-Allez verifier le code et contactez nous si vous trouvez un leak :)
+_Special thanks to Samy Naji for the numerous tests (including test_commands.py) and Akadil Kalimoldayev for the pipe._
 
-Tout d’abord voici les indications que donne le bash:
+Summary of all the steps to take for minishell. This README is not final and may contain ideas that we later changed. For example, the tokenization part took much longer than initially expected. Please check the code and contact us if you find a leak :)
 
-The following is a brief description of the shell’s operation when it reads and executes a command. Basically, the shell does the following:
-- Reads its input from a file (see Shell Scripts), from a string supplied as an argument to the -c invocation option (see Invoking Bash), or from the user’s terminal.
-- Breaks the input into words and operators, obeying the quoting rules described in Quoting. These tokens are separated by metacharacters. Alias expansion is performed by this step (see Aliases).
-- Parses the tokens into simple and compound commands (see Shell Commands).
-- Performs the various shell expansions (see Shell Expansions), breaking the expanded tokens into lists of filenames (see Filename Expansion) and commands and arguments.
-- Performs any necessary redirections (see Redirections) and removes the redirection operators and their operands from the argument list.
-- Executes the command (see Executing Commands).
-Optionally waits for the command to complete and collects its exit status (see Exit Status).
+First, here are the instructions provided by bash:
 
-Commençons avec ceci:
+_The following is a brief description of the shell’s operation when it reads and executes a command. Basically, the shell does the following:_
+- _Reads its input from a file (see Shell Scripts), from a string supplied as an argument to the -c invocation option (see Invoking Bash), or from the user’s terminal._
+- _Breaks the input into words and operators, obeying the quoting rules described in Quoting. These tokens are separated by metacharacters. Alias expansion is performed by this step (see Aliases)._
+- _Parses the tokens into simple and compound commands (see Shell Commands)._
+- _Performs the various shell expansions (see Shell Expansions), breaking the expanded tokens into lists of filenames (see Filename Expansion) and commands and arguments._
+- _Performs any necessary redirections (see Redirections) and removes the redirection operators and their operands from the argument list._
+- _Executes the command (see Executing Commands). Optionally waits for the command to complete and collects its exit status (see Exit Status)._
 
-- Reads its input from a file (see Shell Scripts), from a string supplied as an argument to the -c invocation option (see Invoking Bash), or from the user’s terminal.
+Let’s start with this:
 
-Une vérification d'anciens projets nous indique que ./script.sh ne devra pas executer ce qu'il y a dans le script.
-On peut donc prévoir une fonction:
+- _Reads its input from a file (see Shell Scripts), from a string supplied as an argument to the -c invocation option (see Invoking Bash), or from the user’s terminal._
+
+A check of previous projects indicates that ./script.sh should not execute what is in the script. Therefore, we can plan for a function:
 ```c
 read_stdin()
 ```
-qui lira simplement l'ensemble de la ligne.
+which will simply read the entire line.
 
-Allez, maintenant on s'amuse:
-- Breaks the input into words and operators, obeying the quoting rules described in Quoting. These tokens are separated by metacharacters. Alias expansion is performed by this step (see Aliases).
+Alright, now for some fun:
+- _Breaks the input into words and operators, obeying the quoting rules described in Quoting. These tokens are separated by metacharacters. Alias expansion is performed by this step (see Aliases)._
 
+Here is the plan we decided to follow initially:
+```
 1. Initialize an empty list of tokens.
 2. Initialize an empty string to store the current token.
 3. Initialize a flag to indicate if the current token is within quotes (0 if outside quotes, 1 if within double quotes, 2 if within single quotes).
 4. Iterate through each character in the command line:
-	a. If the character is a space or tab:
-		- If the flag is 0 (outside quotes) and the current token is not empty:
-			- Add the current token to the list of tokens.
-			- Reset the current token to an empty string.
-		- If the flag is 1 or 2 (within quotes):
-			- Append the space or tab character to the current token.
-	b. If the character is a double quote (") and the flag is 0:
-		- Set the flag to 1 (within double quotes).
-	c. If the character is a single quote (') and the flag is 0:
-		- Set the flag to 2 (within single quotes).
-	d. If the character is a backslash (\) and the flag is not 2 (not within single quotes):
-		- If the next character exists, append it to the current token and skip the next iteration.
-	e. If none of the above conditions are met:
-		- Append the character to the current token.
+    a. If the character is a space or tab:
+        - If the flag is 0 (outside quotes) and the current token is not empty:
+            - Add the current token to the list of tokens.
+            - Reset the current token to an empty string.
+        - If the flag is 1 or 2 (within quotes):
+            - Append the space or tab character to the current token.
+    b. If the character is a double quote (") and the flag is 0:
+        - Set the flag to 1 (within double quotes).
+    c. If the character is a single quote (') and the flag is 0:
+        - Set the flag to 2 (within single quotes).
+    d. If the character is a backslash (\) and the flag is not 2 (not within single quotes):
+        - If the next character exists, append it to the current token and skip the next iteration.
+    e. If none of the above conditions are met:
+        - Append the character to the current token.
 5. If the current token is not empty:
-	- Add the current token to the list of tokens.
+    - Add the current token to the list of tokens.
 6. Return the list of tokens.
-
-Ici on a donc décidé de partir sur une liste chaînée:
+```
+This plan is a good base line but some parts needed refining and some special test cases made us modify steps.
+We decided to use a linked list:
 ```c
 typedef struct s_token
 {
-	char			*content;
-	int				type;
-	struct s_token	*next;
-}		t_token;
+    char            *content;
+    int             type;
+    struct s_token  *next;
+}       t_token;
 ```
-pour avoir qqch qui ressemblera à ça:
+to have something that looks like this:
 ```sh
-> ec'ho' nana && (cd dossier || echo yum)
+> ec'ho' nana && (cd folder || echo yum)
 # gives
-> [echo, nana, &&, (, cd, dossier, ||, echo, yum, )]
+> [echo, nana, &&, (, cd, folder, ||, echo, yum, )]
 ```
-en gros chaque chose séparée par un espace est un élement de la liste.
-----------------------------------------------------------------------------
-```sh
-Peut-etre prendre toute la chaine et appeler une fonction qui va renvoyer string analyse sans guillements ni apostrophes.
+basically, each thing separated by a space is an element of the list.
 
-Apres cela tokenizer et creer une liste chainee du type t_token
+The goal was to take the entire string and call a function that will return the string analyzed without quotes or apostrophes.
+After that, tokenize and create a linked list of type t_token.
+We also created a function check_com whose goal was to analyze if there was any mistake detected in the syntax at this point.
 
-Creer fonction check_com qui regarde si tt les commandes obtenues sont valides et leur arguments (?)
-```
-----------------------------------------------------------------------------
-Dans le cas spécifique où l'on a:
+There were also some specific cases to handle like:
 ```
 ech"o y"n
 bash: echo yn: command not found
 ```
-l'espace n'est ici pas le séparateur !
-En effet entre quotes, il faut juste tout prendre et une fois que l'on sort des quotes on reprend un comportement normal.
-Attention aussi à ça:
+the space is not the separator here! Indeed, between quotes, we need to take everything and once out of quotes, we resume normal behavior. Also, watch out for this:
 ```
 ech"o " yn
 ```
-en effet ça ne marche pas car on envoie echo[espace] à bash ce qui n'est pas une commande qui existe.
+this doesn't work because we are sending echo[space] to bash which is not a valid command.
 
-On a donc maintenant chaque élement dans notre liste avec leur type, on peut par exemple dire que:
+Now we have each element in our list with their type, which we identified simply with if statments (switch/case was not allowed in the subject of our project):
 ```c
-
-int	is_op(char *line, int i)
+int is_op(char *line, int i)
 {
-	if (ft_strncmp(line + i, "&&", 2) == 0)
-		return (1);
-	else if (ft_strncmp(line + i, "||", 2) == 0)
-		return (2);
-	return (0);
+    if (ft_strncmp(line + i, "&&", 2) == 0)
+        return (1);
+    else if (ft_strncmp(line + i, "||", 2) == 0)
+        return (2);
+    return (0);
 }
 
-int	is_fb(char *line, int i)
+int is_fb(char *line, int i)
 {
-	else if (ft_strncmp(line + i, "|", 1) == 0)
-		return (3);
-  	else if (ft_strncmp(line + i, ">>", 2) == 0)
-		return (6);
-	else if (ft_strncmp(line + i, "<<", 2) == 0)
-		return (7);
-	else if (ft_strncmp(line + i, ">", 1) == 0)
-		return (4);
-	else if (ft_strncmp(line + i, "<", 1) == 0)
-		return (5);
-	else if (ft_strncmp(line + i, "(", 1) == 0)
-		return (8);
-	else if (ft_strncmp(line + i, ")", 1) == 0)
-		return (9);
-	else if (ft_strncmp(line + i, " ", 1) == 0)
-		return (10);
-	return (0);
+    else if (ft_strncmp(line + i, "|", 1) == 0)
+        return (3);
+    else if (ft_strncmp(line + i, ">>", 2) == 0)
+        return (6);
+    else if (ft_strncmp(line + i, "<<", 2) == 0)
+        return (7);
+    else if (ft_strncmp(line + i, ">", 1) == 0)
+        return (4);
+    else if (ft_strncmp(line + i, "<", 1) == 0)
+        return (5);
+    else if (ft_strncmp(line + i, "(", 1) == 0)
+        return (8);
+    else if (ft_strncmp(line + i, ")", 1) == 0)
+        return (9);
+    else if (ft_strncmp(line + i, " ", 1) == 0)
+        return (10);
+    return (0);
 }
 ```
 
-P. S. : avant de passer à la partie suivante, pensez à gérer les here_doc ! En effet, c'est plus facile de le faire dans le parsing que dans l'execution. 
+P.S.: Before moving to the next part, remember to handle here_doc! It’s easier to do it in the parsing phase than during execution.
 
-Eh mais alors ensuite ?
+What’s next?
 
-- Parses the tokens into simple and compound commands (see Shell Commands).
-Ici on guette. Ici on analyse, ici on cherche: les parenthesès !
-Tout d'abord, on pensait simplement refaire une nouvelle liste qui séparerait les compound commands (entre parenthèses) et les simple commands (comme echo a par exemple). Cependant, on c'est vite rendu compte que c'était assez difficilement gérable.
-Alors, on a créé des arbres binaires :D.
-Le fonctionnement de l'algo est assez simple:
-- on regarde quel type de métacharactère on a : <, <<, >, >>, &&, || ou (, )
-- si on a une parenthèse, on va chercher la dernière parenthèse puis lancer un appel récursif sur ce nouveau bout de commande
-- si on a des parenthèses dans des parenthèses on va relancer un appel récursif
-- ces appels récursifs vont créer des "subtree" qui vont ensuite être ajoutés à l'arbre principal.
+- _Parses the tokens into simple and compound commands (see Shell Commands)._
+Here we watch. Here we analyze, here we look for: parentheses! Initially, we thought of creating a new list that would separate compound commands (within parentheses) and simple commands (like echo a for example). However, we quickly realized that this was quite difficult to manage. So, we created binary trees :D.
 
-Ce bout de code peut être trouvé dans /parsing/build_ast.c et /utils/ast_utils.c
-Finalement pour cette commande :
+The algo's operation is quite simple:
+- Check the type of metacharacter: <, <<, >, >>, &&, || or (, )
+- If there is a parenthesis, find the last parenthesis and make a recursive call on this new command segment
+- If there are parentheses within parentheses, make another recursive call
+- These recursive calls will create "subtrees" that will then be added to the main tree.
+
+This code can be found in /parsing/build_ast.c and /utils/ast_utils.c. Ultimately, for this command:
 ```sh
 > (1 && 2) || ((3 || 4 || 5) && (6 && 7)) && 8
 > [1, &&, 2] -> [||] -> [ [3, ||, 4, ||, 5] -> [&&] -> [6, &&, 7] ] -> [&&] -> [8]
 ```
-On aura un arbre qui ressemble à ça :
+We’ll have a tree that looks like this:
 ```
-	||
-        /  \
-      &&    &&
-     /  \   / \
-    1    2 ||   &&
-         / | \ / \
-        3  4  5 6  7
-```
-
-- Performs the various shell expansions (see Shell Expansions), breaking the expanded tokens into lists of filenames (see Filename Expansion) and commands and arguments.
-```
-#chatjpp
-Perform variable expansion:
-The shell performs variable expansion for the environment variables used in the command ($INPUT_FILE, $OUTPUT_FILE, $LOG_FILE), replacing them with their respective values.
+    ||
+   /  \
+  &&    &&
+ /  \   / \
+1    2 ||   &&
+     / | \ / \
+    3  4  5 6  7
 ```
 
-On a ensuite décidé de faire les shell expansions biennnnnn avant au début de la tokenization. Ça allait beaucoup mieux avec notre code jusque là (et puis ce n'est pas très pratique de le faire dans un arbre).
+Next, we perform shell expansions early during tokenization. This fit much better with our code so far (and it’s not very practical to do it in a tree).
 
-Redirection time, comme ce minishell qui me donne envie de me rediriger en cap patisserie+plomberie:
-- Performs any necessary redirections (see Redirections) and removes the redirection operators and their operands from the argument list.
+Redirection time, like this minishell makes me want to redirect myself to a pastry+plumbing career:
+- _Performs any necessary redirections (see Redirections) and removes the redirection operators and their operands from the argument list._
 
-Ici on fait nos petits dup2 j'imagine, on prend les piti fichier et on remplace les piti files descriptor par les piti fichier <3
-- Executes the command (see Executing Commands).
-Optionally waits for the command to complete and collects its exit status (see Exit Status).
+Here we do our little dup2, we take the little files and replace the little file descriptors with the little files <3
 
-Ça, c'est dans /exec/exec_ast.c comme quand on a construit l'abre, on va maintenant le parcourir et appliquer différentes fonctions selon les noeuds differents. Puis finalement executer les feuilles.
+- _Executes the command (see Executing Commands). Optionally waits for the command to complete and collects its exit status (see Exit Status)._ 
 
-On gère aussi les builtins au niveau des feuilles, avec quelques vérifications :
-- Dans export, verifier que chaque variable qu'on rajoute respecte la specification posix:
+This is in /exec/exec_ast.c. Just as we built the tree, we now traverse it and apply different functions according to different nodes, and finally execute the leaves.
+
+We also handle builtins at the leaf level, with some checks:
+- In export, ensure each added variable respects POSIX specifications:
 environment variable names must consist solely of uppercase letters, digits, and underscores (_), and they must not start with a digit.
 
-Finalement on a géré les signaux, le fichier est dans /shell/signal.c
+Finally, we handled signals, the file is in /shell/signal.c.
 
-A la fin du projet, nous allons aussi inclure certains tests qui semblent un peu contre intuitifs (update : ils sont maintenant dans tests.c :)). A bientôt :D
+At the end of the project, we will also include some tests that seem a bit counterintuitive (update: they are now in tests.txt :)).
+
+### Run the program
+
+Simply do:
+```bash
+make
+./minishell
+```
+And type commands !
+
+### Additional Notes for Testing
+For testing, we used a Python script named `test_commands.py`. To ensure proper functionality with readline, add the following line to the script:
+```python
+rl_outstream = stderr
+```
+and then execute as you would your usual python script.
+```python
+python3 test_commands.py
+```
+If you have additional tests, we would be happy to add them to our small database.
 	
